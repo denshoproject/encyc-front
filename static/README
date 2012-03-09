@@ -1,0 +1,2 @@
+Project-wide static files.
+Files specific to an app should go in the app's static/ directory.

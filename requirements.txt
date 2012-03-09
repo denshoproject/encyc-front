@@ -1,0 +1,13 @@
+# Third-party libs and Django apps used by front
+# Install using pip: http://pip.openplans.org/
+# File format: http://pip.openplans.org/requirement-format.html
+
+Django
+django-debug-toolbar
+iPython
+
+# wikiprox
+beautifulsoup4
+lxml
+requests
+simplejson

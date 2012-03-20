@@ -3,15 +3,30 @@
 <head>
   <link href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css" rel="stylesheet" />
   <link href="http://twitter.github.com/bootstrap/assets/css/bootstrap-responsive.css" rel="stylesheet" />
+  <style>
+    .navbar {
+      background: #333;
+      padding-left: 10px;
+    }
+  </style>
 </head>
 <body>
 
-<div class="container">
+<div class="navbar">
+  <div class="navbar=inner">
+    <div class="container">
+<a class="brand" href="/">Densho Test Wiki</a>
+<ul class="nav">
+  <li><a href="/">Home</a>
+  <li class="active"><a href="#">{{ title }}</a></li>
+</li>
+</ul>
+    </div><!-- .container -->
+  </div><!-- .navbar-inner -->
+</div><!-- .navbar -->
 
-<h2>
-<a href="/" class="btn btn-primary">Home</a>
-Densho Test Wiki
-</h2>
+
+<div class="container">
 
 {% block contents %}{% endblock contents %}
 

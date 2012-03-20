@@ -1,3 +1,6 @@
-<h1 id="firstHeading" class="firstHeading">{{ title }}</h1>
+{% extends "base.html" %}
 
+{% block contents %}
+<h1 id="firstHeading" class="firstHeading">{{ title }}</h1>
 {{ bodycontent|safe }}
+{% endblock contents %}

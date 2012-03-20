@@ -30,6 +30,7 @@ def page(request, page, template_name='mediawiki/page.html'):
     
     tsoup = BeautifulSoup(r.text, parse_only=SoupStrainer('title'))
     title = tsoup.title.string.strip()
+    title = title.replace(' - Densho Test Wiki', '')
     soup = BeautifulSoup(
         r.text,
         parse_only=SoupStrainer('div', attrs={'class':'mw-content-ltr'}))

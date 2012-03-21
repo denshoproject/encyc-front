@@ -4,10 +4,12 @@
 
 Django
 django-debug-toolbar
+gunicorn
 iPython
 
 # wikiprox
 beautifulsoup4
+# sudo apt-get install libxml2 libxslt1.1 libxslt1-dev python-dev
 lxml
 requests
 simplejson

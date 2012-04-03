@@ -3,7 +3,7 @@
 # File format: http://pip.openplans.org/requirement-format.html
 
 #Django
--e svn+https://code.djangoproject.com/browser/django/tags/releases/1.4#egg=Django
+-e svn+http://code.djangoproject.com/browser/django/tags/releases/1.4#egg=Django
 
 django-debug-toolbar
 gunicorn

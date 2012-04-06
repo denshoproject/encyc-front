@@ -16,7 +16,7 @@ from django.views.decorators.http import require_http_methods
 
 
 @require_http_methods(['GET',])
-def page(request, page, template_name='mediawiki/page.html'):
+def page(request, page, template_name='wikiprox/page.html'):
     """
     Alternatives to BeautifulSoup:
     - basic string-split

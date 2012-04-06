@@ -14,6 +14,7 @@ from django.views.decorators.http import require_http_methods
 
 
 
+
 @require_http_methods(['GET',])
 def page(request, page, template_name='mediawiki/page.html'):
     """
@@ -53,7 +54,7 @@ def page(request, page, template_name='mediawiki/page.html'):
         a['href'] = a['href'].replace('&redlink=1', '')
     
     return render_to_response(
-        'wikiprox/page.html', 
+        template_name,
         {'title': title,
          'bodycontent': unicode(soup),},
         context_instance=RequestContext(request)

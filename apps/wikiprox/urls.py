@@ -4,7 +4,12 @@ from wikiprox import views
 
 urlpatterns = patterns(
     '',
-    url(r'^index.php/(\w+)/$', views.page, name='wikiprox-page'),
-    url(r'^([\w -]+)/$', views.page, name='wikiprox-page'),
+    # files (tansu)
+    url(r'^index.php/File:([\w .:_-]+)/$', views.media, name='wikiprox-media'),
+    url(r'^File:([\w .:_-]+)/$', views.media, name='wikiprox-media'),
+    # pages (mediawiki)
+    url(r'^index.php/([\w .:_-]+)/$', views.page, name='wikiprox-page'),
+    url(r'^([\w .:_-]+)/$', views.page, name='wikiprox-page'),
+    #
     url(r'^$', views.index, name='wikiprox-index'),
 )

@@ -62,5 +62,25 @@ def page(request, page, template_name='mediawiki/page.html'):
 
 
 @require_http_methods(['GET',])
+def media(request, filename, template_name='wikiprox/mediafile.html'):
+    """
+    """
+    mediafile = None
+    url = '%s/imagefile/?uri=tansu/%s' % (settings.TANSU_API, filename)
+    r = requests.get(url, headers={'content-type':'application/json'})
+    if r.status_code != 200:
+        assert False
+    response = simplejson.loads(r.text)
+    if response and (response['meta']['total_count'] == 1):
+        mediafile = response['objects'][0]
+    return render_to_response(
+        template_name,
+        {'mediafile': mediafile,
+         'media_url': settings.TANSU_MEDIA_URL,},
+        context_instance=RequestContext(request)
+    )
+
+
+@require_http_methods(['GET',])
 def index(request):
     pass

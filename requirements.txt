@@ -6,6 +6,7 @@ Django
 django-debug-toolbar
 gunicorn
 iPython
+python-memcached
 
 # wikiprox
 beautifulsoup4

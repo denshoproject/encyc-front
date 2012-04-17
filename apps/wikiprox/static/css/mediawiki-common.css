@@ -1,0 +1,103 @@
+/** reduced subset of the mbox styles from enwiki, mainly for the nice boxflow **/
+table.mbox {
+	margin: 4px 10%;
+	border-collapse: collapse;
+	border: 1px solid #aaa; /* Default "notice" gray */
+	background: #f9f9f9;
+}
+table.mbox-wide {
+	margin: 4px 0;
+}
+ 
+th.mbox-text,
+td.mbox-text { 	/* The message body cell(s) */
+	border: none;
+	/* 0.9em left/right */
+	padding: 0.25em 0.9em;
+	/* Make all mboxes the same width regardless of text length */
+	width: 100%;
+}
+/* The left image cell */
+td.mbox-image {
+	border: none;
+	/* 0.9em left, 0px right */
+	padding: 2px 0 2px 0.9em;
+	text-align: center;
+}
+/* The right image cell */
+td.mbox-imageright {
+	border: none;
+	/* 0px left, 0.9em right */
+	padding: 2px 0.9em 2px 0;
+	text-align: center;
+}
+/* An empty narrow cell */
+td.mbox-empty-cell {
+	border: none;
+	padding: 0px;
+	width: 1px;
+}
+ 
+/**
+ * These mbox-small classes must be placed after all other
+ * ambox/tmbox/ombox etc classes. "body.mediawiki" is so
+ * they override "table.ambox + table.ambox" above.
+ */
+/* For the "small=yes" option. */
+body.mediawiki table.mbox-small {
+	clear: right;
+	float: right;
+	margin: 4px 0 4px 1em;
+	width: 238px;
+	font-size: 88%;
+	line-height: 1.25em;
+}
+/* For the "small=left" option. */
+body.mediawiki table.mbox-small-left {
+	margin: 4px 1em 4px 0;
+	width: 238px;
+	border-collapse: collapse;
+	font-size: 88%;
+	line-height: 1.25em;
+}
+ 
+/**
+ * These are the same colours as the enwiki
+ * 'cmbox' styles; just with different names.
+ */
+table.mbox-critical {
+	/* Red */
+	border: 4px solid #b22222;
+	/* Pink */
+	background: #FFDBDB;
+}
+table.mbox-important {
+	/* Red */
+	background: #FFDBDB;
+}
+table.mbox-warning {
+	/* Orange */
+	background: #FFE7CE;
+}
+table.mbox-caution {
+	/* Yellow */
+	background: #FFF9DB;
+}
+table.mbox-notice {
+	/* Blue */
+	background: #D8E8FF;
+}
+table.mbox-move {
+	/* Purple */
+	background: #E4D8FF;
+}
+table.mbox-protection {
+	/* Gray-gold */
+	background: #EFEFE1;
+}
+table.mbox-license {
+	/* Dark gray */
+	border: 3px solid #88a;
+	/* Light gray */
+	background: #f7f8ff;
+}

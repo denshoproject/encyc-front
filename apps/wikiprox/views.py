@@ -46,6 +46,10 @@ def page(request, page, template_name='wikiprox/page.html'):
     for e in soup.find_all('span', attrs={'class':'editsection'}):
         e.decompose()
     
+    # rewrite /mediawiki/index.php/... URLs to /wiki/...
+    for a in soup.find_all('a', href=re.compile('/mediawiki/index.php')):
+        a['href'] = a['href'].replace('/mediawiki/index.php', '/wiki')
+    
     # rewrite new-page links
     # ex: http://.../mediawiki/index.php?title=Nisei&amp;action=edit&amp;redlink=1"
     for a in soup.find_all('a', href=re.compile('action=edit')):

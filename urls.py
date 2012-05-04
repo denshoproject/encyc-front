@@ -6,8 +6,8 @@ from django.http import HttpResponseRedirect
 
 urlpatterns = patterns(
     '',
-    url(r'^mediawiki/', include('wikiprox.urls')),
+    #url(r'^mediawiki/', include('wikiprox.urls')),
     url(r'^wiki/', include('wikiprox.urls')),
     #url(r'^admin/', include(admin.site.urls)),
-    url(r'^$', lambda x: HttpResponseRedirect('/mediawiki/index.php/Main_Page')),
+    url(r'^$', lambda x: HttpResponseRedirect('/wiki/Main_Page')),
 )

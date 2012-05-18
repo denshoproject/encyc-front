@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup, SoupStrainer, Comment
 import requests
 
 from django.conf import settings
-from django.template import Template, Context
+from django.template import loader, Context
 
 
 def parse_mediawiki_title(text):
@@ -108,20 +108,6 @@ def find_primary_sources(soup):
             sources[s['encyclopedia_id']] = s
     return sources
 
-IMAGE_TEMPLATE = """
-<div class="thumbnail" style="border:4px solid green;">
-  <a href="{{ href }}">
-    <img src="{{ MEDIA_URL }}{{ src }}"
-         alt="{{ caption }} {{ courtesy }}"/>
-  </a>
-  <br/>
-  <span class="caption">
-    {{ caption }}
-    {{ courtesy }}
-  </span>
-</div>
-"""
-
 def format_images(soup, sources):
     """Rewrite image HTML so images appear in pop-up lightbox with metadata.
     
@@ -133,6 +119,9 @@ def format_images(soup, sources):
     see http://192.168.0.13/redmine/attachments/4/Encyclopedia-PrimarySourceDraftFlow.pdf
     """
     # all the <a><img>s
+    num_images = 0
+    for a in soup.find_all('a', attrs={'class':'image'}):
+        num_images = num_images + 1
     for a in soup.find_all('a', attrs={'class':'image'}):
         encyclopedia_id = extract_encyclopedia_id(a.img['src'])
         if encyclopedia_id and (encyclopedia_id in sources.keys()):
@@ -144,10 +133,11 @@ def format_images(soup, sources):
                 src = source['original']
             src_chopped = src[src.index('sources'):]
             # render
-            t = Template(IMAGE_TEMPLATE)
+            t = loader.get_template('wikiprox/image.html')
             c = Context({'MEDIA_URL': settings.TANSU_MEDIA_URL,
                          'href': a['href'],
                          'src': src_chopped,
+                         'multiple': num_images > 1,
                          'caption': source['caption'],
                          'courtesy': source['courtesy'],})
             img = BeautifulSoup(t.render(c))

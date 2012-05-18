@@ -1,0 +1,13 @@
+<div class="primarysource">
+  <a href="{{ MEDIA_URL }}{{ src }}"
+     rel="prettyPhoto{% if multiple %}[gal]{% endif %}"
+     title="{{ caption }} {{ courtesy }} <a href='{{ href }}'>MOAR</a>">
+    <img src="{{ MEDIA_URL }}{{ src }}" />
+  </a>
+  <br/>
+  <span class="caption">
+    {{ caption }}
+    {{ courtesy }}
+    <a href="{{ href }}">MOAR</a>
+  </span>
+</div>

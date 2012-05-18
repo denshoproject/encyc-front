@@ -11,8 +11,10 @@
       padding-left: 10px;
     }
   </style>
+  {% block css %}{% endblock css %}
 </head>
 <body>
+
 
 <div class="navbar">
   <div class="navbar=inner">
@@ -30,9 +32,15 @@
 
 <div class="container">
 
+
 {% block contents %}{% endblock contents %}
 
+
 </div><!-- .container -->
+
+
+{% block javascript %}{% endblock javascript %}
+
 
 </body>
 </html>

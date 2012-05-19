@@ -25,8 +25,7 @@ def parse_mediawiki_text(text):
     soup = rewrite_mediawiki_urls(soup)
     soup = rewrite_newpage_links(soup)
     sources = find_primary_sources(soup)
-    soup = format_images(soup, sources)
-    soup = format_video(soup, sources)
+    soup = format_primary_sources(soup, sources)
     return unicode(soup)
 
 
@@ -108,44 +107,58 @@ def find_primary_sources(soup):
             sources[s['encyclopedia_id']] = s
     return sources
 
-def format_images(soup, sources):
-    """Rewrite image HTML so images appear in pop-up lightbox with metadata.
+def format_primary_sources(soup, sources):
+    """Rewrite image HTML so primary sources appear in pop-up lightbox with metadata.
     
-    - Small, fixed-size thumbnail image
-    - Caption text (abbreviated?)
-    - Courtesy line
-    - Lightbox pop-up code
-    - Link to primary source db or digital repository
     see http://192.168.0.13/redmine/attachments/4/Encyclopedia-PrimarySourceDraftFlow.pdf
     """
     # all the <a><img>s
-    num_images = 0
+    num_sources = 0
     for a in soup.find_all('a', attrs={'class':'image'}):
-        num_images = num_images + 1
+        num_sources = num_sources + 1
     for a in soup.find_all('a', attrs={'class':'image'}):
         encyclopedia_id = extract_encyclopedia_id(a.img['src'])
         if encyclopedia_id and (encyclopedia_id in sources.keys()):
             source = sources[encyclopedia_id]
-            # img src
-            if source.get('display',None):
-                src = source['display']
-            elif source.get('original',None):
-                src = source['original']
-            src_chopped = src[src.index('sources'):]
+            
+            template = 'wikiprox/generic.html'
+            context = {'MEDIA_URL': settings.TANSU_MEDIA_URL,
+                       'href': a['href'],
+                       'caption': source['caption'],
+                       'courtesy': source['courtesy'],
+                       'multiple': num_sources > 1,}
+            
+            if source['media_format'] == 'video':
+                template = 'wikiprox/video.html'
+                if source.get('display',None):
+                    context['keyframe'] = source['display']
+                if source.get('streaming_url',None):
+                    context['streaming_url'] = source['streaming_url']
+                
+            elif source['media_format'] == 'document':
+                template = 'wikiprox/document.html'
+                # img src
+                if source.get('display',None):
+                    src = source['display']
+                    src_chopped = src[src.index('sources'):]
+                    context['src'] = src_chopped
+                elif source.get('original',None):
+                    context['src'] = '%simg/icon-document.png' % settings.MEDIA_URL
+                
+            elif source['media_format'] == 'image':
+                template = 'wikiprox/image.html'
+                # img src
+                if source.get('display',None):
+                    src = source['display']
+                elif source.get('original',None):
+                    src = source['original']
+                src_chopped = src[src.index('sources'):]
+                context['src'] = src_chopped
+                
             # render
-            t = loader.get_template('wikiprox/image.html')
-            c = Context({'MEDIA_URL': settings.TANSU_MEDIA_URL,
-                         'href': a['href'],
-                         'src': src_chopped,
-                         'multiple': num_images > 1,
-                         'caption': source['caption'],
-                         'courtesy': source['courtesy'],})
+            t = loader.get_template(template)
+            c = Context(context)
             img = BeautifulSoup(t.render(c))
             # insert back into page
             a.replace_with(img.body)
-    return soup
-
-def format_video(soup, sources):
-    """Rewrite image HTML so images appear in pop-up lightbox with player and metadata.
-    """
     return soup

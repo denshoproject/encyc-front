@@ -113,6 +113,7 @@ def format_primary_sources(soup, sources):
     see http://192.168.0.13/redmine/attachments/4/Encyclopedia-PrimarySourceDraftFlow.pdf
     """
     # all the <a><img>s
+    contexts = []
     num_sources = 0
     for a in soup.find_all('a', attrs={'class':'image'}):
         num_sources = num_sources + 1
@@ -120,31 +121,38 @@ def format_primary_sources(soup, sources):
         encyclopedia_id = extract_encyclopedia_id(a.img['src'])
         if encyclopedia_id and (encyclopedia_id in sources.keys()):
             source = sources[encyclopedia_id]
-            
             template = 'wikiprox/generic.html'
-            context = {'MEDIA_URL': settings.TANSU_MEDIA_URL,
-                       'href': a['href'],
-                       'caption': source['caption'],
-                       'courtesy': source['courtesy'],
-                       'multiple': num_sources > 1,}
-            
+            common = {'media_format': 'generic',
+                      'MEDIA_URL': settings.MEDIA_URL,
+                      'SOURCE_MEDIA_URL': settings.TANSU_MEDIA_URL,
+                      'href': a['href'],
+                      'caption': source['caption'],
+                      'courtesy': source['courtesy'],
+                      'multiple': num_sources > 1,}
+            specific = {}
             if source['media_format'] == 'video':
                 template = 'wikiprox/video.html'
                 if source.get('display',None):
-                    context['keyframe'] = source['display']
-                if source.get('streaming_url',None):
-                    context['streaming_url'] = source['streaming_url']
-                
+                    keyframe = source['display']
+                else:
+                    keyframe = 'img/icon-video.png'
+                specific = {
+                    'media_format': source['media_format'],
+                    'keyframe': keyframe,
+                    'streaming_url': source.get('streaming_url',None),
+                    }
             elif source['media_format'] == 'document':
                 template = 'wikiprox/document.html'
-                # img src
                 if source.get('display',None):
                     src = source['display']
-                    src_chopped = src[src.index('sources'):]
-                    context['src'] = src_chopped
                 elif source.get('original',None):
-                    context['src'] = '%simg/icon-document.png' % settings.MEDIA_URL
-                
+                    src = source['original']
+                else:
+                    src = 'img/icon-document.png'
+                specific = {
+                    'media_format': source['media_format'],
+                    'src': src,
+                    }
             elif source['media_format'] == 'image':
                 template = 'wikiprox/image.html'
                 # img src
@@ -152,9 +160,14 @@ def format_primary_sources(soup, sources):
                     src = source['display']
                 elif source.get('original',None):
                     src = source['original']
-                src_chopped = src[src.index('sources'):]
-                context['src'] = src_chopped
-                
+                else:
+                    src = 'img/icon-image.png'
+                specific = {
+                    'media_format': source['media_format'],
+                    'src': src,
+                    }
+            context = dict(common.items() + specific.items())
+            contexts.append(context)
             # render
             t = loader.get_template(template)
             c = Context(context)

@@ -1,8 +1,9 @@
 <div class="primarysource document">
-  <a href="{{ href }}"
-     rel="prettyPhoto{% if multiple %}[gal]{% endif %}"
-     title="{{ caption }} {{ courtesy }} <a href='{{ href }}'>MOAR</a>">
-    <img src="{{ MEDIA_URL }}{{ src }}" />
+  <a href="{{ src }}"
+     class="lightview"
+     data-lightview-caption="{{ caption }} {{ courtesy }} <a href='{{ href }}'>MOAR</a>"
+     data-lightview-group="mixed">
+    <img src="{{ src }}" />
   </a>
   <br/>
   <span class="caption">

@@ -5,36 +5,27 @@
 
 
 {% block contents %}
+
 <h1 id="firstHeading" class="firstHeading">{{ title }}</h1>
 {{ bodycontent|safe }}
 {% endblock contents %}
 
 
 {% block css %}
-<link rel="stylesheet" href="{{ MEDIA_URL }}prettyPhoto/css/prettyPhoto.css" type="text/css" media="screen" title="prettyPhoto main stylesheet" charset="utf-8" />
-<link rel="stylesheet" href="{{ STATIC_URL }}css/wikiprox.css" />
+  <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}/lightview-3.1.4/css/lightview/lightview.css"/>
+  <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/wikiprox.css" />
 {% endblock css %}
 
 
 {% block javascript %}
-<script src="{{ MEDIA_URL }}prettyPhoto/js/jquery-1.6.1.min.js" type="text/javascript"></script>
-<script src="{{ MEDIA_URL }}prettyPhoto/js/jquery.prettyPhoto.js" type="text/javascript" charset="utf-8"></script>
-<script type="text/javascript" charset="utf-8">
-    $(document).ready(function(){
-        $("a[rel^='prettyPhoto']").prettyPhoto({
-        	show_title: false,
-			allow_resize: true, /* Resize the photos bigger than viewport. true/false */
-			default_width: 500,
-			default_height: 350,
-			theme: 'light_square', /* light_rounded / dark_rounded /  / dark_square / facebook */
-			horizontal_padding: 20, /* The padding on each side of the picture */
-			autoplay: false,
-			overlay_gallery: true, /* If set to true, a gallery will overlay the fullscreen image on mouse over */
-			keyboard_shortcuts: true, /* Set to false if you open forms inside prettyPhoto */
-			ie6_fallback: true,
-			custom_markup: '',
-			social_tools: false
-		});
-	});
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}/jwplayer-5.9/jwplayer.js"></script>
+<!--[if lt IE 9]>
+<script type="text/javascript" src="{{ MEDIA_URL }}/lightview-3.1.4/js/excanvas/excanvas.js"></script>
+<![endif]-->
+<script type="text/javascript" src="{{ MEDIA_URL }}/lightview-3.1.4/js/spinners/spinners.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}/lightview-3.1.4/js/lightview/lightview.js"></script>
+<script type='text/javascript'>
+  Lightview.setDefaultSkin('mac');
 </script>
 {% endblock javascript %}

@@ -1,5 +1,23 @@
 <div class="primarysource video">
-
-
-<a href="{{ streaming_url }}" rel="prettyPhoto[flash]" title="Flash 10 demo"><img src="{{ keyframe }}" alt="Flash 10 demo" width="60" /></a>
+  <a href="{{ MEDIA_URL }}jwplayer-5.9/player.swf"
+     class="lightview"
+     data-lightview-type="flash"
+     data-lightview-options="
+         width:720, height:406,
+         keyboard: { esc: false },
+         flashvars: {
+             file:'{{ streaming_url }}',
+             image:'{{ keyframe }}',
+             autostart:false
+         }"
+     data-lightview-caption="{{ caption }} {{ courtesy }} <a href='{{ href }}'>MOAR</a>"
+     data-lightview-group="mixed">
+    <img src="{{ keyframe }}" />
+  </a>
+  <br/>
+  <span class="caption">
+    {{ caption }}
+    {{ courtesy }}
+    <a href="{{ href }}">MOAR</a>
+  </span>
 </div>

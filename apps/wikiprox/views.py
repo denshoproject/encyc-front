@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 import json
+import os
 import re
 
 from bs4 import BeautifulSoup, SoupStrainer
@@ -33,7 +34,6 @@ def page(request, page, template_name='wikiprox/page.html'):
         context_instance=RequestContext(request)
     )
 
-
 @require_http_methods(['GET',])
 def media(request, filename, template_name='wikiprox/mediafile.html'):
     """
@@ -53,6 +53,24 @@ def media(request, filename, template_name='wikiprox/mediafile.html'):
         context_instance=RequestContext(request)
     )
 
+@require_http_methods(['GET',])
+def source(request, filename, template_name='wikiprox/source.html'):
+    """
+    """
+    encyclopedia_id,ext = os.path.splitext(filename)
+    url = '%s/primarysource/?encyclopedia_id=%s' % (settings.TANSU_API, encyclopedia_id)
+    r = requests.get(url, headers={'content-type':'application/json'})
+    if r.status_code != 200:
+        assert False
+    response = json.loads(r.text)
+    if response and (response['meta']['total_count'] == 1):
+        source = response['objects'][0]
+    return render_to_response(
+        template_name,
+        {'source': source,
+         'media_url': settings.TANSU_MEDIA_URL,},
+        context_instance=RequestContext(request)
+    )
 
 @require_http_methods(['GET',])
 def index(request):

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}{{ source.title }}{% endblock %}
+
+{% block contents %}
+<h1 id="firstHeading" class="firstHeading">{{ source.title }}</h1>
+<p>
+<img src="{{ media_url }}{{ source.original }}" /><br/>
+{{ media_url }}{{ source.original }}<br/>
+{{ source.image }}<br/>
+</p>
+{{ source.description|safe|linebreaks }}
+<pre>
+{{ source }}
+</pre>
+{% endblock contents %}

@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.conf.urls.defaults import patterns, include, url
 from django.http import HttpResponseRedirect
 
@@ -9,5 +10,5 @@ urlpatterns = patterns(
     #url(r'^mediawiki/', include('wikiprox.urls')),
     url(r'^wiki/', include('wikiprox.urls')),
     #url(r'^admin/', include(admin.site.urls)),
-    url(r'^$', lambda x: HttpResponseRedirect('/wiki/Main_Page')),
+    url(r'^$', lambda x: HttpResponseRedirect('/wiki/%s' % settings.WIKIPROX_MEDIAWIKI_DEFAULT_PAGE)),
 )

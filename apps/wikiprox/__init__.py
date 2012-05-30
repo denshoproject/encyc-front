@@ -24,6 +24,7 @@ def parse_mediawiki_text(text):
     soup = remove_edit_links(soup)
     soup = rewrite_mediawiki_urls(soup)
     soup = rewrite_newpage_links(soup)
+    soup = rewrite_prevnext_links(soup)
     sources = find_primary_sources(soup)
     soup = format_primary_sources(soup, sources)
     return unicode(soup)
@@ -63,6 +64,19 @@ def rewrite_newpage_links(soup):
         a['href'] = a['href'].replace('?title=', '/')
         a['href'] = a['href'].replace('&action=edit', '')
         a['href'] = a['href'].replace('&redlink=1', '')
+    return soup
+
+def rewrite_prevnext_links(soup):
+    """Rewrites previous/next links
+    
+    ex: http://.../mediawiki/index.php?title=Category:Pages_Needing_Primary_Sources&pagefrom=Mary+Oyama+Mittwer
+    """
+    for a in soup.find_all('a', href=re.compile('pagefrom=')):
+        a['href'] = a['href'].replace('?title=', '/')
+        a['href'] = a['href'].replace('&pagefrom=', '?pagefrom=')
+    for a in soup.find_all('a', href=re.compile('pageuntil=')):
+        a['href'] = a['href'].replace('?title=', '/')
+        a['href'] = a['href'].replace('&pageuntil=', '?pageuntil=')
     return soup
 
 def extract_encyclopedia_id(uri):

@@ -24,6 +24,11 @@ def page(request, page, template_name='wikiprox/page.html'):
     - regex
     """
     url = '%s/%s' % (settings.WIKIPROX_MEDIAWIKI_HTML, page)
+    if request.GET.get('pagefrom', None):
+        url = '?'.join([url, 'pagefrom=%s' % request.GET['pagefrom']])
+    elif request.GET.get('pageuntil', None):
+        url = '?'.join([url, 'pageuntil=%s' % request.GET['pageuntil']])
+    # request
     r = requests.get(url)
     if r.status_code != 200:
         assert False

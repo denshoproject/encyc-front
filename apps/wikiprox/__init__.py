@@ -150,10 +150,16 @@ def format_primary_sources(soup, sources):
                     keyframe = source['display']
                 else:
                     keyframe = 'img/icon-video.png'
+                xy = [640,480]
+                if source.get('aspect_ratio',None) and (source['aspect_ratio'] == 'hd'):
+                    xy = [640,360]
+                # add 20px to vertical for JWplayer
+                xy[1] = xy[1] + 20
                 specific = {
                     'media_format': source['media_format'],
                     'keyframe': keyframe,
                     'streaming_url': source.get('streaming_url',None),
+                    'xy': xy,
                     }
             elif source['media_format'] == 'document':
                 template = 'wikiprox/document.html'

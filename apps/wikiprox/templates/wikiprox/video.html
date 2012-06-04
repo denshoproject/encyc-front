@@ -3,11 +3,12 @@
      class="lightview"
      data-lightview-type="flash"
      data-lightview-options="
-         width:720, height:406,
+         width:{{ xy.0 }}, height:{{ xy.1 }},
          keyboard: { esc: false },
          flashvars: {
              file:'{{ streaming_url }}',
              image:'{{ keyframe }}',
+             width:{{ xy.0 }}, height:{{ xy.1 }},
              autostart:false
          }"
      data-lightview-caption="{{ caption }} {{ courtesy }} <a href='{{ href }}'>MOAR</a>"

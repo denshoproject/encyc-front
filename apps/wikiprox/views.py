@@ -73,7 +73,7 @@ def source(request, filename, template_name='wikiprox/source.html'):
     return render_to_response(
         template_name,
         {'source': source,
-         'media_url': settings.TANSU_MEDIA_URL,},
+         'SOURCES_BASE': settings.SOURCES_BASE,},
         context_instance=RequestContext(request)
     )
 

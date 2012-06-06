@@ -136,7 +136,7 @@ def format_primary_sources(soup, sources):
         if encyclopedia_id and (encyclopedia_id in sources.keys()):
             source = sources[encyclopedia_id]
             template = 'wikiprox/generic.html'
-            common = {'media_format': 'generic',
+            common = {'media_format': source['media_format'],
                       'MEDIA_URL': settings.MEDIA_URL,
                       'SOURCE_MEDIA_URL': settings.TANSU_MEDIA_URL,
                       'href': a['href'],
@@ -144,47 +144,67 @@ def format_primary_sources(soup, sources):
                       'courtesy': source['courtesy'],
                       'multiple': num_sources > 1,}
             specific = {}
+            # video
             if source['media_format'] == 'video':
                 template = 'wikiprox/video.html'
-                if source.get('display',None):
-                    keyframe = source['display']
+                if source.get('thumbnail_sm',None):
+                    thumb_sm = source['thumbnail_sm']
+                    thumb_lg = source['thumbnail_lg']
+                elif source.get('display',None):
+                    thumb_sm = source['display']
+                    thumb_lg = source['display']
                 else:
-                    keyframe = 'img/icon-video.png'
+                    thumb_sm = 'img/icon-video.png'
+                    thumb_lg = 'img/icon-video.png'
                 xy = [640,480]
                 if source.get('aspect_ratio',None) and (source['aspect_ratio'] == 'hd'):
                     xy = [640,360]
                 # add 20px to vertical for JWplayer
                 xy[1] = xy[1] + 20
                 specific = {
-                    'media_format': source['media_format'],
-                    'keyframe': keyframe,
+                    'thumb_sm': thumb_sm,
+                    'thumb_lg': thumb_lg,
                     'streaming_url': source.get('streaming_url',None),
                     'xy': xy,
                     }
+            # document
             elif source['media_format'] == 'document':
                 template = 'wikiprox/document.html'
-                if source.get('display',None):
-                    src = source['display']
+                if source.get('thumbnail_sm',None):
+                    thumb_sm = source['thumbnail_sm']
+                    thumb_lg = source['thumbnail_lg']
+                elif source.get('display',None):
+                    thumb_sm = source['thumbnail_sm']
+                    thumb_lg = source['thumbnail_lg']
                 elif source.get('original',None):
-                    src = source['original']
+                    thumb_sm = source['original']
+                    thumb_lg = source['original']
                 else:
-                    src = 'img/icon-document.png'
+                    thumb_sm = 'img/icon-document.png'
+                    thumb_lg = 'img/icon-document.png'
                 specific = {
-                    'media_format': source['media_format'],
-                    'src': src,
+                    'thumb_sm': thumb_sm,
+                    'thumb_lg': thumb_lg,
                     }
+            # image
             elif source['media_format'] == 'image':
                 template = 'wikiprox/image.html'
                 # img src
-                if source.get('display',None):
-                    src = source['display']
+                if source.get('thumbnail_sm',None):
+                    thumb_sm = source['thumbnail_sm']
+                    thumb_lg = source['thumbnail_lg']
+                elif source.get('display',None):
+                    thumb_sm = source['display']
+                    thumb_lg = source['display']
                 elif source.get('original',None):
-                    src = source['original']
+                    thumb_sm = source['original']
+                    thumb_lg = source['original']
                 else:
-                    src = 'img/icon-image.png'
+                    thumb_sm = 'img/icon-image.png'
+                    thumb_lg = 'img/icon-image.png'
                 specific = {
-                    'media_format': source['media_format'],
-                    'src': src,
+                    'thumb_sm': thumb_sm,
+                    'thumb_lg': thumb_lg,
                     }
             context = dict(common.items() + specific.items())
             contexts.append(context)

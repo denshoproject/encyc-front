@@ -10,7 +10,7 @@
 <script type="text/javascript">
     var flashvars = {
         file: "{{ source.streaming_url }}",
-        image: "{{ source.display }}",
+        image: "{{ source.thumbnail_lg }}",
         autostart:'true'
     };
     var params = {
@@ -42,18 +42,14 @@
 
 <div id="media">
 {% if source.media_format == 'image' %}
-  {% if source.display %}
-    <img src="{{ source.display }}" />
-  {% else %}
-    <img src="{{ source.original }}" />
-  {% endif %}
+  <img src="{{ source.thumbnail_lg }}" />
+  <br/>
+  <a href="{{ source.original }}">full-size image</a>
 {% endif %}
 {% if source.media_format == 'document' %}
-  {% if source.display %}
-    <img src="{{ source.display }}" />
-  {% else %}
-    <img src="{{ source.original }}" />
-  {% endif %}
+  <img src="{{ source.thumbnail_lg }}" />
+  <br/>
+  <a href="{{ source.original }}">document</a>
 {% endif %}
 {% if source.media_format == 'video' %}
   <div id="videoplayer">

@@ -159,12 +159,20 @@ def format_primary_sources(soup, sources):
                 xy = [640,480]
                 if source.get('aspect_ratio',None) and (source['aspect_ratio'] == 'hd'):
                     xy = [640,360]
+                # remove rtmp_streamer from streaming_url
+                if source.get('streaming_url',None) and ('rtmp' in source['streaming_url']):
+                    streaming_url = source['streaming_url'].replace(settings.RTMP_STREAMER, '')
+                    rtmp_streamer = settings.RTMP_STREAMER
+                else:
+                    streaming_url = source['streaming_url']
+                    rtmp_streamer = ''
                 # add 20px to vertical for JWplayer
                 xy[1] = xy[1] + 20
                 specific = {
                     'thumb_sm': thumb_sm,
                     'thumb_lg': thumb_lg,
-                    'streaming_url': source.get('streaming_url',None),
+                    'rtmp_streamer': rtmp_streamer,
+                    'streaming_url': streaming_url,
                     'xy': xy,
                     }
             # document

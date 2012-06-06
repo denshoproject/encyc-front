@@ -6,6 +6,7 @@
          width:{{ xy.0 }}, height:{{ xy.1 }},
          keyboard: { esc: false },
          flashvars: {
+             {% if rtmp_streamer %}streamer: '{{ rtmp_streamer }}',{% endif %}
              file:'{{ streaming_url }}',
              image:'{{ thumb_lg }}',
              width:{{ xy.0 }}, height:{{ xy.1 }},

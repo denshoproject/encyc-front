@@ -70,10 +70,15 @@ def source(request, filename, template_name='wikiprox/source.html'):
     response = json.loads(r.text)
     if response and (response['meta']['total_count'] == 1):
         source = response['objects'][0]
+    rtmp_streamer = ''
+    if source.get('streaming_url',None) and ('rtmp' in source['streaming_url']):
+        source['streaming_url'] = source['streaming_url'].replace(settings.RTMP_STREAMER,'')
+        rtmp_streamer = settings.RTMP_STREAMER
     return render_to_response(
         template_name,
         {'source': source,
-         'SOURCES_BASE': settings.SOURCES_BASE,},
+         'SOURCES_BASE': settings.SOURCES_BASE,
+         'rtmp_streamer': rtmp_streamer,},
         context_instance=RequestContext(request)
     )
 

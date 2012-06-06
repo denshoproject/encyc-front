@@ -9,6 +9,7 @@
 {% block javascript %}{{ block.super }}
 <script type="text/javascript">
     var flashvars = {
+        {% if rtmp_streamer %}streamer: "{{ rtmp_streamer }}",{% endif %}
         file: "{{ source.streaming_url }}",
         image: "{{ source.thumbnail_lg }}",
         autostart:'true'

@@ -12,7 +12,7 @@
         {% if rtmp_streamer %}streamer: "{{ rtmp_streamer }}",{% endif %}
         file: "{{ source.streaming_url }}",
         image: "{{ source.thumbnail_lg }}",
-        autostart:'true'
+        autostart:'false'
     };
     var params = {
         allowfullscreen:'true',

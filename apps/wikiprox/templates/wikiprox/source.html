@@ -44,18 +44,17 @@
 <div id="media">
 {% if source.media_format == 'image' %}
   <img src="{{ source.thumbnail_lg }}" />
-  <br/>
-  <a href="{{ source.original }}">full-size image</a>
+  {% if source.original %}<br/><a href="{{ source.original }}">Download full-size version ({{ source.original_size|filesizeformat }})</a>{% endif %}
 {% endif %}
 {% if source.media_format == 'document' %}
   <img src="{{ source.thumbnail_lg }}" />
-  <br/>
-  <a href="{{ source.original }}">document</a>
+  {% if source.original %}<br/><a href="{{ source.original }}">Download full PDF ({{ source.original_size|filesizeformat }})</a>{% endif %}
 {% endif %}
 {% if source.media_format == 'video' %}
   <div id="videoplayer">
     JW Player goes here
   </div>
+  {% if source.transcript %}<br/><a href="{{ source.transcript }}" target="_transcript">Download a transcript</a>{% endif %}
 {% endif %}
 </div><!-- #media -->
 

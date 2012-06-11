@@ -31,7 +31,11 @@ def page(request, page, template_name='wikiprox/page.html'):
     # request
     r = requests.get(url)
     if r.status_code != 200:
-        assert False
+        return render_to_response(
+            'wikiprox/404.html',
+            {'title': page,},
+            context_instance=RequestContext(request)
+        )
     return render_to_response(
         template_name,
         {'title': parse_mediawiki_title(r.text),

@@ -114,11 +114,10 @@ def find_primary_sources(soup):
             eid_args.append('encyclopedia_id__in=%s' % eid)
         url = '%s/primarysource/?%s' % (settings.TANSU_API, '&'.join(eid_args))
         r = requests.get(url, headers={'content-type':'application/json'})
-        if r.status_code != 200:
-            assert False
-        response = json.loads(r.text)
-        for s in response['objects']:
-            sources[s['encyclopedia_id']] = s
+        if r.status_code == 200:
+            response = json.loads(r.text)
+            for s in response['objects']:
+                sources[s['encyclopedia_id']] = s
     return sources
 
 def format_primary_sources(soup, sources):

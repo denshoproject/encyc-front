@@ -81,7 +81,3 @@ def source(request, filename, template_name='wikiprox/source.html'):
          'rtmp_streamer': rtmp_streamer,},
         context_instance=RequestContext(request)
     )
-
-@require_http_methods(['GET',])
-def index(request):
-    pass

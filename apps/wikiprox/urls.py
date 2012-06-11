@@ -1,4 +1,6 @@
+from django.conf import settings
 from django.conf.urls.defaults import *
+from django.http import HttpResponseRedirect
 
 from wikiprox import views
 
@@ -11,7 +13,7 @@ urlpatterns = patterns(
     url(r"^index.php/([\w\W]+)/$", views.page, name='wikiprox-page'),
     url(r"^([\w\W]+)/$", views.page, name='wikiprox-page'),
     #
-    url(r'^$', views.index, name='wikiprox-index'),
+    url(r'^$', lambda x: HttpResponseRedirect('/wiki/%s' % settings.WIKIPROX_MEDIAWIKI_DEFAULT_PAGE)),
 )
 
 # problematic page titles

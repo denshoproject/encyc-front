@@ -70,7 +70,11 @@ def source(request, filename, template_name='wikiprox/source.html'):
     url = '%s/primarysource/?encyclopedia_id=%s' % (settings.TANSU_API, encyclopedia_id)
     r = requests.get(url, headers={'content-type':'application/json'})
     if r.status_code != 200:
-        assert False
+        return render_to_response(
+            'wikiprox/404-source.html',
+            {'filename': filename,},
+            context_instance=RequestContext(request)
+        )
     response = json.loads(r.text)
     if response and (response['meta']['total_count'] == 1):
         source = response['objects'][0]

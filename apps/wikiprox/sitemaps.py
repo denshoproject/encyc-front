@@ -3,6 +3,7 @@ import json
 
 import requests
 
+from django.conf import settings
 from django.contrib.sitemaps import Sitemap
 
 
@@ -24,7 +25,7 @@ class MediaWikiSitemap(Sitemap):
         #
         LIMIT = 5000
         TS_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
-        url = 'http://10.0.4.15:9000/mediawiki/api.php?action=query&generator=allpages&prop=revisions&rvprop=timestamp&gaplimit=%s&format=json' % LIMIT
+        url = '%s?action=query&generator=allpages&prop=revisions&rvprop=timestamp&gaplimit=%s&format=json' % (settings.WIKIPROX_MEDIAWIKI_API, LIMIT)
         r = requests.get(url)
         if r.status_code == 200:
             response = json.loads(r.text)

@@ -45,3 +45,27 @@ class MediaWikiSitemap(Sitemap):
 
     def lastmod(self, obj):
         return obj.timestamp
+
+
+class SourceSitemap(Sitemap):
+    changefreq = "weekly"
+    priority = 0.5
+
+    def items(self):
+        pages = []
+        #
+        TS_FORMAT = '%Y-%m-%d %H:%M:%S'
+        url = '%s/primarysource/sitemap/' % settings.TANSU_API
+        r = requests.get(url, headers={'content-type':'application/json'})
+        if r.status_code == 200:
+            response = json.loads(r.text)
+            for s in response['objects']:
+                page = Page()
+                page.title = s['encyclopedia_id']
+                page.location = '/wiki/%s/' % s['wikititle']
+                page.timestamp = datetime.strptime(s['modified'], TS_FORMAT)
+                pages.append(page)
+        return pages
+    
+    def lastmod(self, obj):
+        return obj.timestamp

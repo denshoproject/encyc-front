@@ -5,9 +5,10 @@ from django.views.generic.simple import direct_to_template
 #from django.contrib import admin
 #admin.autodiscover()
 
-from wikiprox.sitemaps import MediaWikiSitemap
+from wikiprox.sitemaps import MediaWikiSitemap, SourceSitemap
 sitemaps = {
     'wiki': MediaWikiSitemap,
+    'sources': SourceSitemap,
 }
 
 urlpatterns = patterns(

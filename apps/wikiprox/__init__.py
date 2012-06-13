@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup, SoupStrainer, Comment
 import requests
 
 from django.conf import settings
+from django.core.urlresolvers import reverse
 from django.template import loader, Context
 
 
@@ -135,10 +136,14 @@ def format_primary_sources(soup, sources):
         if encyclopedia_id and (encyclopedia_id in sources.keys()):
             source = sources[encyclopedia_id]
             template = 'wikiprox/generic.html'
+            # rewrite more-info URL
+            eid,ext = os.path.splitext(a['href'].replace('/wiki/File:', ''))
+            href = reverse('wikiprox-source', kwargs={'encyclopedia_id': eid })
+            # context
             common = {'media_format': source['media_format'],
                       'MEDIA_URL': settings.MEDIA_URL,
                       'SOURCE_MEDIA_URL': settings.TANSU_MEDIA_URL,
-                      'href': a['href'],
+                      'href': href,
                       'caption': source['caption'],
                       'courtesy': source['courtesy'],
                       'multiple': num_sources > 1,}

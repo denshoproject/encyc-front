@@ -63,10 +63,9 @@ def media(request, filename, template_name='wikiprox/mediafile.html'):
     )
 
 @require_http_methods(['GET',])
-def source(request, filename, template_name='wikiprox/source.html'):
+def source(request, encyclopedia_id, template_name='wikiprox/source.html'):
     """
     """
-    encyclopedia_id,ext = os.path.splitext(filename)
     url = '%s/primarysource/?encyclopedia_id=%s' % (settings.TANSU_API, encyclopedia_id)
     r = requests.get(url, headers={'content-type':'application/json'})
     if r.status_code != 200:

@@ -50,10 +50,10 @@ def remove_edit_links(soup):
     return soup
 
 def rewrite_mediawiki_urls(soup):
-    """Rewrites /mediawiki/index.php/... URLs to /wiki/...
+    """Rewrites /mediawiki/index.php/... URLs to /...
     """
     for a in soup.find_all('a', href=re.compile('/mediawiki/index.php')):
-        a['href'] = a['href'].replace('/mediawiki/index.php', '/wiki')
+        a['href'] = a['href'].replace('/mediawiki/index.php', '')
     return soup
 
 def rewrite_newpage_links(soup):
@@ -133,12 +133,15 @@ def format_primary_sources(soup, sources):
         num_sources = num_sources + 1
     for a in soup.find_all('a', attrs={'class':'image'}):
         encyclopedia_id = extract_encyclopedia_id(a.img['src'])
+        href = None
         if encyclopedia_id and (encyclopedia_id in sources.keys()):
             source = sources[encyclopedia_id]
             template = 'wikiprox/generic.html'
             # rewrite more-info URL
-            eid,ext = os.path.splitext(a['href'].replace('/wiki/File:', ''))
+            x,y = a['href'].split('File:')
+            eid,ext = os.path.splitext(y)
             href = reverse('wikiprox-source', kwargs={'encyclopedia_id': eid })
+        if href:
             # context
             common = {'media_format': source['media_format'],
                       'MEDIA_URL': settings.MEDIA_URL,

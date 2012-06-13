@@ -17,7 +17,7 @@ from wikiprox import parse_mediawiki_title, parse_mediawiki_text
 
 
 @require_http_methods(['GET',])
-def page(request, page, template_name='wikiprox/page.html'):
+def page(request, page='index', template_name='wikiprox/page.html'):
     """
     Alternatives to BeautifulSoup:
     - basic string-split

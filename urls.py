@@ -15,9 +15,7 @@ urlpatterns = patterns(
     '',
     #url(r'^admin/', include(admin.site.urls)),
     url(r'^sitemap\.xml$', 'django.contrib.sitemaps.views.sitemap', {'sitemaps': sitemaps}),
-    url(r'^about/$', direct_to_template, {'template': 'about.html'}, name='about'),
-    url(r'^search/$', direct_to_template, {'template': 'search.html'}, name='search'),
     url(r"^sources/(?P<encyclopedia_id>[\w .:_-]+)/$", 'wikiprox.views.source', name='wikiprox-source'),
-    url(r'^wiki/', include('wikiprox.urls')),
-    url(r'^$', direct_to_template, {'template': 'index.html'}, name='index'),
+    url(r"^([\w\W]+)/$", 'wikiprox.views.page', name='wikiprox-page'),
+    url(r"^$", 'wikiprox.views.page', name='wikiprox-page'),
 )

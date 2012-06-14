@@ -12,15 +12,30 @@ from django.template import loader, Context
 
 def parse_mediawiki_title(text):
     """Parses the title of a MediaWiki page.
+    
+    Unlike most pages, "static" pages like /index, /about, and /contact
+    have their nice titles in <h1> tags.  This normally results in 2 titles
+    which is unsightly.
+    For pages with 2 <h1> tags, remove the first one.
     """
-    soup = BeautifulSoup(text, parse_only=SoupStrainer('title'))
-    return soup.title.string.strip().replace(' - Densho Test Wiki', '')
+    title = 'Densho Test Wiki'
+    h1s = re.findall('<h1', text)
+    if len(h1s) > 1:
+        soup = BeautifulSoup(
+            text, parse_only=SoupStrainer('div', attrs={'class':'mw-content-ltr'}))
+        for t in soup.find_all('span', attrs={'class':'mw-headline'}):
+            title = t.string.strip()
+    else:
+        soup = BeautifulSoup(text, parse_only=SoupStrainer('title'))
+        title = soup.title.string.strip().replace(' - Densho Test Wiki', '')
+    return title
 
 def parse_mediawiki_text(text):
     """Parses the body of a MediaWiki page.
     """
     soup = BeautifulSoup(
         text, parse_only=SoupStrainer('div', attrs={'class':'mw-content-ltr'}))
+    soup = remove_staticpage_titles(soup)
     soup = remove_comments(soup)
     soup = remove_edit_links(soup)
     soup = rewrite_mediawiki_urls(soup)
@@ -30,6 +45,19 @@ def parse_mediawiki_text(text):
     soup = format_primary_sources(soup, sources)
     return unicode(soup)
 
+
+def remove_staticpage_titles(soup):
+    """strip extra <h1> on "static" pages
+
+    "Static" pages will have an extra <h1> in the page body.
+    This is extracted by parse_mediawiki_title so now we need
+    to remove it.
+    """
+    h1s = soup.find_all('h1')
+    if h1s:
+        for h1 in soup.find_all('h1'):
+            h1.decompose()
+    return soup
 
 def remove_comments(soup):
     """TODO Removes MediaWiki comments from page text

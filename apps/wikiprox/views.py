@@ -36,12 +36,12 @@ def page(request, page='index', template_name='wikiprox/page.html'):
             {'title': page,},
             context_instance=RequestContext(request)
         )
-    if not mw_page_is_published(r.text):
-        return render_to_response(
-            'wikiprox/unpublished.html',
-            {'title': page,},
-            context_instance=RequestContext(request)
-        )
+    #if not mw_page_is_published(r.text):
+    #    return render_to_response(
+    #        'wikiprox/unpublished.html',
+    #        {'title': page,},
+    #        context_instance=RequestContext(request)
+    #    )
     return render_to_response(
         template_name,
         {'title': parse_mediawiki_title(r.text),

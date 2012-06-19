@@ -10,6 +10,15 @@ from django.core.urlresolvers import reverse
 from django.template import loader, Context
 
 
+def mw_page_is_published(text):
+    """Indicates whether MediaWiki page contains Category:Published template.
+    """
+    published = False
+    soup = BeautifulSoup(text, parse_only=SoupStrainer('div', attrs={'class':'mw-content-ltr'}))
+    for t in soup.find_all('table', attrs={'class':'published'}):
+        published = True
+    return published
+
 def parse_mediawiki_title(text):
     """Parses the title of a MediaWiki page.
     

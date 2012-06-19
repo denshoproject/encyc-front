@@ -13,7 +13,7 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.views.decorators.http import require_http_methods
 
-from wikiprox import parse_mediawiki_title, parse_mediawiki_text
+from wikiprox import parse_mediawiki_title, parse_mediawiki_text, mw_page_is_published
 
 
 @require_http_methods(['GET',])
@@ -33,6 +33,12 @@ def page(request, page='index', template_name='wikiprox/page.html'):
     if r.status_code != 200:
         return render_to_response(
             'wikiprox/404.html',
+            {'title': page,},
+            context_instance=RequestContext(request)
+        )
+    if not mw_page_is_published(r.text):
+        return render_to_response(
+            'wikiprox/unpublished.html',
             {'title': page,},
             context_instance=RequestContext(request)
         )

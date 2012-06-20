@@ -19,6 +19,18 @@ def mw_page_is_published(text):
         published = True
     return published
 
+def mw_page_lastmod(text):
+    """Retrieves timestamp of last modification.
+    """
+    lastmod = None
+    soup = BeautifulSoup(text, parse_only=SoupStrainer(id="footer-info-lastmod"))
+    return soup.find(id="footer-info-lastmod").contents[0]
+    #parts = raw.replace('.','').split('on')
+    #ts = parts[1].strip()
+    #from dateutils import parser
+    #lastmod = parser.parse(ts)
+    #return lastmod
+
 def parse_mediawiki_title(text):
     """Parses the title of a MediaWiki page.
     
@@ -27,7 +39,7 @@ def parse_mediawiki_title(text):
     which is unsightly.
     For pages with 2 <h1> tags, remove the first one.
     """
-    title = 'Densho Test Wiki'
+    title = '[no title]'
     h1s = re.findall('<h1', text)
     if len(h1s) > 1:
         soup = BeautifulSoup(
@@ -36,7 +48,7 @@ def parse_mediawiki_title(text):
             title = t.string.strip()
     else:
         soup = BeautifulSoup(text, parse_only=SoupStrainer('title'))
-        title = soup.title.string.strip().replace(' - Densho Test Wiki', '')
+        title = soup.title.string.strip().replace(settings.WIKIPROX_MEDIAWIKI_TITLE, '')
     return title
 
 def parse_mediawiki_text(text):

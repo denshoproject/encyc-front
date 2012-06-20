@@ -13,7 +13,8 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.views.decorators.http import require_http_methods
 
-from wikiprox import parse_mediawiki_title, parse_mediawiki_text, mw_page_is_published
+from wikiprox import parse_mediawiki_title, parse_mediawiki_text
+from wikiprox import mw_page_is_published, mw_page_lastmod
 
 
 @require_http_methods(['GET',])
@@ -36,16 +37,18 @@ def page(request, page='index', template_name='wikiprox/page.html'):
             {'title': page,},
             context_instance=RequestContext(request)
         )
-    #if not mw_page_is_published(r.text):
-    #    return render_to_response(
-    #        'wikiprox/unpublished.html',
-    #        {'title': page,},
-    #        context_instance=RequestContext(request)
-    #    )
+    # only allow unpublished pages on :8000
+    if (not mw_page_is_published(r.text)) and ('8000' not in request.META.get('HTTP_HOST',None)):
+        return render_to_response(
+            'wikiprox/unpublished.html',
+            {},
+            context_instance=RequestContext(request)
+        )
     return render_to_response(
         template_name,
         {'title': parse_mediawiki_title(r.text),
-         'bodycontent': parse_mediawiki_text(r.text),},
+         'bodycontent': parse_mediawiki_text(r.text),
+         'lastmod': mw_page_lastmod(r.text),},
         context_instance=RequestContext(request)
     )
 

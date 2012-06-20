@@ -2,7 +2,7 @@
 
 
 
-{% block title %}{{ source.title }}{% endblock %}
+{% block title %}{{ source.densho_id }}{% endblock %}
 
 
 
@@ -38,7 +38,7 @@
 <div class="primarysource-detail">
 
 <h1 id="firstHeading" class="firstHeading">
-{% if source.title %}{{ source.title }}{% else %}{{ source.densho_id }}{% endif %}
+{{ source.densho_id }}
 </h1>
 
 <div id="media">
@@ -65,7 +65,6 @@
 
 
 <table>
-<tr><th>id</th><td>{{ source.id }}</td></tr>
 <tr><th>created</th><td>{{ source.created }}</td></tr>
 <tr><th>modified</th><td>{{ source.modified }}</td></tr>
 
@@ -84,18 +83,10 @@
 <tr><th>collection_name</th><td>{{ source.collection_name }}</td></tr>
 <tr><th>institution_id</th><td>{{ source.institution_id }}</td></tr>
 
-<tr><th>caption</th><td>{{ source.caption }}</td></tr>
-<tr><th>courtesy</th><td>{{ source.courtesy }}</td></tr>
-
 <tr><th>headword</th><td><a href="{{ SOURCES_BASE }}{{ source.headword }}">{{ source.headword }}</a></td></tr>
-<tr><th>resource_uri</th><td>{{ source.resource_uri }}</td></tr>
 
 <tr><th>creative_commons</th><td>{{ source.creative_commons }}</td></tr>
 </table>
-
-<pre>
-{{ source }}
-</pre>
 
 </div><!-- .source-detail -->
 {% endblock contents %}

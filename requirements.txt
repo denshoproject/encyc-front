@@ -7,10 +7,12 @@ django-debug-toolbar
 gunicorn
 iPython
 python-memcached
+staticgenerator
 
 # wikiprox
 beautifulsoup4
 # sudo apt-get install libxml2 libxslt1.1 libxslt1-dev python-dev
 lxml
+python-dateutil
 requests
 simplejson

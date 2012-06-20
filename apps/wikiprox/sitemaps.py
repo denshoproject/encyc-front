@@ -1,13 +1,11 @@
-from datetime import datetime
-import json
-
-import requests
-
 from django.conf import settings
 from django.contrib.sitemaps import Sitemap
 
+from wikiprox.encyclopedia import published_pages
+from wikiprox.sources import published_sources
 
-class Page(object):
+
+class Item(object):
     location = ''
     timestamp = None
     def unicode(self):
@@ -21,27 +19,14 @@ class MediaWikiSitemap(Sitemap):
     priority = 0.5
 
     def items(self):
-        pages = []
-        #
-        LIMIT = 5000
-        TS_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
-        url = '%s?action=query&generator=allpages&prop=revisions&rvprop=timestamp&gaplimit=%s&format=json' % (settings.WIKIPROX_MEDIAWIKI_API, LIMIT)
-        r = requests.get(url)
-        if r.status_code == 200:
-            response = json.loads(r.text)
-            if response and response['query'] and response['query']['pages']:
-                ids = []
-                for id  in response['query']['pages'].keys():
-                    if id not in ids:
-                        ids.append(id)
-                for id in ids:
-                    p = response['query']['pages'][id]
-                    page = Page()
-                    page.title = p['title']
-                    page.location = '/wiki/%s/' % p['title']
-                    page.timestamp = datetime.strptime(p['revisions'][0]['timestamp'], TS_FORMAT)
-                    pages.append(page)
-        return pages
+        items = []
+        for p in published_pages():
+            item = Item()
+            item.title = p['title']
+            item.location = p['location']
+            item.timestamp = p['timestamp']
+            items.append(item)
+        return items
 
     def lastmod(self, obj):
         return obj.timestamp
@@ -52,20 +37,14 @@ class SourceSitemap(Sitemap):
     priority = 0.5
 
     def items(self):
-        pages = []
-        #
-        TS_FORMAT = '%Y-%m-%d %H:%M:%S'
-        url = '%s/primarysource/sitemap/' % settings.TANSU_API
-        r = requests.get(url, headers={'content-type':'application/json'})
-        if r.status_code == 200:
-            response = json.loads(r.text)
-            for s in response['objects']:
-                page = Page()
-                page.title = s['encyclopedia_id']
-                page.location = '/wiki/%s/' % s['wikititle']
-                page.timestamp = datetime.strptime(s['modified'], TS_FORMAT)
-                pages.append(page)
-        return pages
+        items = []
+        for s in published_sources():
+            item = Item()
+            item.title = s['encyclopedia_id']
+            item.location = '/wiki/%s/' % s['wikititle']
+            item.timestamp = s['modified']
+            items.append(item)
+        return items
     
     def lastmod(self, obj):
         return obj.timestamp

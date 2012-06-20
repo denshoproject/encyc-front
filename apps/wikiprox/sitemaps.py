@@ -41,7 +41,7 @@ class SourceSitemap(Sitemap):
         for s in published_sources():
             item = Item()
             item.title = s['encyclopedia_id']
-            item.location = '/wiki/%s/' % s['wikititle']
+            item.location = '/sources/%s/' % s['encyclopedia_id']
             item.timestamp = s['modified']
             items.append(item)
         return items

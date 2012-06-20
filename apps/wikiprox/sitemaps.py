@@ -15,7 +15,7 @@ class Item(object):
 
 
 class MediaWikiSitemap(Sitemap):
-    changefreq = "weekly"
+    changefreq = "daily"
     priority = 0.5
 
     def items(self):
@@ -33,7 +33,7 @@ class MediaWikiSitemap(Sitemap):
 
 
 class SourceSitemap(Sitemap):
-    changefreq = "weekly"
+    changefreq = "daily"
     priority = 0.5
 
     def items(self):

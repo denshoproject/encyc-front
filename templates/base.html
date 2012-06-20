@@ -12,6 +12,11 @@
       background: #333;
       padding-left: 10px;
     }
+    .footer {
+      margin-top: 32px;
+      border-top: 1px solid #eee;
+      padding-top: 10px;
+    }
   </style>
   {% block css %}{% endblock css %}
 </head>
@@ -44,6 +49,11 @@
 
 
 {% block contents %}{% endblock contents %}
+
+
+  <footer class="footer">
+{% block footer %}{% endblock footer %}
+  </footer>
 
 
 </div><!-- .container -->

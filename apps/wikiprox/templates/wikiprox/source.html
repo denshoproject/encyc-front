@@ -2,7 +2,7 @@
 
 
 
-{% block title %}{{ source.title }}{% endblock %}
+{% block title %}{{ source.densho_id }}{% endblock %}
 
 
 
@@ -38,7 +38,7 @@
 <div class="primarysource-detail">
 
 <h1 id="firstHeading" class="firstHeading">
-{% if source.title %}{{ source.title }}{% else %}{{ source.densho_id }}{% endif %}
+{{ source.densho_id }}
 </h1>
 
 <div id="media">

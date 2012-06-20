@@ -7,6 +7,40 @@ from django.conf import settings
 
 
 
+def all_pages():
+    """Returns a list of all pages, with timestamp of latest revision.
+    """
+    pages = []
+    # all articles
+    TS_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
+    LIMIT=5000
+    url = '%s?action=query&generator=allpages&prop=revisions&rvprop=timestamp&gaplimit=5000&format=json' % (settings.WIKIPROX_MEDIAWIKI_API)
+    r = requests.get(url, headers={'content-type':'application/json'})
+    if r.status_code == 200:
+        response = json.loads(r.text)
+        if response and response['query'] and response['query']['pages']:
+            for id in response['query']['pages']:
+                page = response['query']['pages'][id]
+                page['timestamp'] = datetime.strptime(page['revisions'][0]['timestamp'], TS_FORMAT)
+                pages.append(page)
+    return pages
+
+def category_published(namespace_id=None):
+    """Returns list of published pages.
+    """
+    pages = []
+    LIMIT=5000
+    url = '%s?format=json&action=query&generator=categorymembers&gcmtitle=Category:Published' % settings.WIKIPROX_MEDIAWIKI_API
+    if namespace_id:
+        url = '%s&gcmnamespace=%s' % (url, namespace_id)
+    r = requests.get(url, headers={'content-type':'application/json'})
+    if r.status_code == 200:
+        response = json.loads(r.text)
+        if response and response['query'] and response['query']['pages']:
+            for id in response['query']['pages']:
+                pages.append(response['query']['pages'][id])
+    return pages
+
 def namespaces():
     """Returns dict of namespaces and their codes.
     """
@@ -36,59 +70,14 @@ def namespaces_reversed():
         nspaces[val] = key
     return nspaces
 
-def category_published(namespace_id=namespaces_reversed()['Default']):
-    """Returns list of published pages.
-    """
-    pages = []
-    LIMIT=5000
-    url = '%s?action=query&generator=categorymembers&gcmtitle=Category:Published&gcmnamespace=%s&format=json' % (settings.WIKIPROX_MEDIAWIKI_API, namespace_id)
-    r = requests.get(url, headers={'content-type':'application/json'})
-    if r.status_code == 200:
-        response = json.loads(r.text)
-        if response and response['query'] and response['query']['pages']:
-            for id in response['query']['pages']:
-                p = response['query']['pages'][id]
-                page = {}
-                page['id'] = p['pageid']
-                page['title'] = p['title']
-                page['location'] = '/wiki/%s/' % p['title']
-                pages.append(page)
-    return pages
-
-def all_pages():
-    """Returns a list of all pages, with timestamp of latest revision.
-    """
-    pages = []
-    # all articles
-    TS_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
-    LIMIT=5000
-    url = '%s?action=query&generator=allpages&prop=revisions&rvprop=timestamp&gaplimit=5000&format=json' % (settings.WIKIPROX_MEDIAWIKI_API)
-    r = requests.get(url, headers={'content-type':'application/json'})
-    if r.status_code == 200:
-        response = json.loads(r.text)
-        if response and response['query'] and response['query']['pages']:
-            ids = []
-            for id  in response['query']['pages'].keys():
-                if id not in ids:
-                    ids.append(id)
-            for id in ids:
-                p = response['query']['pages'][id]
-                page = {}
-                page['id'] = p['pageid']
-                page['title'] = p['title']
-                page['location'] = '/%s/' % p['title']
-                page['timestamp'] = datetime.strptime(p['revisions'][0]['timestamp'], TS_FORMAT)
-                pages.append(page)
-    return pages
-
 def published_pages():
     """Returns a list of *published* articles (pages), with timestamp of latest revision.
     """
     pages = []
     pids = []  # published_article_ids
-    for article in category_published():
-        pids.append(article['id'])
+    for article in category_published(namespace_id=namespaces_reversed()['Default']):
+        pids.append(article['pageid'])
     for article in all_pages():
-        if article['id'] in pids:
+        if article['pageid'] in pids:
             pages.append(article)
     return pages

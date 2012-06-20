@@ -23,7 +23,7 @@ class MediaWikiSitemap(Sitemap):
         for p in published_pages():
             item = Item()
             item.title = p['title']
-            item.location = p['location']
+            item.location = '/%s/' % p['title']
             item.timestamp = p['timestamp']
             items.append(item)
         return items

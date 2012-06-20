@@ -19,7 +19,7 @@
     var customSearchOptions = {};
     customSearchOptions['adoptions'] = {'layout': 'noTop'};
     var customSearchControl = new google.search.CustomSearchControl(
-      '005996613026471396970:omyksnc0hss', customSearchOptions);
+      '{{ GOOGLE_CUSTOM_SEARCH_PASSWORD }}', customSearchOptions);
     customSearchControl.setResultSetSize(google.search.Search.FILTERED_CSE_RESULTSET);
     customSearchControl.draw('cse');
   }, true);

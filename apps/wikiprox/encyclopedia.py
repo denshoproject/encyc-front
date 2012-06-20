@@ -76,7 +76,7 @@ def all_pages():
                 page = {}
                 page['id'] = p['pageid']
                 page['title'] = p['title']
-                page['location'] = '/wiki/%s/' % p['title']
+                page['location'] = '/%s/' % p['title']
                 page['timestamp'] = datetime.strptime(p['revisions'][0]['timestamp'], TS_FORMAT)
                 pages.append(page)
     return pages

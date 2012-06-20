@@ -36,12 +36,13 @@ def page(request, page='index', template_name='wikiprox/page.html'):
             {'title': page,},
             context_instance=RequestContext(request)
         )
-    #if not mw_page_is_published(r.text):
-    #    return render_to_response(
-    #        'wikiprox/unpublished.html',
-    #        {'title': page,},
-    #        context_instance=RequestContext(request)
-    #    )
+    # only allow unpublished pages on :8000
+    if (not mw_page_is_published(r.text)) and ('8000' not in request.META.get('HTTP_HOST',None)):
+        return render_to_response(
+            'wikiprox/unpublished.html',
+            {},
+            context_instance=RequestContext(request)
+        )
     return render_to_response(
         template_name,
         {'title': parse_mediawiki_title(r.text),

@@ -18,6 +18,7 @@
     var customSearchControl = new google.search.CustomSearchControl(
       '{{ GOOGLE_CUSTOM_SEARCH_PASSWORD }}', customSearchOptions);
     customSearchControl.setResultSetSize(google.search.Search.FILTERED_CSE_RESULTSET);
+    customSearchControl.setLinkTarget(google.search.Search.LINK_TARGET_SELF);
     customSearchControl.draw('cse');
   }, true);
 </script>

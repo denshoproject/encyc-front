@@ -2,7 +2,7 @@
 
 
 
-{% block title %}{{ source.densho_id }}{% endblock %}
+{% block title %}{{ source.caption|truncatechars:50 }} ({{ source.encyclopedia_id }}) | Primary Sources{% endblock %}
 
 
 
@@ -38,7 +38,7 @@
 <div class="primarysource-detail">
 
 <h1 id="firstHeading" class="firstHeading">
-{{ source.densho_id }}
+Primary Source &mdash; {{ source.encyclopedia_id }}
 </h1>
 
 <div id="media">
@@ -64,7 +64,7 @@
 {{ source.courtesy|safe|linebreaks }}
 
 
-<table>
+<table style="border: 4px dashed red;">
 <tr><th>created</th><td>{{ source.created }}</td></tr>
 <tr><th>modified</th><td>{{ source.modified }}</td></tr>
 

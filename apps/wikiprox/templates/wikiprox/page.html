@@ -11,7 +11,12 @@
 <div id="share">
   <a href="{% url wikiprox-page-print title %}"><img src="{{ STATIC_URL }}print.png" alt="Printer-friendly page" title="Printer-friendly page" /></a>
   <a href="{% url wikiprox-page-print title %}"><img src="{{ STATIC_URL }}cite.png" alt="Cite this article" title="Cite this article" /></a>
-  [ShareThis]
+
+  <!-- AddThis Button BEGIN -->
+  <a class="addthis_button" href="http://www.addthis.com/bookmark.php?v=250&amp;pubid=densho"><img src="http://s7.addthis.com/static/btn/v2/lg-share-en.gif" width="125" height="16" alt="Bookmark and Share" style="border:0"/></a>
+  <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=densho"></script>
+<!-- AddThis Button END -->
+
 </div><!-- #share -->
 
 {{ bodycontent|safe }}
@@ -39,14 +44,14 @@
       </dd>
     </strong></dl>
 
-    <p>
-    <a href="{{ prev_page }}">&laquo; Previous Article</a><br/>
-    {{ prev_page }}
-    </p>
-    <p>
-    <a href="{{ next_page }}">&raquo; Next Article</a><br/>
-    {{ next_page }}
-    </p>
+    <dl>
+      <dt><a href="{{ prev_page }}">&laquo; Previous Article</a></dt>
+      <dd>{{ prev_page }}</dd>
+    </dl>
+    <dl>
+      <dt><a href="{{ next_page }}">&raquo; Next Article</a></dt>
+      <dd>{{ next_page }}</dd>
+    </dl>
 
     <p>
     <a href="{% url wikiprox-page-print title %}">Print</a><br/>
@@ -86,23 +91,3 @@ primary sources
 {% block footer %}
 <p class="lastmod">{{ lastmod }}</p>
 {% endblock footer %}
-
-
-{% block css %}
-  <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}/lightview-3.1.4/css/lightview/lightview.css"/>
-  <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/wikiprox.css" />
-{% endblock css %}
-
-
-{% block javascript %}
-<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
-<script type="text/javascript" src="{{ MEDIA_URL }}/jwplayer-5.9/jwplayer.js"></script>
-<!--[if lt IE 9]>
-<script type="text/javascript" src="{{ MEDIA_URL }}/lightview-3.1.4/js/excanvas/excanvas.js"></script>
-<![endif]-->
-<script type="text/javascript" src="{{ MEDIA_URL }}/lightview-3.1.4/js/spinners/spinners.js"></script>
-<script type="text/javascript" src="{{ MEDIA_URL }}/lightview-3.1.4/js/lightview/lightview.js"></script>
-<script type='text/javascript'>
-  Lightview.setDefaultSkin('mac');
-</script>
-{% endblock javascript %}

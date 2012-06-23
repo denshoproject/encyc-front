@@ -7,6 +7,15 @@
 {% endblock css %}
 
 
+{% block contents %}
+
+<div id="article">
+{% block article %}{% endblock %}
+</div><!-- #article -->
+
+{% endblock contents %}
+
+
 {% block javascript %}
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
 <script type="text/javascript" src="{{ MEDIA_URL }}/jwplayer-5.9/jwplayer.js"></script>

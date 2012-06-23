@@ -4,11 +4,83 @@
 {% block title %}{{ title }}{% endblock %}
 
 
-{% block contents %}
+{% block article %}
 
 <h1 id="firstHeading" class="firstHeading">{{ title }}</h1>
+
+<div id="share">
+  <a href="{% url wikiprox-page-print title %}"><img src="{{ STATIC_URL }}print.png" alt="Printer-friendly page" title="Printer-friendly page" /></a>
+  <a href="{% url wikiprox-page-print title %}"><img src="{{ STATIC_URL }}cite.png" alt="Cite this article" title="Cite this article" /></a>
+  [ShareThis]
+</div><!-- #share -->
+
 {{ bodycontent|safe }}
-{% endblock contents %}
+
+{% endblock article %}
+
+
+{% block sidebar_right %}
+<div id="sidebar-right">
+
+  <div class="block">
+
+    <dl><strong>
+      <dt>Category</dt>
+      <dd>
+        <a href="{{ page_category }}">{{ page_category }}</a>
+      </dd>
+    </strong></dl>
+
+    <dl><strong>
+      <dt>Table of Contents</dt>
+      <dd>
+        <a href="{% url wikiprox-contents %}">A-Z</a><br/>
+        <a href="{% url wikiprox-categories %}">By Category</a><br/>
+      </dd>
+    </strong></dl>
+
+    <p>
+    <a href="{{ prev_page }}">&laquo; Previous Article</a><br/>
+    {{ prev_page }}
+    </p>
+    <p>
+    <a href="{{ next_page }}">&raquo; Next Article</a><br/>
+    {{ next_page }}
+    </p>
+
+    <p>
+    <a href="{% url wikiprox-page-print title %}">Print</a><br/>
+    <a href="{% url wikiprox-page-cite title %}">Cite</a><br/>
+    </p>
+
+    <p>
+    <a href="">Creative Commons</a><br/>
+    </p>
+
+  </div><!-- .block -->
+
+</div><!-- #sidebar-right -->
+{% endblock sidebar_right %}
+
+
+{% block sidebar_left %}
+<div id="sidebar-left">
+
+  <div class="block primarysources">
+primary sources
+  </div><!-- .block .primarysources -->
+
+  <div class="block">
+    <p>
+    <strong>
+    <a href="/About_the_Encyclopedia/">About the Incarceration</a><br/>
+    <a href="/Terminology/">Do Words Matter?</a><br/>
+    </strong>
+    </p>
+  </div><!-- .block -->
+
+</div><!-- #sidebar-left -->
+{% endblock sidebar_left %}
 
 
 {% block footer %}

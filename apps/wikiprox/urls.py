@@ -6,11 +6,8 @@ from wikiprox import views
 
 urlpatterns = patterns(
     '',
-    # files (tansu)
-    url(r"^index.php/File:([\w .:_-]+)/$", views.media, name='wikiprox-media'),
-    # pages (mediawiki)
-    url(r"^index.php/([\w\W]+)/$", views.page, name='wikiprox-page'),
-    url(r"^([\w\W]+)/$", views.page, name='wikiprox-page'),
+    url(r"^index.php/(?P<page>[\w\W]+)/$", views.page, name='wikiprox-page'),
+    url(r"^(?P<page>[\w\W]+)/$", views.page, name='wikiprox-page'),
     #
     url(r'^$', lambda x: HttpResponseRedirect('/wiki/%s' % settings.WIKIPROX_MEDIAWIKI_DEFAULT_PAGE)),
 )

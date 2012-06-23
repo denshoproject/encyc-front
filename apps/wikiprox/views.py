@@ -18,7 +18,7 @@ from wikiprox import mw_page_is_published, mw_page_lastmod
 
 
 @require_http_methods(['GET',])
-def page(request, page='index', template_name='wikiprox/page.html'):
+def page(request, page='index', printer=False, template_name='wikiprox/page.html'):
     """
     Alternatives to BeautifulSoup:
     - basic string-split
@@ -48,7 +48,19 @@ def page(request, page='index', template_name='wikiprox/page.html'):
         template_name,
         {'title': parse_mediawiki_title(r.text),
          'bodycontent': parse_mediawiki_text(r.text),
-         'lastmod': mw_page_lastmod(r.text),},
+         'lastmod': mw_page_lastmod(r.text),
+         'page_category': 'page_category',
+         'prev_page': 'prev_page',
+         'next_page': 'next_page',
+         },
+        context_instance=RequestContext(request)
+    )
+
+@require_http_methods(['GET',])
+def page_cite(request, page=None, template_name='wikiprox/page-cite.html'):
+    return render_to_response(
+        template_name,
+        {},
         context_instance=RequestContext(request)
     )
 
@@ -95,5 +107,19 @@ def source(request, encyclopedia_id, template_name='wikiprox/source.html'):
         {'source': source,
          'SOURCES_BASE': settings.SOURCES_BASE,
          'rtmp_streamer': rtmp_streamer,},
+        context_instance=RequestContext(request)
+    )
+
+def contents(request, template_name='wikiprox/contents.html'):
+    return render_to_response(
+        template_name,
+        {},
+        context_instance=RequestContext(request)
+    )
+
+def categories(request, template_name='wikiprox/categories.html'):
+    return render_to_response(
+        template_name,
+        {},
         context_instance=RequestContext(request)
     )

@@ -27,6 +27,8 @@ def all_pages():
 
 def category_members(category_name, namespace_id=None):
     """Returns list of pages with specified Category: tag.
+    
+    TODO: can we just return the category names?
     """
     pages = []
     LIMIT=5000
@@ -76,6 +78,29 @@ def namespaces_reversed():
     for key,val in namespaces().iteritems():
         nspaces[val] = key
     return nspaces
+
+def page_categories(title, whitelist=category_article_types()):
+    """Returns list of article subcategories the page belongs to.
+    """
+    article_categories = []
+    for c in whitelist:
+        article_categories.append(c['title'].replace('Category:', ''))
+    #
+    categories = []
+    url = '%s?format=json&action=query&prop=categories&titles=%s' % (settings.WIKIPROX_MEDIAWIKI_API, title)
+    r = requests.get(url, headers={'content-type':'application/json'})
+    if r.status_code == 200:
+        response = json.loads(r.text)
+        ids = []
+        if response and response['query'] and response['query']['pages']:
+            for id in response['query']['pages'].keys():
+                ids.append(id)
+        for id in ids:
+            for cat in response['query']['pages'][id]['categories']:
+                category = cat['title'].replace('Category:', '')
+                if article_categories and (category in article_categories):
+                    categories.append(category)
+    return categories
 
 def published_pages():
     """Returns a list of *published* articles (pages), with timestamp of latest revision.

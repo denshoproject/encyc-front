@@ -26,9 +26,9 @@
 
     <dl><strong>
       <dt>Category</dt>
-      <dd>
-        <a href="{{ page_category }}">{{ page_category }}</a>
-      </dd>
+{% for category in page_categories %}
+      <dd><a href="/Category:{{ category }}/">{{ category }}</a></dd>
+{% endfor %}
     </strong></dl>
 
     <dl><strong>

@@ -15,6 +15,7 @@ from django.views.decorators.http import require_http_methods
 
 from wikiprox import parse_mediawiki_title, parse_mediawiki_text
 from wikiprox import mw_page_is_published, mw_page_lastmod
+from wikiprox.encyclopedia import page_categories
 
 
 @require_http_methods(['GET',])
@@ -49,7 +50,7 @@ def page(request, page='index', printer=False, template_name='wikiprox/page.html
         {'title': parse_mediawiki_title(r.text),
          'bodycontent': parse_mediawiki_text(r.text),
          'lastmod': mw_page_lastmod(r.text),
-         'page_category': 'page_category',
+         'page_categories': page_categories(page),
          'prev_page': 'prev_page',
          'next_page': 'next_page',
          },

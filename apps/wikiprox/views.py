@@ -15,7 +15,7 @@ from django.views.decorators.http import require_http_methods
 
 from wikiprox import parse_mediawiki_title, parse_mediawiki_text
 from wikiprox import mw_page_is_published, mw_page_lastmod
-from wikiprox.encyclopedia import page_categories
+from wikiprox.encyclopedia import page_categories, article_next, article_prev
 
 
 @require_http_methods(['GET',])
@@ -45,14 +45,15 @@ def page(request, page='index', printer=False, template_name='wikiprox/page.html
             {},
             context_instance=RequestContext(request)
         )
+    title = parse_mediawiki_title(r.text)
     return render_to_response(
         template_name,
-        {'title': parse_mediawiki_title(r.text),
+        {'title': title,
          'bodycontent': parse_mediawiki_text(r.text),
          'lastmod': mw_page_lastmod(r.text),
-         'page_categories': page_categories(page),
-         'prev_page': 'prev_page',
-         'next_page': 'next_page',
+         'page_categories': [],  # page_categories(page),
+         'prev_page': article_prev(title),
+         'next_page': article_next(title),
          },
         context_instance=RequestContext(request)
     )

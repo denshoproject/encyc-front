@@ -45,12 +45,22 @@
     </strong></dl>
 
     <dl>
-      <dt><a href="{{ prev_page }}">&laquo; Previous Article</a></dt>
+{% if prev_page %}
+      <dt><a href="/{{ prev_page }}/">&laquo; Previous Article</a></dt>
       <dd>{{ prev_page }}</dd>
+{% else %}
+      <dt>&raquo; Previous Article</dt>
+      <dd></dd>
+{% endif %}
     </dl>
     <dl>
-      <dt><a href="{{ next_page }}">&raquo; Next Article</a></dt>
+{% if next_page %}
+      <dt><a href="/{{ next_page }}/">&raquo; Next Article</a></dt>
       <dd>{{ next_page }}</dd>
+{% else %}
+      <dt>&raquo; Next Article</dt>
+      <dd></dd>
+{% endif %}
     </dl>
 
     <p>

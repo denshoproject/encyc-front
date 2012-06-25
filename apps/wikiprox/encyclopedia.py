@@ -7,6 +7,9 @@ from django.conf import settings
 
 
 
+NON_ARTICLE_PAGES = ['about', 'contact', 'search',]
+
+
 def all_pages():
     """Returns a list of all pages, with timestamp of latest revision.
     """
@@ -24,6 +27,40 @@ def all_pages():
                 page['timestamp'] = datetime.strptime(page['revisions'][0]['timestamp'], TS_FORMAT)
                 pages.append(page)
     return pages
+
+
+def articles_a_z():
+    """Returns a list of published article titles arranged A-Z.
+    
+    TODO: display people according to last name
+    """
+    titles = []
+    for article in category_members('Published', namespace_id=namespaces_reversed()['Default']):
+        if (article['title'] not in NON_ARTICLE_PAGES) and (article['title'] not in titles):
+            titles.append(article['title'])
+    titles.sort()
+    return titles
+
+def article_next(title):
+    """Returns the title of the next article in the A-Z list.
+    """
+    titles = articles_a_z()
+    try:
+        return titles[titles.index(title) + 1]
+    except:
+        pass
+    return None
+    
+
+def article_prev(title):
+    """Returns the title of the previous article in the A-Z list.
+    """
+    titles = articles_a_z()
+    try:
+        return titles[titles.index(title) - 1]
+    except:
+        pass
+    return None
 
 def category_members(category_name, namespace_id=None):
     """Returns list of pages with specified Category: tag.

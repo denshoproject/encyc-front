@@ -66,6 +66,27 @@ def parse_mediawiki_text(text):
     soup = format_primary_sources(soup, sources)
     return unicode(soup)
 
+def parse_mediawiki_cite_page(text, page, request):
+    """Parses the body of a MediaWiki Cite page.
+    """
+    soup = BeautifulSoup(
+        text, parse_only=SoupStrainer('div', attrs={'id':'bodyContent'}))
+    # remove stuff
+    soup.find(id="contentSub").decompose()
+    soup.find(id="jump-to-nav").decompose()
+    soup.find(id="specialcite").decompose()
+    soup.find(id="catlinks").decompose()
+    for d in soup.find_all('div', attrs={'class':'printfooter'}):
+        d.decompose()
+    for d in soup.find_all('div', attrs={'class':'visualClear'}):
+        d.decompose()
+    # rewrite URLs
+    for a in soup.find_all('a'):
+        if page in a['href']:
+            url = 'http://%s%s' % (request.META.get('HTTP_HOST',None),
+                                   reverse('wikiprox-page', args=[page]))
+            a['href'] = a.string = url
+    return unicode(soup)
 
 def remove_staticpage_titles(soup):
     """strip extra <h1> on "static" pages

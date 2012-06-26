@@ -13,7 +13,7 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.views.decorators.http import require_http_methods
 
-from wikiprox import parse_mediawiki_title, parse_mediawiki_text
+from wikiprox import parse_mediawiki_title, parse_mediawiki_text, parse_mediawiki_cite_page
 from wikiprox import mw_page_is_published, mw_page_lastmod
 from wikiprox import encyclopedia
 
@@ -52,12 +52,13 @@ def page(request, page='index', printer=False, template_name='wikiprox/page.html
         'bodycontent': parse_mediawiki_text(r.text),
         'lastmod': mw_page_lastmod(r.text),
         }
-    # type-specific pages
+    # author page
     if encyclopedia.is_author(title):
         template_name = 'wikiprox/author.html'
         context.update({
             'author_articles': encyclopedia.author_articles(title),
             })
+    # article
     elif encyclopedia.is_article(title):
         template_name = 'wikiprox/article.html'
         context.update({
@@ -72,10 +73,20 @@ def page(request, page='index', printer=False, template_name='wikiprox/page.html
     )
 
 @require_http_methods(['GET',])
-def page_cite(request, page=None, template_name='wikiprox/page-cite.html'):
+def page_cite(request, page=None, template_name='wikiprox/cite.html'):
+    url = '%s?title=Special:Cite&page=%s' % (settings.WIKIPROX_MEDIAWIKI_HTML, page)
+    r = requests.get(url)
+    if r.status_code != 200:
+        return render_to_response(
+            'wikiprox/404.html',
+            {'title': page,},
+            context_instance=RequestContext(request)
+        )
+    title = parse_mediawiki_title(r.text)
     return render_to_response(
         template_name,
-        {},
+        {'title': title,
+         'bodycontent': parse_mediawiki_cite_page(r.text, page, request),},
         context_instance=RequestContext(request)
     )
 

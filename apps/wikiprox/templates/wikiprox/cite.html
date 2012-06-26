@@ -1,0 +1,13 @@
+{% extends "wikiprox/base.html" %}
+
+
+{% block title %}{{ title }}{% endblock %}
+
+
+{% block article %}
+
+<h1 id="firstHeading" class="firstHeading">{{ title }}</h1>
+
+{{ bodycontent|safe }}
+
+{% endblock article %}

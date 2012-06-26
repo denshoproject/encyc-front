@@ -7,7 +7,7 @@ from django.conf import settings
 
 
 
-NON_ARTICLE_PAGES = ['about', 'contact', 'search',]
+NON_ARTICLE_PAGES = ['about', 'categories', 'contact', 'contents', 'search',]
 
 
 def all_pages():
@@ -42,6 +42,25 @@ def articles_a_z():
             titles.append(page['title'])
     titles.sort()
     return titles
+
+def articles_by_category():
+    """Returns list of published articles grouped by category.
+    """
+    categories = []
+    titles_by_category = {}
+    published = []
+    [published.append(page['title']) for page in published_pages()]
+    for category in category_article_types():
+        category = category.replace('Category:','')
+        titles = []
+        for page in category_members(category,
+                                     namespace_id=namespaces_reversed()['Default']):
+            if page['title'] in published:
+                titles.append(page['title'])
+        if titles:
+            categories.append(category)
+            titles_by_category[category] = titles
+    return categories,titles_by_category
 
 def article_next(title):
     """Returns the title of the next article in the A-Z list.

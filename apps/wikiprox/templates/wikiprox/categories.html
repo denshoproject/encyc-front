@@ -8,4 +8,13 @@
 
 <h1>Table of Contents &mdash; By Category</h1>
 
+{% for category in articles_by_category %}
+<h2>{{ category.0 }}</h2>
+    {% for article in category.1 %}
+    <a href="/{{ article }}/">{{ article }}</a>{% if not forloop.last %},&nbsp;&nbsp;{% endif %}
+    {% endfor %}
+{% endfor %}
+
+
+
 {% endblock contents %}

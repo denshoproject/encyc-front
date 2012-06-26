@@ -8,4 +8,8 @@
 
 <h1>Table of Contents &mdash; A-Z</h1>
 
+{% for article in articles %}
+<a href="/{{ article }}/">{{ article }}</a><br/>
+{% endfor %}
+
 {% endblock contents %}

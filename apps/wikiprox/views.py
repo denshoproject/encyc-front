@@ -128,13 +128,17 @@ def source(request, encyclopedia_id, template_name='wikiprox/source.html'):
 def contents(request, template_name='wikiprox/contents.html'):
     return render_to_response(
         template_name,
-        {},
+        {'articles': encyclopedia.articles_a_z(),},
         context_instance=RequestContext(request)
     )
 
 def categories(request, template_name='wikiprox/categories.html'):
+    articles_by_category = []
+    categories,titles_by_category = encyclopedia.articles_by_category()
+    for category in categories:
+        articles_by_category.append( (category,titles_by_category[category]) )
     return render_to_response(
         template_name,
-        {},
+        {'articles_by_category': articles_by_category,},
         context_instance=RequestContext(request)
     )

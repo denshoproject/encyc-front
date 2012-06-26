@@ -28,16 +28,15 @@ def all_pages():
                 pages.append(page)
     return pages
 
-
 def articles_a_z():
     """Returns a list of published article titles arranged A-Z.
     
     TODO: display people according to last name
     """
     titles = []
-    for article in category_members('Published', namespace_id=namespaces_reversed()['Default']):
-        if (article['title'] not in NON_ARTICLE_PAGES) and (article['title'] not in titles):
-            titles.append(article['title'])
+    for page in category_members('Published', namespace_id=namespaces_reversed()['Default']):
+        if (page['title'] not in NON_ARTICLE_PAGES) and (page['title'] not in titles):
+            titles.append(page['title'])
     titles.sort()
     return titles
 
@@ -51,7 +50,6 @@ def article_next(title):
         pass
     return None
     
-
 def article_prev(title):
     """Returns the title of the previous article in the A-Z list.
     """
@@ -62,30 +60,50 @@ def article_prev(title):
         pass
     return None
 
+def author_articles(title):
+    return what_links_here(title)
+
 def category_members(category_name, namespace_id=None):
-    """Returns list of pages with specified Category: tag.
-    
-    TODO: can we just return the category names?
+    """Returns titles of pages with specified Category: tag.
     """
     pages = []
-    LIMIT=5000
-    url = '%s?format=json&action=query&generator=categorymembers&gcmtitle=Category:%s' % (settings.WIKIPROX_MEDIAWIKI_API, category_name)
+    LIMIT = 5000
+    url = '%s?format=json&action=query&list=categorymembers&cmtitle=Category:%s&cmlimit=5000' % (settings.WIKIPROX_MEDIAWIKI_API, category_name)
     if namespace_id != None:
         url = '%s&gcmnamespace=%s' % (url, namespace_id)
     r = requests.get(url, headers={'content-type':'application/json'})
     if r.status_code == 200:
         response = json.loads(r.text)
-        if response and response['query'] and response['query']['pages']:
-            for id in response['query']['pages']:
-                pages.append(response['query']['pages'][id])
+        if response and response['query'] and response['query']['categorymembers']:
+            for page in response['query']['categorymembers']:
+                pages.append(page)
     return pages
 
 def category_article_types():
-    return category_members('Articles')
+    """Returns list of subcategories underneath 'Article'."""
+    titles = []
+    [titles.append(page['title']) for page in category_members('Articles')]
+    return titles
 def category_authors():
-    return category_members('Authors')
+    titles = []
+    [titles.append(page['title']) for page in category_members('Authors')]
+    return titles
 def category_supplemental():
-    return category_members('Supplemental_Materials')
+    titles = []
+    [titles.append(page['title']) for page in category_members('Supplemental_Materials')]
+    return titles
+
+def is_article(title):
+    titles = []
+    [titles.append(page['title']) for page in published_pages()]
+    if title in titles:
+        return True
+    return False
+
+def is_author(title):
+    if title in category_authors():
+        return True
+    return False
 
 def namespaces():
     """Returns dict of namespaces and their codes.
@@ -116,12 +134,13 @@ def namespaces_reversed():
         nspaces[val] = key
     return nspaces
 
-def page_categories(title, whitelist=category_article_types()):
+def page_categories(title, whitelist=[]):
     """Returns list of article subcategories the page belongs to.
     """
     article_categories = []
-    for c in whitelist:
-        article_categories.append(c['title'].replace('Category:', ''))
+    if not whitelist:
+        whitelist = category_article_types()
+    [article_categories.append(c) for c in whitelist]
     #
     categories = []
     url = '%s?format=json&action=query&prop=categories&titles=%s' % (settings.WIKIPROX_MEDIAWIKI_API, title)
@@ -134,9 +153,9 @@ def page_categories(title, whitelist=category_article_types()):
                 ids.append(id)
         for id in ids:
             for cat in response['query']['pages'][id]['categories']:
-                category = cat['title'].replace('Category:', '')
+                category = cat['title']
                 if article_categories and (category in article_categories):
-                    categories.append(category)
+                    categories.append(category.replace('Category:', ''))
     return categories
 
 def published_pages():
@@ -152,14 +171,19 @@ def published_pages():
     return pages
 
 def what_links_here(title):
-    """Returns titles of pages that link to this one.
+    """Returns titles of published pages that link to this one.
     """
     titles = []
-    url = '%s?format=json&action=query&list=backlinks&bltitle=%s' % (settings.WIKIPROX_MEDIAWIKI_API, title)
+    #
+    published = []
+    [published.append(page['title']) for page in published_pages()]
+    #
+    url = '%s?format=json&action=query&list=backlinks&bltitle=%s&bllimit=5000' % (settings.WIKIPROX_MEDIAWIKI_API, title)
     r = requests.get(url, headers={'content-type':'application/json'})
     if r.status_code == 200:
         response = json.loads(r.text)
         if response and response['query'] and response['query']['backlinks']:
             for backlink in response['query']['backlinks']:
-                titles.append(backlink['title'])
+                if backlink['title'] in published:
+                    titles.append(backlink['title'])
     return titles

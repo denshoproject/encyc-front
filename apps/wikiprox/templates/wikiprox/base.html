@@ -28,3 +28,8 @@
   Lightview.setDefaultSkin('mac');
 </script>
 {% endblock javascript %}
+
+
+{% block footer %}
+{% if lastmod %}<p class="lastmod">{{ lastmod }}</p>{% endif %}
+{% endblock footer %}

@@ -15,7 +15,7 @@ from django.views.decorators.http import require_http_methods
 
 from wikiprox import parse_mediawiki_title, parse_mediawiki_text
 from wikiprox import mw_page_is_published, mw_page_lastmod
-from wikiprox.encyclopedia import page_categories, article_next, article_prev
+from wikiprox import encyclopedia
 
 
 @require_http_methods(['GET',])
@@ -45,16 +45,29 @@ def page(request, page='index', printer=False, template_name='wikiprox/page.html
             {},
             context_instance=RequestContext(request)
         )
+    # basic page context
     title = parse_mediawiki_title(r.text)
+    context = {
+        'title': title,
+        'bodycontent': parse_mediawiki_text(r.text),
+        'lastmod': mw_page_lastmod(r.text),
+        }
+    # type-specific pages
+    if encyclopedia.is_author(title):
+        template_name = 'wikiprox/author.html'
+        context.update({
+            'author_articles': encyclopedia.author_articles(title),
+            })
+    elif encyclopedia.is_article(title):
+        template_name = 'wikiprox/article.html'
+        context.update({
+            'page_categories': encyclopedia.page_categories(title),
+            'prev_page': encyclopedia.article_prev(title),
+            'next_page': encyclopedia.article_next(title),
+            })
+    # retsu go!
     return render_to_response(
-        template_name,
-        {'title': title,
-         'bodycontent': parse_mediawiki_text(r.text),
-         'lastmod': mw_page_lastmod(r.text),
-         'page_categories': [],  # page_categories(page),
-         'prev_page': article_prev(title),
-         'next_page': article_next(title),
-         },
+        template_name, context,
         context_instance=RequestContext(request)
     )
 

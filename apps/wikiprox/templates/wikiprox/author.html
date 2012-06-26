@@ -1,0 +1,50 @@
+{% extends "wikiprox/base.html" %}
+
+
+{% block title %}{{ title }}{% endblock %}
+
+
+{% block article %}
+
+AUTHOR
+
+<h1 id="firstHeading" class="firstHeading">{{ title }}</h1>
+
+<div id="share">
+  <a href="{% url wikiprox-page-print title %}"><img src="{{ STATIC_URL }}print.png" alt="Printer-friendly page" title="Printer-friendly page" /></a>
+  <a href="{% url wikiprox-page-print title %}"><img src="{{ STATIC_URL }}cite.png" alt="Cite this article" title="Cite this article" /></a>
+
+  <!-- AddThis Button BEGIN -->
+  <a class="addthis_button" href="http://www.addthis.com/bookmark.php?v=250&amp;pubid=densho"><img src="http://s7.addthis.com/static/btn/v2/lg-share-en.gif" width="125" height="16" alt="Bookmark and Share" style="border:0"/></a>
+  <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=densho"></script>
+<!-- AddThis Button END -->
+
+</div><!-- #share -->
+
+{{ bodycontent|safe }}
+
+{% endblock article %}
+
+
+{% block sidebar_left %}
+<div id="sidebar-left">
+
+  <div class="block">
+    <dl><strong>
+      <dt><a href="/Authors/">Authors</a></dt>
+    </strong></dl>
+  </div><!-- .block -->
+
+{% if author_articles %}
+  <div class="block author-articles">
+    <dl>
+      <dt>By this author</dt>
+{% for article in author_articles %}
+        <dd><a href="/{{ article }}/">{{ article }}</a></dd>
+{% endfor %}
+      </dl>
+  </div><!-- .block .author-articles -->
+{% endif %}{#author_articles #}
+
+</div><!-- #sidebar-left -->
+{% endblock sidebar_left %}

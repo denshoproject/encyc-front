@@ -4,10 +4,14 @@
 {% block title %}{{ title }}{% endblock %}
 
 
-{% block article %}
+{% block contents %}
+<div class="span12">
+
+page.html
 
 <h1 id="firstHeading" class="firstHeading">{{ title }}</h1>
 
 {{ bodycontent|safe }}
 
-{% endblock article %}
+</div><!-- .span12 -->
+{% endblock contents %}

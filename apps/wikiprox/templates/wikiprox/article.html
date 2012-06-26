@@ -8,7 +8,7 @@
 {% block contents %}
 <div id="article" class="span6">
 
-ARTICLE
+article.html
 
 <h1 id="firstHeading" class="firstHeading">{{ title }}</h1>
 
@@ -36,7 +36,7 @@ ARTICLE
     <dl><strong>
       <dt>Category</dt>
 {% for category in page_categories %}
-      <dd><a href="/Category:{{ category }}/">{{ category }}</a></dd>
+      <dd><a href="/categories/#{{ category }}">{{ category }}</a></dd>
 {% endfor %}
     </strong></dl>
     <dl><strong>
@@ -78,7 +78,7 @@ ARTICLE
     <h4>
     Category:
 {% for category in page_categories %}
-      <a href="/Category:{{ category }}/">{{ category }}</a>
+      <a href="/categories/#{{ category }}">{{ category }}</a>
 {% endfor %}
     <br />
     Table of Contents:

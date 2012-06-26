@@ -5,16 +5,23 @@
 
 
 {% block contents %}
+<div class="span12">
+
+categories.html
 
 <h1>Table of Contents &mdash; By Category</h1>
 
+<dl>
 {% for category in articles_by_category %}
-<h2>{{ category.0 }}</h2>
-    {% for article in category.1 %}
-    <a href="/{{ article }}/">{{ article }}</a>{% if not forloop.last %},&nbsp;&nbsp;{% endif %}
-    {% endfor %}
+<a name="{{ category.0 }}"></a>
+<dt><h2>{{ category.0 }}</h2></dt>
+<dd>
+{% for article in category.1 %}
+<a href="/{{ article }}/">{{ article }}</a>{% if not forloop.last %},&nbsp;&nbsp;{% endif %}
 {% endfor %}
+</dd>
+{% endfor %}
+</dl>
 
-
-
+</div><!-- .span12 -->
 {% endblock contents %}

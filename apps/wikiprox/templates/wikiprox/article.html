@@ -32,15 +32,13 @@ ARTICLE
 {% block sidebar_left %}
 <div id="sidebar-left" class="span2">
 
-  <div class="block">
-    
+  <div class="block hidden-phone">
     <dl><strong>
       <dt>Category</dt>
 {% for category in page_categories %}
       <dd><a href="/Category:{{ category }}/">{{ category }}</a></dd>
 {% endfor %}
     </strong></dl>
-    
     <dl><strong>
       <dt>Table of Contents</dt>
       <dd>
@@ -48,36 +46,61 @@ ARTICLE
         <a href="{% url wikiprox-categories %}">By Category</a><br/>
       </dd>
     </strong></dl>
-    
     <dl>
 {% if prev_page %}
-      <dt><a href="/{{ prev_page }}/">&laquo; Previous Article</a></dt>
+      <dt><a href="/{{ prev_page }}/">&laquo;&nbsp;Previous Article</a></dt>
       <dd>{{ prev_page }}</dd>
 {% else %}
       <dt>&raquo; Previous Article</dt>
       <dd></dd>
 {% endif %}
     </dl>
-    
     <dl>
 {% if next_page %}
-      <dt><a href="/{{ next_page }}/">&raquo; Next Article</a></dt>
+      <dt><a href="/{{ next_page }}/">&raquo;&nbsp;Next Article</a></dt>
       <dd>{{ next_page }}</dd>
 {% else %}
       <dt>&raquo; Next Article</dt>
       <dd></dd>
 {% endif %}
     </dl>
-    
     <p>
     <a href="{% url wikiprox-page-print title %}">Print</a><br/>
     <a href="{% url wikiprox-page-cite title %}">Cite</a><br/>
     </p>
-    
     <p>
     <a href="">Creative Commons</a><br/>
     </p>
 
+  </div><!-- .block -->
+
+  <div class="block hidden-tablet hidden-desktop">
+    <h4>
+    Category:
+{% for category in page_categories %}
+      <a href="/Category:{{ category }}/">{{ category }}</a>
+{% endfor %}
+    <br />
+    Table of Contents:
+    <a href="{% url wikiprox-contents %}">A-Z</a>
+    | <a href="{% url wikiprox-categories %}">By Category</a>
+    <br/>
+<table border="0">
+  <tr>
+    <td>Previous:</td>
+    <td>
+{% if prev_page %}<a href="/{{ prev_page }}/">&laquo;&nbsp;{{ prev_page|truncatechars:40 }}</a>{% endif %}
+    </td>
+  </tr>
+  <tr>
+    <td>Next:</td>
+    <td>
+{% if next_page %}<a href="/{{ next_page }}/">&raquo;&nbsp;{{ next_page|truncatechars:40 }}</a>{% endif %}
+    </td>
+  </tr>
+</table>
+    <a href="">Creative Commons</a><br/>
+    </h4>
   </div><!-- .block -->
 
 </div><!-- #sidebar-left .span2 -->

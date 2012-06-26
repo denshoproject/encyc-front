@@ -18,7 +18,7 @@
     margin-bottom: 10px;
     border: 1px solid #ccc;
     padding: 10px;
-    width: 300px;
+    width: 250px;
     font-size: smaller;
 }
 .primarysource left {
@@ -26,7 +26,7 @@
     margin-right: 10px;
 }
 .primarysource img {
-    width: 300px;
+    width: 250px;
 }
 
 .primarysource-detail img {

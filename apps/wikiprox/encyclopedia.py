@@ -34,8 +34,11 @@ def articles_a_z():
     TODO: display people according to last name
     """
     titles = []
+    NON_ARTICLE_PAGES.extend(category_authors())
     for page in category_members('Published', namespace_id=namespaces_reversed()['Default']):
-        if (page['title'] not in NON_ARTICLE_PAGES) and (page['title'] not in titles):
+        if (page['title'] not in NON_ARTICLE_PAGES) \
+               and ('Category' not in page['title']) \
+               and (page['title'] not in titles):
             titles.append(page['title'])
     titles.sort()
     return titles

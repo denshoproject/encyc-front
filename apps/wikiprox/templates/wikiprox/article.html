@@ -1,4 +1,5 @@
 {% extends "wikiprox/base.html" %}
+{% load wikiprox_tags %}
 
 
 {% block title %}{{ title }}{% endblock %}
@@ -84,7 +85,9 @@ ARTICLE
 <div id="sidebar-left">
 
   <div class="block primarysources">
-primary sources
+{% for source in sources %}
+{% primarysource source %}
+{% endfor %}
   </div><!-- .block .primarysources -->
 
   <div class="block">

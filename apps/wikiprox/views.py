@@ -47,9 +47,11 @@ def page(request, page='index', printer=False, template_name='wikiprox/page.html
         )
     # basic page context
     title = parse_mediawiki_title(r.text)
+    bodycontent,sources = parse_mediawiki_text(r.text)
     context = {
         'title': title,
-        'bodycontent': parse_mediawiki_text(r.text),
+        'bodycontent': bodycontent,
+        'sources': sources,
         'lastmod': mw_page_lastmod(r.text),
         }
     # author page

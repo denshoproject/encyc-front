@@ -7,7 +7,8 @@ import requests
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.template import loader, Context
+
+from wikiprox.sources import format_primary_source
 
 
 def mw_page_is_published(text):
@@ -63,8 +64,9 @@ def parse_mediawiki_text(text):
     soup = rewrite_newpage_links(soup)
     soup = rewrite_prevnext_links(soup)
     sources = find_primary_sources(soup)
-    soup = format_primary_sources(soup, sources)
-    return unicode(soup)
+    #soup = format_primary_sources(soup, sources)
+    soup = remove_primary_sources(soup, sources)
+    return unicode(soup), sources
 
 def parse_mediawiki_cite_page(text, page, request):
     """Parses the body of a MediaWiki Cite page.
@@ -178,7 +180,6 @@ def find_primary_sources(soup):
         if encyclopedia_id:
             eids.append(encyclopedia_id)
     # get sources via sources API
-    sources = {}
     if eids:
         eid_args = []
         for eid in eids:
@@ -188,7 +189,7 @@ def find_primary_sources(soup):
         if r.status_code == 200:
             response = json.loads(r.text)
             for s in response['objects']:
-                sources[s['encyclopedia_id']] = s
+                sources.append(s)
     return sources
 
 def format_primary_sources(soup, sources):
@@ -212,91 +213,25 @@ def format_primary_sources(soup, sources):
             eid,ext = os.path.splitext(y)
             href = reverse('wikiprox-source', kwargs={'encyclopedia_id': eid })
         if href:
-            # context
-            common = {'media_format': source['media_format'],
-                      'MEDIA_URL': settings.MEDIA_URL,
-                      'SOURCE_MEDIA_URL': settings.TANSU_MEDIA_URL,
-                      'href': href,
-                      'caption': source['caption'],
-                      'courtesy': source['courtesy'],
-                      'multiple': num_sources > 1,}
-            specific = {}
-            # video
-            if source['media_format'] == 'video':
-                template = 'wikiprox/video.html'
-                if source.get('thumbnail_sm',None):
-                    thumb_sm = source['thumbnail_sm']
-                    thumb_lg = source['thumbnail_lg']
-                elif source.get('display',None):
-                    thumb_sm = source['display']
-                    thumb_lg = source['display']
-                else:
-                    thumb_sm = 'img/icon-video.png'
-                    thumb_lg = 'img/icon-video.png'
-                xy = [640,480]
-                if source.get('aspect_ratio',None) and (source['aspect_ratio'] == 'hd'):
-                    xy = [640,360]
-                # remove rtmp_streamer from streaming_url
-                if source.get('streaming_url',None) and ('rtmp' in source['streaming_url']):
-                    streaming_url = source['streaming_url'].replace(settings.RTMP_STREAMER, '')
-                    rtmp_streamer = settings.RTMP_STREAMER
-                else:
-                    streaming_url = source['streaming_url']
-                    rtmp_streamer = ''
-                # add 20px to vertical for JWplayer
-                xy[1] = xy[1] + 20
-                specific = {
-                    'thumb_sm': thumb_sm,
-                    'thumb_lg': thumb_lg,
-                    'rtmp_streamer': rtmp_streamer,
-                    'streaming_url': streaming_url,
-                    'xy': xy,
-                    }
-            # document
-            elif source['media_format'] == 'document':
-                template = 'wikiprox/document.html'
-                if source.get('thumbnail_sm',None):
-                    thumb_sm = source['thumbnail_sm']
-                    thumb_lg = source['thumbnail_lg']
-                elif source.get('display',None):
-                    thumb_sm = source['thumbnail_sm']
-                    thumb_lg = source['thumbnail_lg']
-                elif source.get('original',None):
-                    thumb_sm = source['original']
-                    thumb_lg = source['original']
-                else:
-                    thumb_sm = 'img/icon-document.png'
-                    thumb_lg = 'img/icon-document.png'
-                specific = {
-                    'thumb_sm': thumb_sm,
-                    'thumb_lg': thumb_lg,
-                    }
-            # image
-            elif source['media_format'] == 'image':
-                template = 'wikiprox/image.html'
-                # img src
-                if source.get('thumbnail_sm',None):
-                    thumb_sm = source['thumbnail_sm']
-                    thumb_lg = source['thumbnail_lg']
-                elif source.get('display',None):
-                    thumb_sm = source['display']
-                    thumb_lg = source['display']
-                elif source.get('original',None):
-                    thumb_sm = source['original']
-                    thumb_lg = source['original']
-                else:
-                    thumb_sm = 'img/icon-image.png'
-                    thumb_lg = 'img/icon-image.png'
-                specific = {
-                    'thumb_sm': thumb_sm,
-                    'thumb_lg': thumb_lg,
-                    }
-            context = dict(common.items() + specific.items())
-            contexts.append(context)
-            # render
-            t = loader.get_template(template)
-            c = Context(context)
-            img = BeautifulSoup(t.render(c))
+            img = BeautifulSoup(format_primary_source(source))
             # insert back into page
             a.replace_with(img.body)
+    return soup
+
+def remove_primary_sources(soup, sources):
+    """Remove primary sources from the MediaWiki page entirely.
+    
+    see http://192.168.0.13/redmine/attachments/4/Encyclopedia-PrimarySourceDraftFlow.pdf
+    ...and really look at it.  Primary sources are all displayed in sidebar_right.
+    """
+    # all the <a><img>s
+    contexts = []
+    sources_keys = []
+    for s in sources:
+        sources_keys.append(s['encyclopedia_id'])
+    for a in soup.find_all('a', attrs={'class':'image'}):
+        encyclopedia_id = extract_encyclopedia_id(a.img['src'])
+        href = None
+        if encyclopedia_id and (encyclopedia_id in sources_keys):
+            a.decompose()
     return soup

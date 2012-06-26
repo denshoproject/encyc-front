@@ -62,7 +62,10 @@ def page(request, page='index', printer=False, template_name='wikiprox/page.html
             })
     # article
     elif encyclopedia.is_article(title):
-        template_name = 'wikiprox/article.html'
+        if printer:
+            template_name = 'wikiprox/article-print.html'
+        else:
+            template_name = 'wikiprox/article.html'
         context.update({
             'page_categories': encyclopedia.page_categories(title),
             'prev_page': encyclopedia.article_prev(title),

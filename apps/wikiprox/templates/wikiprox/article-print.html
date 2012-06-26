@@ -1,0 +1,38 @@
+{% extends "wikiprox/base-print.html" %}
+{% load wikiprox_tags %}
+
+
+{% block title %}{{ title }}{% endblock %}
+
+
+{% block article %}
+
+ARTICLE
+
+<h1 id="firstHeading" class="firstHeading">{{ title }}</h1>
+
+{{ bodycontent|safe }}
+
+{% endblock article %}
+
+
+{% block sidebar_left %}
+<div id="sidebar-left">
+
+  <div class="block primarysources">
+{% for source in sources %}
+{% primarysource source %}
+{% endfor %}
+  </div><!-- .block .primarysources -->
+
+  <div class="block">
+    <p>
+    <strong>
+    <a href="/About_the_Encyclopedia/">About the Incarceration</a><br/>
+    <a href="/Terminology/">Do Words Matter?</a><br/>
+    </strong>
+    </p>
+  </div><!-- .block -->
+
+</div><!-- #sidebar-left -->
+{% endblock sidebar_left %}

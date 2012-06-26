@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>{% block title %}{% endblock %} | Densho Encyclopedia</title>
+</head>
+<body>
+
+
+<div class="container">
+
+
+{% block contents %}{% endblock contents %}
+
+
+{% block sidebar_right %}{% endblock sidebar_right %}
+
+
+{% block sidebar_left %}{% endblock sidebar_left %}
+
+
+  <footer class="footer">
+SITEWIDE FOOTER TEXT HERE
+{% block footer %}{% endblock footer %}
+  </footer>
+
+
+</div><!-- .container -->
+
+
+</body>
+</html>

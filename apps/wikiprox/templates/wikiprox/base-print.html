@@ -1,0 +1,15 @@
+{% extends "base-print.html" %}
+
+
+{% block contents %}
+
+<div id="article">
+{% block article %}{% endblock %}
+</div><!-- #article -->
+
+{% endblock contents %}
+
+
+{% block footer %}
+{% if lastmod %}<p class="lastmod">{{ lastmod }}</p>{% endif %}
+{% endblock footer %}

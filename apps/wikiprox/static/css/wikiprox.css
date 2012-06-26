@@ -1,6 +1,4 @@
 #sidebar-left, #sidebar-right {
-    border: 1px solid #eee;
-    padding: 5px;
 }
 #sidebar-left {
 }
@@ -11,18 +9,13 @@
 .primarysource, .primarysource img {
 }
 .primarysource {
-    float: right;
-    margin: 0px;
-    margin-top: 10px;
-    margin-left: 10px;
-    margin-bottom: 10px;
+    margin: 10px;
     border: 1px solid #ccc;
     padding: 10px;
-    width: 250px;
     font-size: smaller;
+    width: 250px;
 }
 .primarysource left {
-    float: left;
     margin-right: 10px;
 }
 .primarysource img {

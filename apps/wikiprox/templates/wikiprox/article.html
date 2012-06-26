@@ -5,7 +5,8 @@
 {% block title %}{{ title }}{% endblock %}
 
 
-{% block article %}
+{% block contents %}
+<div id="article" class="span6">
 
 ARTICLE
 
@@ -24,21 +25,22 @@ ARTICLE
 
 {{ bodycontent|safe }}
 
-{% endblock article %}
+</div><!-- #article .span8 -->
+{% endblock contents %}
 
 
-{% block sidebar_right %}
-<div id="sidebar-right">
+{% block sidebar_left %}
+<div id="sidebar-left" class="span2">
 
   <div class="block">
-
+    
     <dl><strong>
       <dt>Category</dt>
 {% for category in page_categories %}
       <dd><a href="/Category:{{ category }}/">{{ category }}</a></dd>
 {% endfor %}
     </strong></dl>
-
+    
     <dl><strong>
       <dt>Table of Contents</dt>
       <dd>
@@ -46,7 +48,7 @@ ARTICLE
         <a href="{% url wikiprox-categories %}">By Category</a><br/>
       </dd>
     </strong></dl>
-
+    
     <dl>
 {% if prev_page %}
       <dt><a href="/{{ prev_page }}/">&laquo; Previous Article</a></dt>
@@ -56,6 +58,7 @@ ARTICLE
       <dd></dd>
 {% endif %}
     </dl>
+    
     <dl>
 {% if next_page %}
       <dt><a href="/{{ next_page }}/">&raquo; Next Article</a></dt>
@@ -65,24 +68,24 @@ ARTICLE
       <dd></dd>
 {% endif %}
     </dl>
-
+    
     <p>
     <a href="{% url wikiprox-page-print title %}">Print</a><br/>
     <a href="{% url wikiprox-page-cite title %}">Cite</a><br/>
     </p>
-
+    
     <p>
     <a href="">Creative Commons</a><br/>
     </p>
 
   </div><!-- .block -->
 
-</div><!-- #sidebar-right -->
-{% endblock sidebar_right %}
+</div><!-- #sidebar-left .span2 -->
+{% endblock sidebar_left %}
 
 
-{% block sidebar_left %}
-<div id="sidebar-left">
+{% block sidebar_right %}
+<div id="sidebar-right" class="span3">
 
   <div class="block primarysources">
 {% for source in sources %}
@@ -99,5 +102,5 @@ ARTICLE
     </p>
   </div><!-- .block -->
 
-</div><!-- #sidebar-left -->
-{% endblock sidebar_left %}
+</div><!-- #sidebar-right .span2 -->
+{% endblock sidebar_right %}

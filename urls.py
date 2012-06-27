@@ -25,5 +25,5 @@ urlpatterns = patterns(
     url(r"^cite/(?P<page>[\w\W]+)/$", 'wikiprox.views.page_cite', name='wikiprox-page-cite'),
     url(r"^print/(?P<page>[\w\W]+)/$", 'wikiprox.views.page', {'printer':True}, name='wikiprox-page-print'),
     url(r"^([\w\W]+)/$", 'wikiprox.views.page', name='wikiprox-page'),
-    url(r"^$", 'wikiprox.views.page', name='wikiprox-page'),
+    url(r"^$", 'wikiprox.views.index', name='wikiprox-index'),
 )

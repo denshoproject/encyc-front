@@ -17,6 +17,13 @@ from wikiprox import mediawiki as mw
 from wikiprox import encyclopedia
 
 
+def index(request, template_name='index.html'):
+    return render_to_response(
+        template_name,
+        {},
+        context_instance=RequestContext(request)
+    )
+
 @require_http_methods(['GET',])
 def page(request, page='index', printer=False, template_name='wikiprox/page.html'):
     """

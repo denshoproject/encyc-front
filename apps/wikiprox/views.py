@@ -144,8 +144,8 @@ def source(request, encyclopedia_id, template_name='wikiprox/source.html'):
 
 def contents(request, template_name='wikiprox/contents.html'):
     articles = []
-    for title in encyclopedia.articles_a_z():
-        articles.append( {'first_letter':title[0], 'title':title} )
+    for title in sorted(encyclopedia.articles_a_z(), key=unicode.lower):
+        articles.append( {'first_letter':title[0].upper(), 'title':title} )
     return render_to_response(
         template_name,
         {'articles': articles,},

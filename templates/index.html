@@ -6,18 +6,45 @@
 
 {% block contents %}
 
-<h1>Encyclopedia Home Page</h1>
+<div class="container">
 
-<p>
-YOUR TEXT GOES HERE
-</p>
+  <div class="hero-unit">
+    <h1>Welcome to the Densho Encyclopedia<span class="label label-info"></span>!</h1>
+    <p>The Encyclopedia contains articles </p>
+    <p><a class="btn btn-primary btn-large">Learn more &raquo;</a></p>
+  </div>
+
+  <div class="row">
+    <div class="span4">
+      <h2>Browse Topics</h2>
+       <p><a href="/categories/">List of Topics?</a></p>
+    </div>
+    <div class="span4">
+      <h2>Table of Contents A-Z</h2>
+       <p><a href="/contents/">Hmmm....</a></p>
+   </div>
+    <div class="span4">
+      <h2>Featured Article</h2>
+      <p>Is this even here? Maybe...</p>
+    </div>
+  </div>
+
+  <div class="row">
+	<div class="span12">
+		The Encyclopedia was made possible through the generous support of our funders.
+	</div>
+  </div>
+  
+<hr>
+
+  <footer>
+    <p>&copy; Company 2012</p>
+  </footer>
+
+</div> <!-- /container -->
 
 <p>
 <a href="/wiki/{{ WIKIPROX_MEDIAWIKI_DEFAULT_PAGE }}">Editors page</a>
-</p>
-
-<p>
-[edit: front/templates/index.html]
 </p>
 
 {% endblock contents %}

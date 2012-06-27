@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 import requests
 
 from django.conf import settings
+from django.core.urlresolvers import reverse
 from django.template import loader, Context
 
 
@@ -27,6 +28,7 @@ def format_primary_source(source):
     common = {'media_format': source['media_format'],
               'MEDIA_URL': settings.MEDIA_URL,
               'SOURCE_MEDIA_URL': settings.TANSU_MEDIA_URL,
+              'href': reverse('wikiprox-source', args=[source['encyclopedia_id']]),
               'caption': source['caption'],
               'courtesy': source['courtesy'],}
     specific = {}

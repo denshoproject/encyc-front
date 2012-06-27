@@ -1,0 +1,27 @@
+{% extends "wikiprox/base.html" %}
+
+
+{% block title %}Authors{% endblock %}
+
+
+{% block contents %}
+<div class="span12">
+
+authors.html
+
+<h1>Authors</h1>
+
+{% regroup authors by first_letter as letters_list %}
+<dl>
+{% for letter in letters_list %}
+<dt><h2>{{ letter.grouper }}</h2></dt>
+<dd>
+{% for authors in letter.list %}
+<a href="/{{ authors.title }}/">{{ authors.title }}</a>&nbsp;&nbsp;
+{% endfor %}
+</dd>
+{% endfor %}
+</dl>
+
+</div><!-- .span12 -->
+{% endblock contents %}

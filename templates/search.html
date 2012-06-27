@@ -5,10 +5,17 @@
 
 
 {% block contents %}
+<div id="search" class="span12">
 
 <h1>Search the Encyclopedia</h1>
 
 <div id="cse" style="width:100%;">Loading</div>
+
+</div><!-- #search .span12 -->
+{% endblock contents %}
+
+
+{% block javascript %}
 <script src="http://www.google.com/jsapi" type="text/javascript"></script>
 <script type="text/javascript">
   google.load('search', '1', {language : 'en', style : google.loader.themes.MINIMALIST});
@@ -22,5 +29,4 @@
     customSearchControl.draw('cse');
   }, true);
 </script>
-
-{% endblock contents %}
+{% endblock javascript %}

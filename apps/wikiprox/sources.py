@@ -44,6 +44,10 @@ def format_primary_source(source):
         else:
             thumb_sm = 'img/icon-video.png'
             thumb_lg = 'img/icon-video.png'
+        if source.get('original',None):
+            original = source['original']
+        else:
+            original = ''
         xy = [640,480]
         if source.get('aspect_ratio',None) and (source['aspect_ratio'] == 'hd'):
             xy = [640,360]
@@ -59,6 +63,7 @@ def format_primary_source(source):
         specific = {
             'thumb_sm': thumb_sm,
             'thumb_lg': thumb_lg,
+            'original': original,
             'rtmp_streamer': rtmp_streamer,
             'streaming_url': streaming_url,
             'xy': xy,

@@ -6,10 +6,37 @@
          width:{{ xy.0 }}, height:{{ xy.1 }},
          keyboard: { esc: false },
          flashvars: {
-             {% if rtmp_streamer %}streamer: '{{ rtmp_streamer }}',{% endif %}
-             file:'{{ streaming_url }}',
+             controlbar: 'bottom',
+             width:{{ xy.0 }},
+             height:{{ xy.1 }},
+             provider: 'rtmp',
              image:'{{ thumb_lg }}',
-             width:{{ xy.0 }}, height:{{ xy.1 }},
+             file: '{{ streaming_url }}',
+             {% if rtmp_streamer %}streamer: '{{ rtmp_streamer }}',{% endif %}
+             modes: [
+                 {
+                     type: 'flash',
+                     src: '{{ MEDIA_URL }}/jwplayer-5.9/player.swf'
+{% if original %}
+                 },
+                 {
+                     type: 'html5',
+                     config: {
+                         'file': '{{ original }}',
+                         'provider': 'video'
+                     }
+                 },
+                 {
+                     type: 'download',
+                     config: {
+                         file: '{{ original }}',
+                         provider: 'video'
+                     }
+                 }
+{% else %}
+                 }
+{% endif %}
+             ],
              autostart:false
          }"
      data-lightview-caption="{{ caption }} {{ courtesy }} <a class='more' href='{{ href }}'>More info &raquo;</a>"

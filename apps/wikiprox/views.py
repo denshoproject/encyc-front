@@ -13,8 +13,7 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.views.decorators.http import require_http_methods
 
-from wikiprox import parse_mediawiki_title, parse_mediawiki_text, parse_mediawiki_cite_page
-from wikiprox import mw_page_is_published, mw_page_lastmod
+from wikiprox import mediawiki as mw
 from wikiprox import encyclopedia
 
 
@@ -40,7 +39,7 @@ def page(request, page='index', printer=False, template_name='wikiprox/page.html
         )
     # only allow unpublished pages on :8000
     public = request.META.get('HTTP_X_FORWARDED_FOR',False)
-    published = mw_page_is_published(r.text)
+    published = mw.mw_page_is_published(r.text)
     if public and not published:
         return render_to_response(
             'wikiprox/unpublished.html',
@@ -48,13 +47,13 @@ def page(request, page='index', printer=False, template_name='wikiprox/page.html
             context_instance=RequestContext(request)
         )
     # basic page context
-    title = parse_mediawiki_title(r.text)
-    bodycontent,sources = parse_mediawiki_text(r.text, public)
+    title = mw.parse_mediawiki_title(r.text)
+    bodycontent,sources = mw.parse_mediawiki_text(r.text, public)
     context = {
         'title': title,
         'bodycontent': bodycontent,
         'sources': sources,
-        'lastmod': mw_page_lastmod(r.text),
+        'lastmod': mw.mw_page_lastmod(r.text),
         }
     # author page
     if encyclopedia.is_author(title):
@@ -89,11 +88,11 @@ def page_cite(request, page=None, template_name='wikiprox/cite.html'):
             {'title': page,},
             context_instance=RequestContext(request)
         )
-    title = parse_mediawiki_title(r.text)
+    title = mw.parse_mediawiki_title(r.text)
     return render_to_response(
         template_name,
         {'title': title,
-         'bodycontent': parse_mediawiki_cite_page(r.text, page, request),},
+         'bodycontent': mw.parse_mediawiki_cite_page(r.text, page, request),},
         context_instance=RequestContext(request)
     )
 

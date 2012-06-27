@@ -52,7 +52,7 @@ def parse_mediawiki_title(text):
         title = soup.title.string.strip().replace(settings.WIKIPROX_MEDIAWIKI_TITLE, '')
     return title
 
-def parse_mediawiki_text(text):
+def parse_mediawiki_text(text, public=False):
     """Parses the body of a MediaWiki page.
     """
     soup = BeautifulSoup(
@@ -66,6 +66,9 @@ def parse_mediawiki_text(text):
     sources = find_primary_sources(soup)
     #soup = format_primary_sources(soup, sources)
     soup = remove_primary_sources(soup, sources)
+    soup = rewrite_prevnext_links(soup)
+    if public:
+        soup = remove_status_markers(soup)
     return unicode(soup), sources
 
 def parse_mediawiki_cite_page(text, page, request):
@@ -119,6 +122,14 @@ def remove_edit_links(soup):
     """
     for e in soup.find_all('span', attrs={'class':'editsection'}):
         e.decompose()
+    return soup
+
+def remove_status_markers(soup):
+    """Remove the "Published", "Needs Primary Sources" tables.
+    """
+    for t in soup.find_all('table', attrs={'class':'mbox'}):
+        if 'published' in t['class']:
+            t.decompose()
     return soup
 
 def rewrite_mediawiki_urls(soup):

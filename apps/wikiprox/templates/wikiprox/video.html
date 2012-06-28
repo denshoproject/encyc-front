@@ -14,10 +14,11 @@
                  'provider': 'rtmp',
                  'image': '{{ thumb_lg }}',
                  'file': '{{ streaming_url }}',
-                 {% if rtmp_streamer %}streamer: '{{ rtmp_streamer }}',{% endif %}
+                 {% if rtmp_streamer %}'streamer': '{{ rtmp_streamer }}',{% endif %}
                  'modes' : [
                      {
-                         type: 'flash', src: '{{ MEDIA_URL }}/jwplayer-5.9/player.swf'
+                         type: 'flash',
+                         src: '{{ MEDIA_URL }}/jwplayer-5.9/player.swf'
 {% if original %}
                      },
                      {

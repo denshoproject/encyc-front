@@ -16,6 +16,8 @@ urlpatterns = patterns(
     #url(r'^admin/', include(admin.site.urls)),
     url(r'^sitemap\.xml$', 'django.contrib.sitemaps.views.sitemap', {'sitemaps': sitemaps}),
     #
+    url(r'^videotest/$', direct_to_template, {'template': 'wikiprox/LVplusJWPlayer.html'}),
+    #
     url(r'^search/$', direct_to_template, {'template': 'search.html'}),
     url(r"^contents/$", 'wikiprox.views.contents', name='wikiprox-contents'),
     url(r"^categories/$", 'wikiprox.views.categories', name='wikiprox-categories'),

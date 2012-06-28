@@ -1,0 +1,82 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+  <title>HTML5 Streaming Test Harness</title>
+
+  <meta name="generator" content="TextMate http://macromates.com/">
+  <meta name="author" content="Geoffrey Froh">
+  <!-- Date: 2012-06-21 -->
+    
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
+
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
+
+  <!--[if lt IE 9]>
+    <script type="text/javascript" src="http://dango.densho.org/front/media/lightview-3.1.4/js/excanvas/excanvas.js"></script>
+  <![endif]-->
+  <script type="text/javascript" src="http://dango.densho.org/front/media/lightview-3.1.4/js/spinners/spinners.js"></script>
+  <script type="text/javascript" src="http://dango.densho.org/front/media/lightview-3.1.4/js/lightview/lightview.js"></script>
+  <link rel="stylesheet" type="text/css" href="http://dango.densho.org/front/media/lightview-3.1.4/css/lightview/lightview.css"/>
+
+  <script type='text/javascript' src='http://dango.densho.org/front/media/jwplayer-5.9/jwplayer.js'></script>
+</head>
+<body>
+
+<h1>Streaming Test Harness</h1>
+
+<div class="primarysource video">
+  <a href="mediaspace" 
+     class="lightview" 
+     data-lightview-type="inline"
+     data-lightview-options="
+         keyboard: { esc: false },
+         afterUpdate: function(element, position) {
+             //jwplayer callback script
+             jwplayer('mediaspace').setup({
+                 'controlbar': 'bottom',
+                 'width': '640',
+                 'height': '520', 
+                 'provider': 'rtmp',
+                 'image': 'http://dango.densho.org/psms/media/cache/88/fc/88fcd8e4a8167729e931eccf643ac4b4.jpg',
+                 'file': '/production/encyclopedia/en-denshovh-ffrancis-01-0018-1.mp4',
+                 'streamer': 'rtmp://streaming.densho.org/denshostream',
+                 'modes' : [
+                     {type: 'flash', src: 'http://dango.densho.org/front/media/jwplayer-5.9/player.swf'},
+                     {
+                         type: 'html5',
+                         config: {
+                             'file' : 'http://dango.densho.org/psms/media/sources/1/1642/en-denshovh-ffrancis-01-0018-1.m4v',
+                             'provider' : 'video'
+                         }
+                     },
+                     {
+                         type: 'download',
+                         config: {
+                             'file' : 'http://dango.densho.org/psms/media/sources/1/1642/en-denshovh-ffrancis-01-0018-1.m4v',
+                             'provider' : 'video'
+                         }
+                     }
+                 ],
+                 autostart: false
+             });
+         }"
+     data-lightview-caption="Francis Mas Fukuhara recalls meeting with a displeased John Aiso. Courtesy of Densho, excerpted from Francis Mas Fukuhara Interview, Segment 18 (1997) <a class='more' href='http://dango.densho.org/sources/en-denshovh-ffrancis-01-0018-1/'>More info &raquo;</a>"
+     data-lightview-group="mixed">
+    <img src="http://dango.densho.org/psms/media/cache/f0/9d/f09de09a0e6a6b2edfd2e8d5f3a74351.jpg" />
+  </a>
+  <br/>
+  <span class="caption">
+  Francis Mas Fukuhara recalls meeting with a displeased John Aiso.
+  Courtesy of Densho, excerpted from Francis Mas Fukuhara Interview, Segment 18 (1997)
+  <a class="more" href="http://dango.densho.org/sources/en-denshovh-ffrancis-01-0018-1/">More info &raquo;</a>
+  </span>
+</div><!-- .primarysource .video -->
+
+<div id="mediaspace" style="display:none;width:680px;height:680px;">This div will end up in the lightbox</div>
+
+</body>
+</html>

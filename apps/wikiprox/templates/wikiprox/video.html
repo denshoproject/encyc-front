@@ -1,5 +1,5 @@
 <div class="primarysource video">
-  <a href="mediaspace"
+  <a href="mediaspace-{{ encyclopedia_id }}"
      class="lightview"
      data-lightview-type="inline"
      data-lightview-group="mixed"
@@ -7,7 +7,7 @@
          keyboard: { esc: false },
          afterUpdate: function(element, position) {
              //jwplayer callback script
-             jwplayer('mediaspace').setup({
+             jwplayer('mediaspace-{{ encyclopedia_id }}').setup({
                  'controlbar': 'bottom',
                  'width': '{{ xy.0 }}',
                  'height': '{{ xy.1 }}',
@@ -51,4 +51,4 @@
     <a class="more" href="{{ href }}">More info &raquo;</a>
   </span>
 </div>
-<div id="mediaspace" style="display:none;width:680px;height:680px;">This div will end up in the lightbox</div>
+<div id="mediaspace-{{ encyclopedia_id }}" style="display:none;width:{{ xyms.0 }}px;height:{{ xyms.1 }}px;">This div will end up in the lightbox</div>

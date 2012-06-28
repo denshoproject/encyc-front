@@ -9,6 +9,10 @@
 }
 
 
+#toc ul {
+    list-style-type: none;
+}
+
 .primarysource, .primarysource img {
 }
 .primarysource {

@@ -1,52 +1,50 @@
 <div class="primarysource video">
   <a href="{{ MEDIA_URL }}jwplayer-5.9/player.swf"
      class="lightview"
-     data-lightview-type="flash"
+     data-lightview-type="inline"
+     data-lightview-group="mixed"
      data-lightview-options="
-         width:{{ xy.0 }}, height:{{ xy.1 }},
          keyboard: { esc: false },
-         flashvars: {
-             controlbar: 'bottom',
-             width:{{ xy.0 }},
-             height:{{ xy.1 }},
-             provider: 'rtmp',
-             image:'{{ thumb_lg }}',
-             file: '{{ streaming_url }}',
-             {% if rtmp_streamer %}streamer: '{{ rtmp_streamer }}',{% endif %}
-             modes: [
-                 {
-                     type: 'flash',
-                     src: '{{ MEDIA_URL }}/jwplayer-5.9/player.swf'
+         afterUpdate: function(element, position) {
+             //jwplayer callback script
+             jwplayer('mediaspace').setup({
+                 'controlbar': 'bottom',
+                 'width': '{{ xy.0 }}',
+                 'height': '{{ xy.1 }}',
+                 'provider': 'rtmp',
+                 'image': '{{ thumb_lg }}',
+                 'file': '{{ streaming_url }}',
+                 {% if rtmp_streamer %}streamer: '{{ rtmp_streamer }}',{% endif %}
+                 'modes' : [
+                     {
+                         type: 'flash', src: '{{ MEDIA_URL }}/jwplayer-5.9/player.swf'
 {% if original %}
-                 },
-                 {
-                     type: 'html5',
-                     config: {
-                         'file': '{{ original }}',
-                         'provider': 'video'
-                     }
-                 },
-                 {
-                     type: 'download',
-                     config: {
-                         file: '{{ original }}',
-                         provider: 'video'
-                     }
-                 }
-{% else %}
-                 }
+                     },
+                     {
+                         type: 'html5',
+                         config: {
+                             'file' : '{{ original }}',
+                             'provider' : 'video'
+                         }
+                     },
+                     {
+                         type: 'download',
+                         config: {
+                             'file' : '{{ original }}',
+                             'provider' : 'video'
+                         }
 {% endif %}
-             ],
-             autostart:false
+                     }
+                 ],
+                 autostart: false
+             });
          }"
      data-lightview-caption="{{ caption }} {{ courtesy }} <a class='more' href='{{ href }}'>More info &raquo;</a>"
-     data-lightview-group="mixed">
-    <img src="{{ thumb_sm }}" />
-  </a>
-  <br/>
+  ><img src="{{ thumb_sm }}" /></a><br/>
   <span class="caption">
     {{ caption }}
     {{ courtesy }}
     <a class="more" href="{{ href }}">More info &raquo;</a>
   </span>
+  <div id="mediaspace" style="display:none;width:680px;height:680px;">This div will end up in the lightbox</div>
 </div>

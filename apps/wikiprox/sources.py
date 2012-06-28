@@ -25,7 +25,8 @@ def published_sources():
 
 def format_primary_source(source):
     # context
-    common = {'media_format': source['media_format'],
+    common = {'encyclopedia_id': source['encyclopedia_id'],
+              'media_format': source['media_format'],
               'MEDIA_URL': settings.MEDIA_URL,
               'SOURCE_MEDIA_URL': settings.TANSU_MEDIA_URL,
               'href': reverse('wikiprox-source', args=[source['encyclopedia_id']]),
@@ -60,6 +61,8 @@ def format_primary_source(source):
             rtmp_streamer = ''
         # add 20px to vertical for JWplayer
         xy[1] = xy[1] + 20
+        # mediaspace <div>
+        xyms = [xy[0]+10, xy[1]+10]
         specific = {
             'thumb_sm': thumb_sm,
             'thumb_lg': thumb_lg,
@@ -67,6 +70,7 @@ def format_primary_source(source):
             'rtmp_streamer': rtmp_streamer,
             'streaming_url': streaming_url,
             'xy': xy,
+            'xyms': xyms,
             }
     # document
     elif source['media_format'] == 'document':

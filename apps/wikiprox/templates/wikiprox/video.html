@@ -1,5 +1,5 @@
 <div class="primarysource video">
-  <a href="{{ MEDIA_URL }}jwplayer-5.9/player.swf"
+  <a href="mediaspace"
      class="lightview"
      data-lightview-type="inline"
      data-lightview-group="mixed"
@@ -41,11 +41,14 @@
              });
          }"
      data-lightview-caption="{{ caption }} {{ courtesy }} <a class='more' href='{{ href }}'>More info &raquo;</a>"
-  ><img src="{{ thumb_sm }}" /></a><br/>
+  >
+    <img src="{{ thumb_sm }}" />
+  </a>
+  <br/>
   <span class="caption">
     {{ caption }}
     {{ courtesy }}
     <a class="more" href="{{ href }}">More info &raquo;</a>
   </span>
-  <div id="mediaspace" style="display:none;width:680px;height:680px;">This div will end up in the lightbox</div>
 </div>
+<div id="mediaspace" style="display:none;width:680px;height:680px;">This div will end up in the lightbox</div>

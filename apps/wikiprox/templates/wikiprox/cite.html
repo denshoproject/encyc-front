@@ -1,14 +1,107 @@
-{% extends "wikiprox/base.html" %}
+<div style="border: 1px solid grey; background: #E6E8FA; width: 90%; padding: 15px 30px 15px 30px; margin: 10px auto;">
+  <h2>
+  Bibliographic details for {{ title }}
+  </h2>
+  <ul>
+    <li>
+      Page name: {{ title }}
+    </li>
+    <li>
+      Author: Densho Encyclopedia contributors
+    </li>
+    <li>
+      Publisher: <i>Densho Encyclopedia</i>.
+    </li>
+    <li>
+      Date of last revision: {{ lastmod|date:"j F Y H:i T" }}
+    </li>
+    <li>
+      Date retrieved: {{ retrieved|date:"j F Y H:i T" }}
+    </li>
+    <li>
+      Permanent URL: <a class="offsite" href="{{ href }}" rel="nofollow">{{ href }}</a>
+    </li>
+  </ul>
+</div>
+<div class="plainlinks" style="border: 1px solid grey; width: 90%; padding: 15px 30px 15px 30px; margin: 10px auto;">
 
+<h2>
+Citation styles for {{ title }}
+</h2>
 
-{% block title %}{{ title }}{% endblock %}
+<h3 id="APA">APA style</h3>
+<p>
+{{ title }}.
+({{ lastmod|date:"Y, F j" }}).
+<i>Densho Encyclopedia</i>.
+Retrieved {{ retrieved|date:"H:i, F j, Y" }} from <a class="offsite" href="{{ href }}" rel="nofollow">{{ href }}</a>.
+</p>
 
+<h3 id="MLA">MLA style</h3>
+<p>
+"{{ title }}."
+<i>Densho Encyclopedia</i>.
+{{ lastmod|date:"j M Y, H:i T" }}.
+{{ retrieved|date:"j M Y, H:i" }}
+&lt;<a class="offsite" href="{{ href }}" rel="nofollow">{{ href }}</a>&gt;.
+</p>
 
-{% block contents %}
-<!-- wikiprox/cite.html -->
+<h3 id="MHRA">MHRA style</h3>
+<p>
+Densho Encyclopedia contributors,
+'{{ title }}',
+<i>Densho Encyclopedia</i>
+25 June 2012, 22:19 UTC,
+&lt;<a class="offsite" href="{{ href }}" rel="nofollow">{{ href }}</a>&gt;
+[accessed {{ retrieved|date:"j M Y" }}]
+</p>
 
-<h1 id="firstHeading" class="firstHeading">{{ title }}</h1>
+<h3 id="Chicago">Chicago style</h3>
+<p>
+Densho Encyclopedia contributors,
+"{{ title }},"
+<i>Densho Encyclopedia</i>
+<a class="offsite" href="{{ href }}" rel="nofollow">{{ href }}</a>
+(accessed {{ retrieved|date:"M j Y" }}).
+</p>
 
-{{ bodycontent|safe }}
+<h3 id="CBE.2FCS">CBE/CSE style</h3>
+<p>
+Densho Encyclopedia contributors.
+{{ title }}
+[Internet].
+Densho Encyclopedia;
+{{ lastmod|date:"Y M j, H:i T" }}
+[cited {{ retrieved|date:"Y F j" }}].
+Available from:
+<a class="offsite" href="{{ href }}" rel="nofollow">{{ href }}</a>.
+</p>
 
-{% endblock contents %}
+<h3 id="Bluebook_style">Bluebook style</h3>
+<p>
+{{ title }},
+<a class="offsite" href="{{ href }}" rel="nofollow">{{ href }}</a>
+(last visited {{ retrieved|date:"F j, Y" }}).
+</p>
+
+<h3 id="BibTeX_entry">BibTeX</h3>
+<pre> @misc{ wiki:xxx,
+   author = "Densho Encyclopedia",
+   title = "{{ title }} --- Densho Encyclopedia{,} ",
+   year = "{{ retrieved|date:"Y" }}",
+   url = "<a class="offsite" href="{{ href }}" rel="nofollow">{{ href }}</a>",
+   note = "[Online; accessed {{ retrieved|date:"j-M-Y" }}]"
+ }
+</pre>
+<p>When using the LaTeX package url (<code>\usepackage{url}</code> somewhere in the preamble) which tends to give much more nicely formatted web addresses, the following may be preferred:
+</p>
+<pre> @misc{ wiki:xxx,
+   author = "Densho Encyclopedia",
+   title = "{{ title }} --- Densho Encyclopedia ",
+   year = "{{ retrieved|date:"Y" }}",
+   url = "<b>\url{</b><a class="offsite" href="{{ href }}" rel="nofollow">{{ href }}</a><b>}</b>",
+   note = "[Online; accessed {{ retrieved|date:"j-F-Y" }}]"
+ }
+</pre>
+
+</div>

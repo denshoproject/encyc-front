@@ -14,7 +14,13 @@
 <div id="share">
   <a href="{% url wikiprox-page-print title %}"><i class="icon-print"></i> Print</a>
   &nbsp;
-  <a href="{% url wikiprox-page-cite title %}"><i class="icon-bookmark"></i>Cite</a>
+  <a href="{% url wikiprox-page-cite title %}"
+     class="lightview"
+     data-lightview-type="iframe"
+     data-lightview-group="cite-header"
+     data-lightview-options="width: 1000, height: '100%'">
+  <i class="icon-bookmark"></i>Cite
+  </a>
   &nbsp;
   <!-- AddThis Button BEGIN -->
   <a class="addthis_button" href="http://www.addthis.com/bookmark.php?v=250&amp;pubid=densho"><img src="http://s7.addthis.com/static/btn/v2/lg-share-en.gif" width="125" height="16" alt="Bookmark and Share" style="border:0"/></a>
@@ -66,7 +72,13 @@
     </dl>
     <p>
     <a href="{% url wikiprox-page-print title %}"><i class="icon-print"></i> Printer-friendly</a><br/>
-    <a href="{% url wikiprox-page-cite title %}"><i class="icon-bookmark"></i> Cite this article</a><br/>
+  <a href="{% url wikiprox-page-cite title %}"
+     class="lightview"
+     data-lightview-type="iframe"
+     data-lightview-group="cite-sidebar"
+     data-lightview-options="width: 1000, height: '100%'">
+  <i class="icon-bookmark"></i>Cite
+  </a>
     </p>
     <p>
     

@@ -8,8 +8,9 @@ from bs4 import Comment
 import requests
 
 from django.conf import settings
+from django.core.urlresolvers import reverse
 from django.http import HttpResponse
-from django.shortcuts import render_to_response, get_object_or_404
+from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.template import RequestContext
 from django.views.decorators.http import require_http_methods
 
@@ -87,19 +88,50 @@ def page(request, page='index', printer=False, template_name='wikiprox/page.html
 
 @require_http_methods(['GET',])
 def page_cite(request, page=None, template_name='wikiprox/cite.html'):
-    url = '%s?title=Special:Cite&page=%s' % (settings.WIKIPROX_MEDIAWIKI_HTML, page)
+    url = '%s?format=json&action=query&prop=info&prop=revisions&titles=%s' % (settings.WIKIPROX_MEDIAWIKI_API, page)
     r = requests.get(url)
-    if r.status_code != 200:
+    if r.status_code == 200:
+        r_text = r.text
+        response = json.loads(r.text)
+        keys = response['query']['pages'].keys()
+        if len(keys) == 1:
+            pageinfo = response['query']['pages'][keys[0]]
+            TS_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
+            timestamp = pageinfo['revisions'][0]['timestamp']
+            lastmod = datetime.strptime(timestamp, TS_FORMAT)
+            href = 'http://%s%s' % (request.META['HTTP_HOST'], reverse('wikiprox-page', args=[page]))
+            return render_to_response(
+                template_name,
+                {'title': pageinfo['title'],
+                 'lastmod': lastmod,
+                 'retrieved': datetime.now(),
+                 'href': href,},
+                context_instance=RequestContext(request)
+            )
+    return render_to_response(
+        'wikiprox/404.html',
+        {'title': page,},
+        context_instance=RequestContext(request)
+    )
+
+@require_http_methods(['GET',])
+def source_cite(request, encyclopedia_id, template_name='wikiprox/cite.html'):
+    source = sources.source(encyclopedia_id)
+    if source:
+        TS_FORMAT = '%Y-%m-%dT%H:%M:%S'
+        lastmod = datetime.strptime(source['modified'], TS_FORMAT)
+        href = 'http://%s%s' % (request.META['HTTP_HOST'], reverse('wikiprox-source', args=[encyclopedia_id]))
         return render_to_response(
-            'wikiprox/404.html',
-            {'title': page,},
+            template_name,
+            {'title': encyclopedia_id,
+             'lastmod': lastmod,
+             'retrieved': datetime.now(),
+             'href': href,},
             context_instance=RequestContext(request)
         )
-    title = mw.parse_mediawiki_title(r.text)
     return render_to_response(
-        template_name,
-        {'title': title,
-         'bodycontent': mw.parse_mediawiki_cite_page(r.text, page, request),},
+        'wikiprox/404.html',
+        {'title': page,},
         context_instance=RequestContext(request)
     )
 

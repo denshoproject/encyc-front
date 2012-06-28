@@ -38,10 +38,15 @@
 <!-- wikiprox/source.html -->
 <div class="primarysource-detail span12">
 
+<p>
+<a href="/{{ source.headword }}/">&laquo; Back to article {{ source.headword }}</a>
+</p>
+
 <h1 id="firstHeading" class="firstHeading">
 Primary Source &mdash; {{ source.encyclopedia_id }}
 </h1>
 
+<p>
 <div id="media">
 {% if source.media_format == 'image' %}
   <img src="{{ source.thumbnail_lg }}" />
@@ -57,15 +62,20 @@ Primary Source &mdash; {{ source.encyclopedia_id }}
   </div>
   {% if source.transcript %}<br/><a href="{{ source.transcript }}" target="_transcript">Download a transcript</a>{% endif %}
 {% endif %}
+{% if source.external_url %}&nbsp;&mdash;&nbsp; <a href="{{ source.external_url }}" class="offsite" target="offsite">{{ source.external_url }}</a>{% endif %}
 </div><!-- #media -->
+</p>
 
 {{ source.caption|safe|linebreaks }}
 {{ source.caption_extended|safe|linebreaks }}
 
 {{ source.courtesy|safe|linebreaks }}
 
+<p>
+<a href="/{{ source.headword }}/">&laquo; Back to article {{ source.headword }}</a>
+</p>
 
-<table style="border: 4px dashed red;">
+<table style="">
 <tr><th>created</th><td>{{ source.created }}</td></tr>
 <tr><th>modified</th><td>{{ source.modified }}</td></tr>
 

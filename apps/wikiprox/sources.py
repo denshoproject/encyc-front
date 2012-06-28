@@ -9,6 +9,16 @@ from django.core.urlresolvers import reverse
 from django.template import loader, Context
 
 
+def source(encyclopedia_id):
+    source = None
+    url = '%s/primarysource/?encyclopedia_id=%s' % (settings.TANSU_API, encyclopedia_id)
+    r = requests.get(url, headers={'content-type':'application/json'})
+    if r.status_code == 200:
+        response = json.loads(r.text)
+        if response and (response['meta']['total_count'] == 1):
+            source = response['objects'][0]
+    return source
+
 def published_sources():
     """Returns list of published Sources.
     """

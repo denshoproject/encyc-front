@@ -14,7 +14,7 @@ from django.template import RequestContext
 from django.views.decorators.http import require_http_methods
 
 from wikiprox import mediawiki as mw
-from wikiprox import encyclopedia
+from wikiprox import encyclopedia, sources
 
 
 def index(request, template_name='index.html'):
@@ -126,17 +126,7 @@ def media(request, filename, template_name='wikiprox/mediafile.html'):
 def source(request, encyclopedia_id, template_name='wikiprox/source.html'):
     """
     """
-    url = '%s/primarysource/?encyclopedia_id=%s' % (settings.TANSU_API, encyclopedia_id)
-    r = requests.get(url, headers={'content-type':'application/json'})
-    if r.status_code != 200:
-        return render_to_response(
-            'wikiprox/404-source.html',
-            {'filename': filename,},
-            context_instance=RequestContext(request)
-        )
-    response = json.loads(r.text)
-    if response and (response['meta']['total_count'] == 1):
-        source = response['objects'][0]
+    source = sources.source(encyclopedia_id)
     rtmp_streamer = ''
     if source.get('streaming_url',None) and ('rtmp' in source['streaming_url']):
         source['streaming_url'] = source['streaming_url'].replace(settings.RTMP_STREAMER,'')

@@ -173,7 +173,7 @@ def authors(request, template_name='wikiprox/authors.html'):
     authors = encyclopedia.category_authors()
     return render_to_response(
         template_name,
-        {'authors': columnizer(authors, 5),},
+        {'authors': columnizer(authors, 4),},
         context_instance=RequestContext(request)
     )
 

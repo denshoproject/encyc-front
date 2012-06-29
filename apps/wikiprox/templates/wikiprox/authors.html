@@ -25,17 +25,15 @@ table#authors td {
 
 <h1>Authors</h1>
 
-<table id="authors">
-  <tr>
+<div class="authors row">
 {% for column in authors %}
-    <td valign="top">
+  <div class="span3">
 {% for author in column %}
-<a href="/{{ author }}/">{{ author }}</a><br/>
+    <a href="/{{ author }}/">{{ author }}</a><br/>
 {% endfor %}
-    </td>
+  </div>
 {% endfor %}
-  </tr>
-</table>
+</div>
 
 <!--
 {% regroup authors by first_letter as letters_list %}

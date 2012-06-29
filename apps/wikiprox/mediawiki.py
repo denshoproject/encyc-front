@@ -16,7 +16,7 @@ def mw_page_is_published(text):
     """
     published = False
     soup = BeautifulSoup(text, parse_only=SoupStrainer('div', attrs={'class':'mw-content-ltr'}))
-    for t in soup.find_all('table', attrs={'class':'published'}):
+    for t in soup.find_all('div', attrs={'class':'published'}):
         published = True
     return published
 
@@ -105,9 +105,9 @@ def remove_edit_links(soup):
 def remove_status_markers(soup):
     """Remove the "Published", "Needs Primary Sources" tables.
     """
-    for t in soup.find_all('table', attrs={'class':'mbox'}):
-        if 'published' in t['class']:
-            t.decompose()
+    for d in soup.find_all('div', attrs={'class':'alert'}):
+        if 'published' in d['class']:
+            d.decompose()
     return soup
 
 def rewrite_mediawiki_urls(soup):

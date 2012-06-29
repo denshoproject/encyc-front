@@ -1,19 +1,60 @@
-{% extends "base.html" %}
+<!doctype html>
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]> <html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]> <html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  
+  <title>500 - Server Error | Densho Encyclopedia</title>
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <link rel="stylesheet" href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css" />
+  <link rel="stylesheet" href="http://twitter.github.com/bootstrap/assets/css/bootstrap-responsive.css" />
+  <style>
+    .navbar {
+      background: #333;
+      padding-left: 10px;
+    }
+	.navbar .brand {
+		color: #ffffff;
+		font-weight:400;
+	}
+    .footer {
+      margin-top: 32px;
+      border-top: 1px solid #eee;
+      padding-top: 32px;
+      padding-bottom: 32px;
+	}
+  </style>
 
+</head>
+<body>
 
-{% block title %}500 - Server Error{% endblock %}
+<div class="navbar">
+  <div class="navbar-inner">
+    <div class="container">
+      <a class="brand" href="/">
+        Densho Encyclopedia
+        <span class="label label-info">Beta</span>
+      </a>
+    </div>
+  </div>
+</div>
 
+<div id="error-500" class="span12">
 
-{% block contents %}
-<div id="500" class="span12">
+<h1>500 - Server Error</h1>
 
 <p>
-OMG!!!  500 ERROR!!!
+We're sorry, the Densho Encyclopedia site is down for maintenance.
+Please try again in 15 minutes.
 </p>
 
-<p>
-[edit: front/templates/500.html]
-</p>
+</div>
 
-</div><!-- #500 .span12 -->
-{% endblock contents %}
+</body>
+</html>

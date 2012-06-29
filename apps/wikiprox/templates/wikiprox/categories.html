@@ -1,14 +1,20 @@
 {% extends "wikiprox/base.html" %}
 
 
-{% block title %}Table of Contents &mdash; By Category{% endblock %}
+{% block title %}Browse Topics{% endblock %}
 
 
 {% block contents %}
 <!-- wikiprox/categories.html -->
 <div class="span12">
 
-<h1>Table of Contents &mdash; By Category</h1>
+<p>
+  <strong>Browse Topics</strong>
+| <a href="/contents/">Table of Contents A-Z</a>
+| <a href="/authors/">Authors</a>
+</p>
+
+<h1>Browse Topics</h1>
 
 <dl>
 {% for category in articles_by_category %}

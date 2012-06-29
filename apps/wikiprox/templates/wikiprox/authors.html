@@ -4,6 +4,14 @@
 {% block title %}Authors{% endblock %}
 
 
+{% block css %}
+<style>
+table#authors td {
+    padding-right: 32px;
+}
+</style>
+{% endblock %}
+
 {% block contents %}
 <!-- wikiprox/authors.html -->
 <div class="span12">
@@ -16,9 +24,18 @@
 
 <h1>Authors</h1>
 
-{% for author in authors %}
-<a href="{{ author }}">{{ author }}</a><br/>
+<table id="authors">
+  <tr>
+{% for column in authors %}
+    <td valign="top">
+{% for author in column %}
+<a href="/{{ author }}/">{{ author }}</a><br/>
 {% endfor %}
+    </td>
+{% endfor %}
+  </tr>
+</table>
+
 <!--
 {% regroup authors by first_letter as letters_list %}
 <dl>

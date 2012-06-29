@@ -175,7 +175,7 @@ def authors(request, template_name='wikiprox/authors.html'):
     authors = encyclopedia.category_authors()
     return render_to_response(
         template_name,
-        {'authors': authors,},
+        {'authors': columnizer(authors, 5),},
         context_instance=RequestContext(request)
     )
 
@@ -199,3 +199,17 @@ def contents(request, template_name='wikiprox/contents.html'):
         {'articles': articles,},
         context_instance=RequestContext(request)
     )
+
+# ----------------------------------------------------------------------
+
+def columnizer(things, cols):
+    columns = []
+    collen = round(len(things) / float(cols))
+    col = []
+    for t in things:
+        col.append(t)
+        if len(col) > collen:
+           columns.append(col)
+           col = []
+    columns.append(col)
+    return columns

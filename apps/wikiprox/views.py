@@ -9,7 +9,7 @@ import requests
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.template import RequestContext
 from django.views.decorators.http import require_http_methods
@@ -40,11 +40,7 @@ def page(request, page='index', printer=False, template_name='wikiprox/page.html
     # request
     r = requests.get(url)
     if r.status_code != 200:
-        return render_to_response(
-            'wikiprox/404.html',
-            {'title': page,},
-            context_instance=RequestContext(request)
-        )
+        raise Http404
     # only allow unpublished pages on :8000
     public = request.META.get('HTTP_X_FORWARDED_FOR',False)
     published = mw.mw_page_is_published(r.text)
@@ -109,7 +105,7 @@ def page_cite(request, page=None, template_name='wikiprox/cite.html'):
                 context_instance=RequestContext(request)
             )
     return render_to_response(
-        'wikiprox/404.html',
+        '404.html',
         {'title': page,},
         context_instance=RequestContext(request)
     )
@@ -130,7 +126,7 @@ def source_cite(request, encyclopedia_id, template_name='wikiprox/cite.html'):
             context_instance=RequestContext(request)
         )
     return render_to_response(
-        'wikiprox/404.html',
+        '404.html',
         {'title': page,},
         context_instance=RequestContext(request)
     )
@@ -159,6 +155,8 @@ def source(request, encyclopedia_id, template_name='wikiprox/source.html'):
     """
     """
     source = sources.source(encyclopedia_id)
+    if not source:
+        raise Http404
     rtmp_streamer = ''
     if source.get('streaming_url',None) and ('rtmp' in source['streaming_url']):
         source['streaming_url'] = source['streaming_url'].replace(settings.RTMP_STREAMER,'')

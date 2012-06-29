@@ -1,19 +1,22 @@
-{% extends "base.html" %}
+{% extends "wikiprox/base.html" %}
 
 
-{% block title %}404 - Page Not Found{% endblock %}
+{% block title %}{{ title }}{% endblock %}
 
 
 {% block contents %}
-<div id="404" class="span12">
 
 <p>
-OMG!!!  404 PAGE NOT FOUND!!!
+              <a href="/categories">Browse Topics</a>
+&nbsp;|&nbsp; <a href="/contents">Table of Contents A-Z</a>
+&nbsp;|&nbsp; <a href="/authors/">Authors</a>
+&nbsp;|&nbsp; <a href="/search">Search</a>
 </p>
+
+<h1>404 - Page Not Found</h1>
 
 <p>
-[edit: front/templates/404.html]
+We're sorry, but the page that you requested does not exist.
 </p>
 
-</div><!-- #404 .span12 -->
 {% endblock contents %}

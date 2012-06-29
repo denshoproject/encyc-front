@@ -13,6 +13,20 @@
     list-style-type: none;
 }
 
+.infobox {
+    margin:0px;
+    margin-left: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    background: #efefef;
+    float: right;
+}
+.infobox th, .infobox td {
+    padding: 5px;
+    vertical-align: top;
+    line-height: normal;
+}
+
 .primarysource, .primarysource img {
 }
 .primarysource {

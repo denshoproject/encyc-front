@@ -69,6 +69,7 @@ def parse_mediawiki_text(text, public=False):
     soup = rewrite_prevnext_links(soup)
     if public:
         soup = remove_status_markers(soup)
+    soup = add_top_links(soup)
     return unicode(soup), sources
 
 def remove_staticpage_titles(soup):
@@ -223,4 +224,17 @@ def remove_primary_sources(soup, sources):
         href = None
         if encyclopedia_id and (encyclopedia_id in sources_keys):
             a.decompose()
+    return soup
+    
+def add_top_links(soup):
+    import copy
+    TOPLINK_TEMPLATE = '<div class="toplink"><a href="#top"><i class="icon-chevron-up"></i> Top</a></div>'
+    toplink = BeautifulSoup(TOPLINK_TEMPLATE,
+                            parse_only=SoupStrainer('div', attrs={'class':'toplink'}))
+    n = 0
+    for h in soup.find_all('h2'):
+        if n > 1:
+            h.insert_before(copy.copy(toplink))
+        n = n + 1
+    soup.append(copy.copy(toplink))
     return soup

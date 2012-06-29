@@ -90,7 +90,10 @@ Primary Source &mdash; {{ source.encyclopedia_id }}
 <div id="rightsStatement">
 
 {% if source.creative_commons %}
-  
+
+<p>
+	<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png" /></a>
+</p>
 <p>&copy; Densho 2012. This primary source is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License</a>. More information <a href="/about/#Using_and_Citing">&raquo;</a></p>
 
   
@@ -104,3 +107,20 @@ Primary Source &mdash; {{ source.encyclopedia_id }}
 
 </div><!-- .source-detail -->
 {% endblock contents %}
+
+
+# PS pages should not include standard cc message
+{% block footer %}
+
+<div class="footer" id="footerToolsMenu">
+
+	<a href="/about/#Using_and_Citing">Using and Citing Articles</a> | 
+	<a href="/terms/">Terms of Use/Privacy</a> | 
+	<a href="/about/">About</a> | 
+	<a href="/contact/">Contact</a>
+	
+</div>
+
+{% endblock footer %}
+
+

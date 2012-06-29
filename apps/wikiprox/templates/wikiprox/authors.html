@@ -16,6 +16,10 @@
 
 <h1>Authors</h1>
 
+{% for author in authors %}
+<a href="{{ author }}">{{ author }}</a><br/>
+{% endfor %}
+<!--
 {% regroup authors by first_letter as letters_list %}
 <dl>
 {% for letter in letters_list %}
@@ -27,6 +31,7 @@
 </dd>
 {% endfor %}
 </dl>
+-->
 
 </div><!-- .span12 -->
 {% endblock contents %}

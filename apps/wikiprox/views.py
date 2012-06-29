@@ -171,13 +171,11 @@ def source(request, encyclopedia_id, template_name='wikiprox/source.html'):
         context_instance=RequestContext(request)
     )
 
-def contents(request, template_name='wikiprox/contents.html'):
-    articles = []
-    for title in sorted(encyclopedia.articles_a_z(), key=unicode.lower):
-        articles.append( {'first_letter':title[0].upper(), 'title':title} )
+def authors(request, template_name='wikiprox/authors.html'):
+    authors = encyclopedia.category_authors()
     return render_to_response(
         template_name,
-        {'articles': articles,},
+        {'authors': authors,},
         context_instance=RequestContext(request)
     )
 
@@ -189,5 +187,15 @@ def categories(request, template_name='wikiprox/categories.html'):
     return render_to_response(
         template_name,
         {'articles_by_category': articles_by_category,},
+        context_instance=RequestContext(request)
+    )
+
+def contents(request, template_name='wikiprox/contents.html'):
+    articles = []
+    for title in sorted(encyclopedia.articles_a_z(), key=unicode.lower):
+        articles.append( {'first_letter':title[0].upper(), 'title':title} )
+    return render_to_response(
+        template_name,
+        {'articles': articles,},
         context_instance=RequestContext(request)
     )

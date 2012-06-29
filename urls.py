@@ -18,12 +18,13 @@ urlpatterns = patterns(
     #
     url(r'^videotest/$', direct_to_template, {'template': 'wikiprox/LVplusJWPlayer.html'}),
     #
-    url(r'^search/$', direct_to_template, {'template': 'search.html'}),
     url(r'^about/$', direct_to_template, {'template': 'about.html'}),
+    url(r'^authors/$', 'wikiprox.views.authors', name='wikiprox-authors'),
+    url(r'^categories/$', 'wikiprox.views.categories', name='wikiprox-categories'),
+    url(r'^contents/$', 'wikiprox.views.contents', name='wikiprox-contents'),
     url(r'^history/$', direct_to_template, {'template': 'history.html'}),
+    url(r'^search/$', direct_to_template, {'template': 'search.html'}),
     url(r'^terminology/$', direct_to_template, {'template': 'terminology.html'}),
-    url(r"^contents/$", 'wikiprox.views.contents', name='wikiprox-contents'),
-    url(r"^categories/$", 'wikiprox.views.categories', name='wikiprox-categories'),
     #
     url(r"^sources/(?P<encyclopedia_id>[\w .:_-]+)/$", 'wikiprox.views.source', name='wikiprox-source'),
     #

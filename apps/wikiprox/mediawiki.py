@@ -56,7 +56,7 @@ def parse_mediawiki_text(text, public=False):
     """Parses the body of a MediaWiki page.
     """
     soup = BeautifulSoup(
-        text.replace('<!DOCTYPE html>', ''),
+        text.replace('<!DOCTYPE html>', '').replace('<p><br />\n</p>', ''),
         parse_only=SoupStrainer('div', attrs={'class':'mw-content-ltr'}))
     soup = remove_staticpage_titles(soup)
     soup = remove_comments(soup)

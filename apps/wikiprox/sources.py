@@ -45,6 +45,7 @@ def published_sources():
     return sources
 
 def format_primary_source(source):
+    template = 'wikiprox/generic.html'
     # context
     common = {'encyclopedia_id': source['encyclopedia_id'],
               'media_format': source['media_format'],

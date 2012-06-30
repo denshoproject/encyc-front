@@ -10,6 +10,7 @@ from wikiprox import make_cache_key
 
 
 NON_ARTICLE_PAGES = ['about', 'categories', 'contact', 'contents', 'search',]
+TS_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
 
 
 def all_pages():
@@ -21,11 +22,9 @@ def all_pages():
     if cached:
         pages = json.loads(cached)
         for page in pages:
-            page['timestamp'] = datetime.strptime(page['revisions'][0]['timestamp'],
-                                                  TS_FORMAT)
+            page['timestamp'] = datetime.strptime(page['timestamp'], TS_FORMAT)
     else:
         # all articles
-        TS_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
         LIMIT=5000
         url = '%s?action=query&generator=allpages&prop=revisions&rvprop=timestamp&gaplimit=5000&format=json' % (settings.WIKIPROX_MEDIAWIKI_API)
         r = requests.get(url, headers={'content-type':'application/json'})
@@ -34,6 +33,7 @@ def all_pages():
             if response and response['query'] and response['query']['pages']:
                 for id in response['query']['pages']:
                     page = response['query']['pages'][id]
+                    page['timestamp'] = page['revisions'][0]['timestamp']
                     pages.append(page)
         cache.set(cache_key, json.dumps(pages), settings.CACHE_TIMEOUT)
     return pages
@@ -228,13 +228,16 @@ def published_pages():
     cached = cache.get(cache_key)
     if cached:
         pages = json.loads(cached)
+        for page in pages:
+            page['timestamp'] = datetime.strptime(page['timestamp'], TS_FORMAT)
     else:
         pids = []  # published_article_ids
         for article in category_members('Published', namespace_id=namespaces_reversed()['Default']):
             pids.append(article['pageid'])
-        for article in all_pages():
-            if article['pageid'] in pids:
-                pages.append(article)
+        for page in all_pages():
+            if page['pageid'] in pids:
+                page['timestamp'] = page['revisions'][0]['timestamp']
+                pages.append(page)
         cache.set(cache_key, json.dumps(pages), settings.CACHE_TIMEOUT)
     return pages
 

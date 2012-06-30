@@ -5,10 +5,13 @@ from bs4 import BeautifulSoup
 import requests
 
 from django.conf import settings
+from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.template import loader, Context
 
 from wikiprox import make_cache_key
+
+TS_FORMAT = '%Y-%m-%d %H:%M:%S'
 
 
 def source(encyclopedia_id):
@@ -29,14 +32,14 @@ def published_sources():
     cached = cache.get(cache_key)
     if cached:
         sources = json.loads(cached)
+        for source in sources:
+            s['modified'] = datetime.strptime(s['modified'], TS_FORMAT)
     else:
-        TS_FORMAT = '%Y-%m-%d %H:%M:%S'
         url = '%s/primarysource/sitemap/' % settings.TANSU_API
         r = requests.get(url, headers={'content-type':'application/json'})
         if r.status_code == 200:
             response = json.loads(r.text)
             for s in response['objects']:
-                s['modified'] = datetime.strptime(s['modified'], TS_FORMAT)
                 sources.append(s)
         cache.set(cache_key, json.dumps(sources), settings.CACHE_TIMEOUT)
     return sources

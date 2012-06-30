@@ -33,14 +33,14 @@ def published_sources():
     if cached:
         sources = json.loads(cached)
         for source in sources:
-            s['modified'] = datetime.strptime(s['modified'], TS_FORMAT)
+            source['modified'] = datetime.strptime(source['modified'], TS_FORMAT)
     else:
         url = '%s/primarysource/sitemap/' % settings.TANSU_API
         r = requests.get(url, headers={'content-type':'application/json'})
         if r.status_code == 200:
             response = json.loads(r.text)
-            for s in response['objects']:
-                sources.append(s)
+            for source in response['objects']:
+                sources.append(source)
         cache.set(cache_key, json.dumps(sources), settings.CACHE_TIMEOUT)
     return sources
 

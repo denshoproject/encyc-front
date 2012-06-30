@@ -8,6 +8,8 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.template import loader, Context
 
+from wikiprox import make_cache_key
+
 
 def source(encyclopedia_id):
     source = None
@@ -23,14 +25,20 @@ def published_sources():
     """Returns list of published Sources.
     """
     sources = []
-    TS_FORMAT = '%Y-%m-%d %H:%M:%S'
-    url = '%s/primarysource/sitemap/' % settings.TANSU_API
-    r = requests.get(url, headers={'content-type':'application/json'})
-    if r.status_code == 200:
-        response = json.loads(r.text)
-        for s in response['objects']:
-            s['modified'] = datetime.strptime(s['modified'], TS_FORMAT)
-            sources.append(s)
+    cache_key = make_cache_key('wikiprox:sources:published_sources')
+    cached = cache.get(cache_key)
+    if cached:
+        sources = json.loads(cached)
+    else:
+        TS_FORMAT = '%Y-%m-%d %H:%M:%S'
+        url = '%s/primarysource/sitemap/' % settings.TANSU_API
+        r = requests.get(url, headers={'content-type':'application/json'})
+        if r.status_code == 200:
+            response = json.loads(r.text)
+            for s in response['objects']:
+                s['modified'] = datetime.strptime(s['modified'], TS_FORMAT)
+                sources.append(s)
+        cache.set(cache_key, json.dumps(sources), settings.CACHE_TIMEOUT)
     return sources
 
 def format_primary_source(source):

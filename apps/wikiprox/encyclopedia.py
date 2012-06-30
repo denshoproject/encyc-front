@@ -6,16 +6,11 @@ import requests
 from django.conf import settings
 from django.core.cache import cache
 
+from wikiprox import make_cache_key
 
 
 NON_ARTICLE_PAGES = ['about', 'categories', 'contact', 'contents', 'search',]
 
-
-def make_cache_key(text):
-    MEMCACHED_CONTROL_CHARS = [' ']
-    for c in MEMCACHED_CONTROL_CHARS:
-        text = text.replace(c,'')
-    return text[:250]
 
 def all_pages():
     """Returns a list of all pages, with timestamp of latest revision.

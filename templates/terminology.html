@@ -42,3 +42,25 @@
 
 </div> <!-- div.row -->
 {% endblock contents %}
+
+{% footer %}
+<div id="ccNotice">
+<p>
+	<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png" /></a>
+	</p>
+<p>
+&copy; Densho 2012. The text of this work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License</a>. Where indicated, images and other primary source materials may be subject to use restrictions by their respective rights holders. <a href="/about/#usingandciting">More information &raquo;</a>
+</p>
+</div>
+
+<div class="footer" id="footerToolsMenu">
+
+	<a href="/about/#usingandciting">Using and Citing Articles</a> | 
+	<a href="/about/#tosprivacy/">Terms of Use/Privacy</a> | 
+	<a href="/about/">About</a> | 
+	<a href="/about/#contact">Contact</a>
+	
+</div>
+
+{% if lastmod %}<p class="lastmod">{{ lastmod }}</p>{% endif %}
+{% endblock footer %}

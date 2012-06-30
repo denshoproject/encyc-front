@@ -193,17 +193,17 @@ def namespaces_reversed():
 def page_categories(title, whitelist=[]):
     """Returns list of article subcategories the page belongs to.
     """
+    categories = []
     article_categories = []
     cache_key = make_cache_key('wikiprox:encyclopedia:page_categories:%s' % title)
     cached = cache.get(cache_key)
     if cached:
-        article_categories = json.loads(cached)
+        categories = json.loads(cached)
     else:
         if not whitelist:
             whitelist = category_article_types()
         [article_categories.append(c) for c in whitelist]
         #
-        categories = []
         url = '%s?format=json&action=query&prop=categories&titles=%s' % (settings.WIKIPROX_MEDIAWIKI_API, title)
         r = requests.get(url, headers={'content-type':'application/json'})
         if r.status_code == 200:
@@ -217,7 +217,7 @@ def page_categories(title, whitelist=[]):
                     category = cat['title']
                     if article_categories and (category in article_categories):
                         categories.append(category.replace('Category:', ''))
-        cache.set(cache_key, json.dumps(article_categories), settings.CACHE_TIMEOUT)
+        cache.set(cache_key, json.dumps(categories), settings.CACHE_TIMEOUT)
     return categories
 
 def published_pages():

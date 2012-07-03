@@ -18,6 +18,7 @@ urlpatterns = patterns(
     #
     url(r'^videotest/$', direct_to_template, {'template': 'wikiprox/LVplusJWPlayer.html'}),
     #
+    url(r'^about/editorsmessage/$', direct_to_template, {'template': 'editorsmessage.html'}),
     url(r'^about/$', direct_to_template, {'template': 'about.html'}),
     url(r'^authors/$', 'wikiprox.views.authors', name='wikiprox-authors'),
     url(r'^categories/$', 'wikiprox.views.categories', name='wikiprox-categories'),

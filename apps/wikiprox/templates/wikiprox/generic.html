@@ -1,8 +1,7 @@
 <div class="primarysource generic">
   <a href="#inline-1" rel="prettyPhoto" ><img src="/wp-content/themes/NMFE/images/thumbnails/earth-logo.jpg" alt="" width="50" /></a>
   <div id="inline-1" class="hide">
-    {{ caption }}
-    {{ courtesy }}
+    {{ caption }} {% if courtesy %} ({{ courtesy }}){% endif %}
     <a class="more" href="{{ href }}">More info &raquo;</a>
   </div>
 </div>

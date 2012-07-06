@@ -69,7 +69,9 @@ Primary Source &mdash; {{ source.encyclopedia_id }}
 {{ source.caption|safe|linebreaks }}
 {{ source.caption_extended|safe|linebreaks }}
 
-{{ source.courtesy|safe|linebreaks }}
+{% if source.courtesy %}
+&nbsp;({{ source.courtesy|safe|linebreaks }})
+{% endif %}
 
 <p><strong>Densho ID: {{ source.densho_id }}</strong></p>
 

@@ -17,6 +17,9 @@
 
 <h1>Table of Contents &mdash; A-Z</h1>
 
+
+{% include "comingsoonmessage.html " %}
+
 {% regroup articles by first_letter as letters_list %}
 <dl>
 {% for letter in letters_list %}

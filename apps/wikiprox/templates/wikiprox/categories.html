@@ -17,6 +17,8 @@
 
 <h1>Browse Topics</h1>
 
+{% include "comingsoonmessage.html " %}
+
 <dl>
 {% for category in articles_by_category %}
 <a name="{{ category.0 }}"></a>

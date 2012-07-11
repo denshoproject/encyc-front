@@ -36,9 +36,8 @@
 
 
 {% block sidebar_left %}
-<div id="sidebar-left" class="span2">
-
-  <div class="block hidden-phone">
+<div id="sidebar-left" class="span2 hidden-phone">
+  <div class="block>
     <dl><strong>
       <dt>Category</dt>
 {% for category in page_categories %}
@@ -88,18 +87,27 @@
     </p>
 
   </div><!-- .block -->
+</div><!-- #sidebar-left .span2 .hidden-phone -->
 
-  <div class="block hidden-tablet hidden-desktop">
-    <h4>
-    Category:
+<div id="sidebar-left" class="visible-phone" style="margin-bottom:20px;">
+{% if sources.0 %}
+  <div id="media-pointer" style="text-align:right; background:#fff; padding-left:20px; padding-bottom:10px; margin-left:20px; margin-bottom:20px; float:right;">
+    <a href="#primary-sources">
+      <img src="{{ sources.0.thumbnail_sm }}" style="width:100px;" title="" alt="" />
+      <h4><i class="icon-chevron-down"></i>&nbsp;Media</h4>
+    </a>
+  </div>
+{% endif %}
+  <h4>
+  Category:
 {% for category in page_categories %}
-      <a href="/categories/#{{ category }}">{{ category }}</a>
+    <a href="/categories/#{{ category }}">{{ category }}</a>
 {% endfor %}
-    <br />
-    Table of Contents:
-    <a href="{% url wikiprox-contents %}">A-Z</a>
-    | <a href="{% url wikiprox-categories %}">By Category</a>
-    <br/>
+  <br />
+  Table of Contents:
+  <a href="{% url wikiprox-contents %}">A-Z</a>
+  | <a href="{% url wikiprox-categories %}">By Category</a>
+  <br/>
 <table border="0">
   <tr>
     <td>Previous:</td>
@@ -114,22 +122,23 @@
     </td>
   </tr>
 </table>
-    <a href="">Creative Commons</a><br/>
-    </h4>
-  </div><!-- .block -->
-
-</div><!-- #sidebar-left .span2 -->
+  <a href="">Creative Commons</a><br/>
+  </h4>
+</div><!-- #sidebar-left .visible-phone -->
 {% endblock sidebar_left %}
 
 
 {% block sidebar_right %}
 <div id="sidebar-right" class="span3">
 
+  <a name="primary-sources"></a>
   <div class="block primarysources">
 {% for source in sources %}
 {% primarysource source %}
 {% endfor %}
   </div><!-- .block .primarysources -->
+
+  <div class="toplink visible-phone"><a href="#top"><i class="icon-chevron-up"></i> Top</a></div>
 
   <div class="block">
     <p>

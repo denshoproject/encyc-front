@@ -52,11 +52,15 @@ def page(request, page='index', printer=False, template_name='wikiprox/page.html
         )
     # basic page context
     title = mw.parse_mediawiki_title(r.text)
-    bodycontent,sources = mw.parse_mediawiki_text(r.text, public)
+    bodycontent,page_sources = mw.parse_mediawiki_text(r.text, public)
+    # rewrite media URLs on stage
+    # (external URLs not visible to Chrome on Android when connecting through SonicWall)
+    if hasattr(settings, 'STAGE') and settings.STAGE:
+        page_sources = sources.replace_source_urls(page_sources, request)
     context = {
         'title': title,
         'bodycontent': bodycontent,
-        'sources': sources,
+        'sources': page_sources,
         'lastmod': mw.mw_page_lastmod(r.text),
         }
     # author page

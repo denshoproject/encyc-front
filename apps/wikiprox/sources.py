@@ -138,3 +138,22 @@ def format_primary_source(source):
     t = loader.get_template(template)
     c = Context(context)
     return t.render(c)
+
+def replace_source_urls(sources, request):
+    """rewrite sources URLs to point to stage domain:port
+    
+    When viewing the stage site through SonicWall, Android Chrome browser
+    won't display media from the outside (e.g. encyclopedia.densho.org).
+    """
+    fields = ['display','original','streaming_url','thumbnail_lg','thumbnail_sm',]
+    old_domain = None
+    if hasattr(settings,'STAGE_MEDIA_DOMAIN') and settings.STAGE_MEDIA_DOMAIN:
+        old_domain = settings.STAGE_MEDIA_DOMAIN
+    new_domain = request.META['HTTP_HOST']
+    if new_domain.find(':') > -1:
+        new_domain = new_domain.split(':')[0]
+    if old_domain and new_domain:
+        for source in sources:
+            for f in fields:
+                source[f] = source[f].replace(old_domain, new_domain)
+    return sources

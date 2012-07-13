@@ -1,16 +1,12 @@
-<div class="primarysource document">
-  <span class="visible-phone">
-    <a href="{{ href }}">
-      <img src="{{ thumb_sm }}" />
-    </a>
-  </span>
-  <span class="hidden-phone">
-    <a href="{{ thumb_lg }}"
-       class="lightview"
-       data-lightview-caption="{{ caption }} {{ courtesy }} <a class='more' href='{{ href }}'>More info &raquo;</a>"
-       data-lightview-group="mixed">
-      <img src="{{ thumb_sm }}" />
-    </a>
+<div class="primarysource">
+  <a href="{{ href }}"
+     class="document"
+     data-lightview-caption="{{ caption }} {{ courtesy }} <a class='more' href='{{ href }}'>More info &raquo;</a>"
+     data-lightview-group="mixed">
+    <img src="{{ thumb_sm }}"
+         large="{{ thumb_lg }}"
+         more="{{ href }}" />
+  </a>
   </span>
   <br/>
   <span class="caption">

@@ -1,56 +1,51 @@
-<div class="primarysource video">
-  <span class="visible-phone">
-    <a href="{{ href }}">
-      <img src="{{ thumb_sm }}" />
-    </a>
-  </span>
-  <span class="hidden-phone">
-    <a href="mediaspace-{{ encyclopedia_id }}"
-       class="lightview"
-       data-lightview-type="inline"
-       data-lightview-group="mixed"
-       data-lightview-options="
-           keyboard: { esc: false },
-           afterUpdate: function(element, position) {
-               //jwplayer callback script
-               jwplayer('mediaspace-{{ encyclopedia_id }}').setup({
-                   'controlbar': 'bottom',
-                   'width': '{{ xy.0 }}',
-                   'height': '{{ xy.1 }}',
-                   'provider': 'rtmp',
-                   'image': '{{ thumb_lg }}',
-                   'file': '{{ streaming_url }}',
-                   {% if rtmp_streamer %}'streamer': '{{ rtmp_streamer }}',{% endif %}
-                   'modes' : [
-                       {
-                           type: 'flash',
-                           src: '{{ MEDIA_URL }}/jwplayer-5.9/player.swf'
+<div class="primarysource">
+  <a href="mediaspace-{{ encyclopedia_id }}"
+     class="video"
+     data-lightview-type="inline"
+     data-lightview-group="mixed"
+     data-lightview-options="
+         keyboard: { esc: false },
+         afterUpdate: function(element, position) {
+             //jwplayer callback script
+             jwplayer('mediaspace-{{ encyclopedia_id }}').setup({
+                 'controlbar': 'bottom',
+                 'width': '{{ xy.0 }}',
+                 'height': '{{ xy.1 }}',
+                 'provider': 'rtmp',
+                 'image': '{{ thumb_lg }}',
+                 'file': '{{ streaming_url }}',
+                 {% if rtmp_streamer %}'streamer': '{{ rtmp_streamer }}',{% endif %}
+                 'modes' : [
+                     {
+                         type: 'flash',
+                         src: '{{ STATIC_URL }}jwplayer-5.9/player.swf'
 {% if original %}
-                       },
-                       {
-                           type: 'html5',
-                           config: {
-                               'file' : '{{ original }}',
-                               'provider' : 'video'
-                           }
-                       },
-                       {
-                           type: 'download',
-                           config: {
-                               'file' : '{{ original }}',
-                               'provider' : 'video'
-                           }
+                     },
+                     {
+                         type: 'html5',
+                         config: {
+                             'file' : '{{ original }}',
+                             'provider' : 'video'
+                         }
+                     },
+                     {
+                         type: 'download',
+                         config: {
+                             'file' : '{{ original }}',
+                             'provider' : 'video'
+                         }
 {% endif %}
-                       }
-                   ],
-                   autostart: false
-               });
-           }"
-       data-lightview-caption="{{ caption }} {{ courtesy }} <a class='more' href='{{ href }}'>More info &raquo;</a>"
-    >
-      <img src="{{ thumb_sm }}" />
-    </a>
-  </span><!-- .hidden-phone -->
+                     }
+                 ],
+                 autostart: false
+             });
+         }"
+     data-lightview-caption="{{ caption }} {{ courtesy }} <a class='more' href='{{ href }}'>More info &raquo;</a>"
+  >
+    <img src="{{ thumb_sm }}"
+         large="{{ thumb_lg }}"
+         more="{{ href }}" />
+  </a>
   <br/>
   <span class="caption">
     {{ caption }}

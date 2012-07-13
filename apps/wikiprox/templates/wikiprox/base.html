@@ -7,6 +7,13 @@
 {% endblock css %}
 
 
+{% block contents %}
+<div id="mediaquery" style="border:2px dashed orange; padding:5px;">
+  NO MEDIA QUERY
+</div>
+{% endblock contents %}
+
+
 {% block javascript %}
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}jwplayer-5.9/jwplayer.js"></script>
@@ -17,6 +24,26 @@
 <script type="text/javascript" src="{{ STATIC_URL }}lightview-3.1.4/js/lightview/lightview.js"></script>
 <script type='text/javascript'>
   Lightview.setDefaultSkin('mac');
+
+  $(document).ready(function(){
+
+      function addLightboxClass() {
+          var msg = $(window).width();
+          if (Modernizr.mq('screen and (min-width: 768px)')) {
+              msg = $(window).width() + ' LIGHTBOX';
+          }
+          else {
+              msg = $(window).width() + ' DISABLED';
+          }
+          $('#mediaquery').text(msg);
+      }
+
+      addLightboxClass();
+      $(window).resize(function() {
+          addLightboxClass();
+      });
+
+  });
 </script>
 {% endblock javascript %}
 

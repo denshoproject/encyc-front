@@ -1,8 +1,10 @@
-<div class="primarysource image">
-  <a href="{{ href }}" class=""
+<div class="primarysource">
+  <a href="{{ href }}" class="image"
      data-lightview-caption="{{ caption }} {{ courtesy }} <a class='more' href='{{ href }}'>More info &raquo;</a>"
      data-lightview-group="mixed">
-    <img src="{{ thumb_sm }}" />
+    <img src="{{ thumb_sm }}"
+         large="{{ thumb_lg }}"
+         more="{{ href }}" />
   </a>
   <br/>
   <span class="caption">

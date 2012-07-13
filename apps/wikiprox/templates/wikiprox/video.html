@@ -1,6 +1,6 @@
-<div class="primarysource video">
+<div class="primarysource">
   <a href="mediaspace-{{ encyclopedia_id }}"
-     class=""
+     class="video"
      data-lightview-type="inline"
      data-lightview-group="mixed"
      data-lightview-options="
@@ -18,7 +18,7 @@
                  'modes' : [
                      {
                          type: 'flash',
-                         src: '{{ MEDIA_URL }}/jwplayer-5.9/player.swf'
+                         src: '{{ STATIC_URL }}jwplayer-5.9/player.swf'
 {% if original %}
                      },
                      {
@@ -42,7 +42,9 @@
          }"
      data-lightview-caption="{{ caption }} {{ courtesy }} <a class='more' href='{{ href }}'>More info &raquo;</a>"
   >
-    <img src="{{ thumb_sm }}" />
+    <img src="{{ thumb_sm }}"
+         large="{{ thumb_lg }}"
+         more="{{ href }}" />
   </a>
   <br/>
   <span class="caption">

@@ -26,16 +26,49 @@
   Lightview.setDefaultSkin('mac');
 
   $(document).ready(function(){
-
       function addLightboxClass() {
           var msg = $(window).width();
           if (Modernizr.mq('screen and (min-width: 768px)')) {
-              msg = $(window).width() + ' LIGHTBOX';
+              $('#mediaquery').text($(window).width() + ' LIGHTBOX');
+              // image
+              $('div.primarysource a.image img').each(function() {
+                  // add lightview class, point link to img src
+                  $(this).parent().addClass('lightview');
+                  $(this).parent().attr({ href:$(this).attr('large') });
+              });
+              // document
+              $('div.primarysource a.document img').each(function() {
+                  // add lightview class, point link to img src
+                  $(this).parent().addClass('lightview');
+                  $(this).parent().attr({ href:$(this).attr('large') });
+              });
+              // video
+              $('div.primarysource a.video img').each(function() {
+                  // add lightview class, point link to img src
+                  $(this).parent().addClass('lightview');
+              });
           }
           else {
-              msg = $(window).width() + ' DISABLED';
+              $('#mediaquery').text($(window).width() + ' DISABLED');
+              // image
+              $('div.primarysource a.image img').each(function() {
+                  // remove lightview class, point link to primarysource page
+                  $(this).parent().removeClass('lightview');
+                  $(this).parent().attr({ href:$(this).attr('more') });
+              });
+              // document
+              $('div.primarysource a.document img').each(function() {
+                  // remove lightview class, point link to primarysource page
+                  $(this).parent().removeClass('lightview');
+                  $(this).parent().attr({ href:$(this).attr('more') });
+              });
+              // video
+              $('div.primarysource a.video img').each(function() {
+                  // remove lightview class, point link to primarysource page
+                  $(this).parent().removeClass('lightview');
+                  $(this).parent().attr({ href:$(this).attr('more') });
+              });
           }
-          $('#mediaquery').text(msg);
       }
 
       addLightboxClass();

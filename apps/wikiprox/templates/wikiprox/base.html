@@ -20,7 +20,6 @@
       function addLightboxClass() {
           var msg = $(window).width();
           if (Modernizr.mq('screen and (min-width: 768px)')) {
-              $('#mediaquery').text($(window).width() + ' LIGHTBOX');
               // image
               $('div.primarysource a.image img').each(function() {
                   // add lightview class, point link to img src
@@ -40,7 +39,6 @@
               });
           }
           else {
-              $('#mediaquery').text($(window).width() + ' DISABLED');
               // image
               $('div.primarysource a.image img').each(function() {
                   // remove lightview class, point link to primarysource page

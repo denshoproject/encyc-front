@@ -5,6 +5,73 @@
 {% block title %}{{ title }}{% endblock %}
 
 
+{% block css %}{{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}lightview-3.1.4/css/lightview/lightview.css"/>
+{% endblock css %}
+
+
+{% block javascript %}
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}jwplayer-5.9/jwplayer.js"></script>
+<!--[if lt IE 9]>
+<script type="text/javascript" src="{{ STATIC_URL }}lightview-3.1.4/js/excanvas/excanvas.js"></script>
+<![endif]-->
+<script type="text/javascript" src="{{ STATIC_URL }}lightview-3.1.4/js/spinners/spinners.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}lightview-3.1.4/js/lightview/lightview.js"></script>
+<script type='text/javascript'>
+  $(document).ready(function(){
+      function addLightboxClass() {
+          var msg = $(window).width();
+          if (Modernizr.mq('screen and (min-width: 768px)')) {
+              // image
+              $('div.primarysource a.image img').each(function() {
+                  // add lightview class, point link to img src
+                  $(this).parent().addClass('lightview');
+                  $(this).parent().attr({ href:$(this).attr('large') });
+              });
+              // document
+              $('div.primarysource a.document img').each(function() {
+                  // add lightview class, point link to img src
+                  $(this).parent().addClass('lightview');
+                  $(this).parent().attr({ href:$(this).attr('large') });
+              });
+              // video
+              $('div.primarysource a.video img').each(function() {
+                  // add lightview class, point link to img src
+                  $(this).parent().addClass('lightview');
+              });
+          }
+          else {
+              // image
+              $('div.primarysource a.image img').each(function() {
+                  // remove lightview class, point link to primarysource page
+                  $(this).parent().removeClass('lightview');
+                  $(this).parent().attr({ href:$(this).attr('more') });
+              });
+              // document
+              $('div.primarysource a.document img').each(function() {
+                  // remove lightview class, point link to primarysource page
+                  $(this).parent().removeClass('lightview');
+                  $(this).parent().attr({ href:$(this).attr('more') });
+              });
+              // video
+              $('div.primarysource a.video img').each(function() {
+                  // remove lightview class, point link to primarysource page
+                  $(this).parent().removeClass('lightview');
+                  $(this).parent().attr({ href:$(this).attr('more') });
+              });
+          }
+      }
+      addLightboxClass();
+      $(window).resize(function() {
+          addLightboxClass();
+      });
+      Lightview.setDefaultSkin('mac');
+  });
+</script>
+{% endblock javascript %}
+
+
 {% block contents %}{{ block.super }}
 
 <!-- wikiprox/article.html -->

@@ -155,6 +155,6 @@ def replace_source_urls(sources, request):
     if old_domain and new_domain:
         for source in sources:
             for f in fields:
-                if hasattr(source,f) and source[f]:
+                if source.get(f,None):
                     source[f] = source[f].replace(old_domain, new_domain)
     return sources

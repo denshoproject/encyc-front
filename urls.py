@@ -15,6 +15,7 @@ urlpatterns = patterns(
     '',
     #url(r'^admin/', include(admin.site.urls)),
     url(r'^sitemap\.xml$', 'django.contrib.sitemaps.views.sitemap', {'sitemaps': sitemaps}),
+    url(r'^crossdomain\.xml$', direct_to_template, {'template': 'crossdomain.xml'}),
     #
     url(r'^videotest/$', direct_to_template, {'template': 'wikiprox/LVplusJWPlayer.html'}),
     #

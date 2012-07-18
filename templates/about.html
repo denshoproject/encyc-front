@@ -21,7 +21,7 @@
           if (Modernizr.mq('screen and (min-width: 768px)')) {
               $('a#editorsmessagelink').each(function() {
                   $(this).addClass('lightview');
-                  $(this).attr({ href: 'editorsmessage' });
+                  $(this).attr({ href: '{% url editorsmessageembed %}' });
               });
           }
           else {
@@ -88,7 +88,17 @@
 			<p>This first two year phase will result in an encyclopedia containing more than 300 articles that will be online by the fall of 2012. The Encyclopedia is envisioned as a long-term, living resource that will continue to grow over time. Additional articles and features will be added, and the project governance structure is being designed to emphasize sustainability.</p>
 		</div>
 		<div class="span4">
-			<p class="well" style="text-align:center;"><a id="editorsmessagelink" href="{% url editorsmessage %}" class="" data-lightview-type="inline" data-lightview-group="editorsmessage" data-lightview-options="width:1000,height:'100%'"><strong>Read the Editor's Message</strong></p></a>
+
+<p class="well" style="text-align:center;">
+<a id="editorsmessagelink"
+   href="{% url editorsmessage %}"
+   class=""
+   data-lightview-type="iframe"
+   data-lightview-group="editorsmessage"
+   data-lightview-options="width:1000,height:'100%'">
+<strong>Read the Editor's Message</strong>
+</a>
+</p>
 
 			<div>
 				<h3>This is a beta</h3>
@@ -209,10 +219,6 @@
 <div class="toplink"><a href="#top"><i class="icon-chevron-up"></i> Top</a></div>
 </section>	
 </div> <!-- /container-fluid -->
-
-<div id="editorsmessage" style="display:none;">
-{% include "editorsmessage.html" %}
-</div>
 
 {% endblock contents %}
 

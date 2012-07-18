@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.conf import settings
 from django.contrib.sitemaps import Sitemap
 
@@ -24,7 +26,7 @@ class MediaWikiSitemap(Sitemap):
             item = Item()
             item.title = p['title']
             item.location = '/%s/' % p['title']
-            item.timestamp = p['timestamp']
+            item.timestamp = datetime.strptime(p['timestamp'], '%Y-%m-%dT%H:%M:%SZ')
             items.append(item)
         return items
 
@@ -42,7 +44,7 @@ class SourceSitemap(Sitemap):
             item = Item()
             item.title = s['encyclopedia_id']
             item.location = '/sources/%s/' % s['encyclopedia_id']
-            item.timestamp = s['modified']
+            item.timestamp = datetime.strptime(s['modified'], '%Y-%m-%d %H:%M:%S')
             items.append(item)
         return items
     

@@ -58,6 +58,8 @@ def page(request, page='index', printer=False, template_name='wikiprox/page.html
     if hasattr(settings, 'STAGE') and settings.STAGE:
         page_sources = sources.replace_source_urls(page_sources, request)
     context = {
+        'request': request,
+        'page': page,
         'title': title,
         'bodycontent': bodycontent,
         'sources': page_sources,

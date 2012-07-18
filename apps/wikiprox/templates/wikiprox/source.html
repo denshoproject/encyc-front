@@ -7,29 +7,37 @@
 
 
 {% block javascript %}{{ block.super }}
+{% if source.media_format == 'video' %}
 <script type="text/javascript">
-    var flashvars = {
-        {% if rtmp_streamer %}streamer: "{{ rtmp_streamer }}",{% endif %}
-        file: "{{ source.streaming_url }}",
+    jwplayer("videocontainer").setup({
+        autostart: 'false',
+        controlbar: 'bottom',
+        width: 640,
+        height: {% if source.aspect_ratio == 'hd' %}380{% else %}500{% endif %},
         image: "{{ source.thumbnail_lg }}",
-        autostart:'false'
-    };
-    var params = {
-        allowfullscreen:'true',
-        allowscriptaccess:'always'
-    };
-    var attributes = {
-        id:'player1',
-        name:'player1'
-    };
-    swfobject.embedSWF(
-        '{{ MEDIA_URL }}jwplayer-5.9/player.swf',
-        'videoplayer',
-        '640','{% if source.aspect_ratio == 'hd' %}380{% else %}500{% endif %}',
-        '9.0.115',
-        'false',
-        flashvars, params, attributes);
+        modes: [
+{% if source.streaming_url %}
+            { type: "flash",
+              src: "{{ STATIC_URL }}jwplayer-5.9/player.swf",
+              config: {
+                provider: "rtmp",
+                streamer: "{{ rtmp_streamer }}",
+                file: "{{ source.streaming_url }}"
+              }
+            },
+{% endif %}
+{% if source.original %}
+            { type: "html5",
+              config: {
+                file: "{{ source.original }}"
+              }
+            },
+{% endif %}
+            { type: "download" }
+        ]
+    });
 </script>
+{% endif %}
 {% endblock javascript %}
 
 
@@ -57,9 +65,7 @@ Primary Source &mdash; {{ source.encyclopedia_id }}
   {% if source.original %}<br/><a href="{{ source.original }}">Download full PDF ({{ source.original_size|filesizeformat }})</a>{% endif %}
 {% endif %}
 {% if source.media_format == 'video' %}
-  <div id="videoplayer">
-    JW Player goes here
-  </div>
+  <div id="videocontainer">Loading video player...</div>
   {% if source.transcript %}<br/><a href="{{ source.transcript }}" target="_transcript">Download a transcript</a>{% endif %}
 {% endif %}
 {% if source.external_url %}&nbsp;&mdash;&nbsp; <a href="{{ source.external_url }}" class="offsite" target="offsite">{{ source.external_url }}</a>{% endif %}

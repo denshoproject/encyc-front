@@ -8,36 +8,36 @@
          afterUpdate: function(element, position) {
              //jwplayer callback script
              jwplayer('mediaspace-{{ encyclopedia_id }}').setup({
+                 'autostart': 'false',
                  'controlbar': 'bottom',
                  'width': '{{ xy.0 }}',
                  'height': '{{ xy.1 }}',
-                 'provider': 'rtmp',
                  'image': '{{ thumb_lg }}',
-                 'file': '{{ streaming_url }}',
-                 {% if rtmp_streamer %}'streamer': '{{ rtmp_streamer }}',{% endif %}
                  'modes' : [
-                     {
-                         type: 'flash',
-                         src: '{{ STATIC_URL }}jwplayer-5.9/player.swf'
-{% if original %}
-                     },
-                     {
-                         type: 'html5',
-                         config: {
-                             'file' : '{{ original }}',
-                             'provider' : 'video'
-                         }
-                     },
-                     {
-                         type: 'download',
-                         config: {
-                             'file' : '{{ original }}',
-                             'provider' : 'video'
-                         }
+{% if streaming_url %}
+                     { type: 'flash',
+                       src: '{{ MEDIA_URL }}jwplayer-5.9/player.swf',
+                       config: {
+                         provider: 'rtmp',
+                         streamer: '{{ rtmp_streamer }}',
+                         file: '{{ streaming_url }}'
+                       }
+                     }{% if streaming_url and original %},{% endif %}
 {% endif %}
+{% if original %}
+                     { type: 'html5',
+                       config: {
+                         file: '{{ original }}'
+                       }
+                     },
+                     { type: 'download',
+                         config: {
+                             'file' : '{{ original }}',
+                             'provider' : 'video'
+                         }
                      }
-                 ],
-                 autostart: false
+{% endif %}
+                 ]
              });
          }"
      data-lightview-caption="{{ caption }} {{ courtesy }} <a class='more' href='{{ href }}'>More info &raquo;</a>"

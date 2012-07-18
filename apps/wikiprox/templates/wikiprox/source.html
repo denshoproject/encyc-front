@@ -24,7 +24,7 @@
                 streamer: "{{ rtmp_streamer }}",
                 file: "{{ source.streaming_url }}"
               }
-            },
+            }{% if source.streaming_url and source.original %},{% endif %}
 {% endif %}
 {% if source.original %}
             { type: "html5",
@@ -32,8 +32,13 @@
                 file: "{{ source.original }}"
               }
             },
+            { type: "download",
+              config: {
+                file: "{{ source.original }}",
+                provider: 'video'
+              }
+            }
 {% endif %}
-            { type: "download" }
         ]
     });
 </script>

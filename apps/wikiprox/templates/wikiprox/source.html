@@ -16,6 +16,13 @@
         height: {% if source.aspect_ratio == 'hd' %}380{% else %}500{% endif %},
         image: "{{ source.thumbnail_lg }}",
         modes: [
+{% if source.original %}
+            { type: "html5",
+              config: {
+                file: "{{ source.original }}"
+              }
+            },
+{% endif %}
 {% if source.streaming_url %}
             { type: "flash",
               src: "{{ STATIC_URL }}jwplayer-5.9/player.swf",
@@ -27,11 +34,6 @@
             }{% if source.streaming_url and source.original %},{% endif %}
 {% endif %}
 {% if source.original %}
-            { type: "html5",
-              config: {
-                file: "{{ source.original }}"
-              }
-            },
             { type: "download",
               config: {
                 file: "{{ source.original }}",
@@ -60,7 +62,7 @@ Primary Source &mdash; {{ source.encyclopedia_id }}
 </h1>
 
 <p>
-<div id="media">
+<div id="media" class="{{ source.media_format }} {% if source.aspect_ratio %}{{ source.aspect_ratio }}{% endif %}">
 {% if source.media_format == 'image' %}
   <img src="{{ source.thumbnail_lg }}" />
   {% if source.original %}<br/><a href="{{ source.original }}">Download full-size version ({{ source.original_size|filesizeformat }})</a>{% endif %}
@@ -133,5 +135,3 @@ Primary Source &mdash; {{ source.encyclopedia_id }}
 </div>
 
 {% endblock footer %}
-
-

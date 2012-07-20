@@ -43,7 +43,10 @@
     width: 260px;
 }
 
-.primarysource-detail img {
+.primarysource-detail #media.image img, .primarysource-detail #media.document {
+    border: 4px solid #eee;
+}
+.primarysource-detail #videocontainer {
     border: 4px solid #eee;
 }
 

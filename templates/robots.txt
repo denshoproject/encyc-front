@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: /print/
+Disallow: /cite/
+Sitemap: http://encyclopedia.densho.org/sitemap.xml

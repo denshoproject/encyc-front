@@ -13,9 +13,36 @@
 <script type="text/javascript" src="{{ MEDIA_URL }}/lightview-3.1.4/js/spinners/spinners.js"></script>
 <script type="text/javascript" src="{{ MEDIA_URL }}/lightview-3.1.4/js/lightview/lightview.js"></script>
 <script type='text/javascript'>
-  Lightview.setDefaultSkin('mac');
+  $(document).ready(function(){
+      /* tablet,desktop -- show in popup */
+      /* phone -- link directly to page */
+      function addLightboxClass() {
+          var msg = $(window).width();
+          if (Modernizr.mq('screen and (min-width: 768px)')) {
+              $('a#editorsmessagelink').each(function() {
+                  $(this).addClass('lightview');
+                  $(this).attr({ href: '{% url editorsmessageembed %}' });
+              });
+          }
+          else {
+              $('a#editorsmessagelink').each(function() {
+                  $(this).removeClass('lightview');
+                  $(this).attr({ href: '{% url editorsmessage %}' });
+              });
+          }
+      }
+      addLightboxClass();
+      $(window).resize(function() {
+          addLightboxClass();
+      });
+      Lightview.setDefaultSkin('mac');
+  });
 </script>
 {% endblock javascript %}
+
+
+
+
 
 
 {% block title %}About{% endblock %}
@@ -61,12 +88,17 @@
 			<p>This first two year phase will result in an encyclopedia containing more than 300 articles that will be online by the fall of 2012. The Encyclopedia is envisioned as a long-term, living resource that will continue to grow over time. Additional articles and features will be added, and the project governance structure is being designed to emphasize sustainability.</p>
 		</div>
 		<div class="span4">
-			<p class="well" style="text-align:center;"><a href="editorsmessage" class="lightview" data-lightview-type="inline" data-lightview-group="editorsmessage" data-lightview-options="width:1000,height:'100%'"><strong>Read the Editor's Message</strong></p></a>
 
-			<div id="editorsmessage" style="display:none;">{% include "editorsmessage.html" %}
-			</div>
-			
-
+<p class="well" style="text-align:center;">
+<a id="editorsmessagelink"
+   href="{% url editorsmessage %}"
+   class=""
+   data-lightview-type="iframe"
+   data-lightview-group="editorsmessage"
+   data-lightview-options="width:1000,height:'100%'">
+<strong>Read the Editor's Message</strong>
+</a>
+</p>
 
 			<div>
 				<h3>This is a beta</h3>
@@ -187,6 +219,7 @@
 <div class="toplink"><a href="#top"><i class="icon-chevron-up"></i> Top</a></div>
 </section>	
 </div> <!-- /container-fluid -->
+
 {% endblock contents %}
 
 {% block footer %}

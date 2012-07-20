@@ -50,6 +50,7 @@ def format_primary_source(source):
     common = {'encyclopedia_id': source['encyclopedia_id'],
               'media_format': source['media_format'],
               'MEDIA_URL': settings.MEDIA_URL,
+              'STATIC_URL': settings.STATIC_URL,
               'SOURCE_MEDIA_URL': settings.TANSU_MEDIA_URL,
               'href': reverse('wikiprox-source', args=[source['encyclopedia_id']]),
               'caption': source['caption'],

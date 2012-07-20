@@ -14,11 +14,15 @@ sitemaps = {
 urlpatterns = patterns(
     '',
     #url(r'^admin/', include(admin.site.urls)),
+    url(r'^crossdomain\.xml$', direct_to_template, {'template': 'crossdomain.xml'}),
+    url(r'^robots\.txt$', direct_to_template, {'template': 'robots.txt'}),
     url(r'^sitemap\.xml$', 'django.contrib.sitemaps.views.sitemap', {'sitemaps': sitemaps}),
     #
     url(r'^videotest/$', direct_to_template, {'template': 'wikiprox/LVplusJWPlayer.html'}),
     #
-    url(r'^about/$', direct_to_template, {'template': 'about.html'}),
+    url(r'^about/editorsmessage/embed/$', direct_to_template, {'template': 'editorsmessage-lightbox.html'}, name='editorsmessageembed'),
+    url(r'^about/editorsmessage/$', direct_to_template, {'template': 'editorsmessage.html'}, name='editorsmessage'),
+    url(r'^about/$', direct_to_template, {'template': 'about.html'}, name='about'),
     url(r'^authors/$', 'wikiprox.views.authors', name='wikiprox-authors'),
     url(r'^categories/$', 'wikiprox.views.categories', name='wikiprox-categories'),
     url(r'^contents/$', 'wikiprox.views.contents', name='wikiprox-contents'),

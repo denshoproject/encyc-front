@@ -66,6 +66,7 @@ def page(request, page='index', printed=False, template_name='wikiprox/page.html
         'bodycontent': bodycontent,
         'sources': page_sources,
         'lastmod': mw.page_lastmod(page),
+        'print': printed,
         }
     # author page
     if encyclopedia.is_author(title):

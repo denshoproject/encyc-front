@@ -14,6 +14,13 @@
                  'height': '{{ xy.1 }}',
                  'image': '{{ thumb_lg }}',
                  'modes' : [
+{% if original %}
+                     { type: 'html5',
+                       config: {
+                         file: '{{ original }}'
+                       }
+                     },
+{% endif %}
 {% if streaming_url %}
                      { type: 'flash',
                        src: '{{ MEDIA_URL }}jwplayer-5.9/player.swf',
@@ -25,11 +32,6 @@
                      }{% if streaming_url and original %},{% endif %}
 {% endif %}
 {% if original %}
-                     { type: 'html5',
-                       config: {
-                         file: '{{ original }}'
-                       }
-                     },
                      { type: 'download',
                          config: {
                              'file' : '{{ original }}',

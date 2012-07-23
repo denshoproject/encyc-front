@@ -45,7 +45,7 @@ def page_lastmod(page_title):
         lastmod = datetime.strptime(ts, '%Y-%m-%dT%H:%M:%SZ')
     return lastmod
 
-def parse_mediawiki_text(text, images, public=False):
+def parse_mediawiki_text(text, images, public=False, printed=False):
     """Parses the body of a MediaWiki page.
     """
     soup = BeautifulSoup(text.replace('<p><br />\n</p>',''))
@@ -55,9 +55,10 @@ def parse_mediawiki_text(text, images, public=False):
     soup = rewrite_mediawiki_urls(soup)
     soup = rewrite_newpage_links(soup)
     soup = rewrite_prevnext_links(soup)
-    soup = add_top_links(soup)
     if public:
         soup = remove_status_markers(soup)
+    if not printed:
+        soup = add_top_links(soup)
     primary_sources = find_primary_sources(images)
     soup = remove_primary_sources(soup, primary_sources)
     html = unicode(soup)

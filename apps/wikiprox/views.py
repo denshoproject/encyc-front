@@ -26,7 +26,7 @@ def index(request, template_name='index.html'):
     )
 
 @require_http_methods(['GET',])
-def page(request, page='index', printer=False, template_name='wikiprox/page.html'):
+def page(request, page='index', printed=False, template_name='wikiprox/page.html'):
     """
     """
     url = mw.page_data_url(page)
@@ -54,7 +54,7 @@ def page(request, page='index', printer=False, template_name='wikiprox/page.html
     bodycontent,page_sources = mw.parse_mediawiki_text(
         pagedata['parse']['text']['*'],
         pagedata['parse']['images'],
-        public)
+        public, printed)
     # rewrite media URLs on stage
     # (external URLs not visible to Chrome on Android when connecting through SonicWall)
     if hasattr(settings, 'STAGE') and settings.STAGE:
@@ -75,7 +75,7 @@ def page(request, page='index', printer=False, template_name='wikiprox/page.html
             })
     # article
     elif encyclopedia.is_article(title):
-        if printer:
+        if printed:
             template_name = 'wikiprox/article-print.html'
         else:
             template_name = 'wikiprox/article.html'

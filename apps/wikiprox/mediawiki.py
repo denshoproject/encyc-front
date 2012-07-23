@@ -1,3 +1,4 @@
+from datetime import datetime
 import json
 import os.path
 import re
@@ -11,67 +12,58 @@ from django.core.urlresolvers import reverse
 from wikiprox.sources import format_primary_source
 
 
-def mw_page_is_published(text):
+def page_data_url(page_title):
+    """URL of MediaWiki API call to get page info.
+    """
+    return '%s?action=parse&format=json' \
+           '&page=%s' % (settings.WIKIPROX_MEDIAWIKI_API, page_title)
+
+def lastmod_data_url(page_title):
+    """URL of MediaWiki API call to get page revision lastmod.
+    """
+    return '%s?action=query&format=json&prop=revisions&rvprop=ids|timestamp' \
+           '&titles=%s' % (settings.WIKIPROX_MEDIAWIKI_API, page_title)
+
+def page_is_published(pagedata):
     """Indicates whether MediaWiki page contains Category:Published template.
     """
     published = False
-    soup = BeautifulSoup(text, parse_only=SoupStrainer('div', attrs={'class':'mw-content-ltr'}))
-    for t in soup.find_all('div', attrs={'class':'published'}):
-        published = True
+    for category in pagedata['parse']['categories']:
+        if category['*'] == 'Published':
+            published = True
     return published
 
-def mw_page_lastmod(text):
+def page_lastmod(page_title):
     """Retrieves timestamp of last modification.
     """
     lastmod = None
-    soup = BeautifulSoup(text, parse_only=SoupStrainer(id="footer-info-lastmod"))
-    return soup.find(id="footer-info-lastmod").contents[0]
-    #parts = raw.replace('.','').split('on')
-    #ts = parts[1].strip()
-    #from dateutils import parser
-    #lastmod = parser.parse(ts)
-    #return lastmod
+    url = lastmod_data_url(page_title)
+    r = requests.get(url)
+    if r.status_code == 200:
+        pagedata = json.loads(r.text)
+        ts = pagedata['query']['pages'].values()[0]['revisions'][0]['timestamp']
+        lastmod = datetime.strptime(ts, '%Y-%m-%dT%H:%M:%SZ')
+    return lastmod
 
-def parse_mediawiki_title(text):
-    """Parses the title of a MediaWiki page.
-    
-    Unlike most pages, "static" pages like /index, /about, and /contact
-    have their nice titles in <h1> tags.  This normally results in 2 titles
-    which is unsightly.
-    For pages with 2 <h1> tags, remove the first one.
-    """
-    title = '[no title]'
-    h1s = re.findall('<h1', text)
-    if len(h1s) > 1:
-        soup = BeautifulSoup(
-            text, parse_only=SoupStrainer('div', attrs={'class':'mw-content-ltr'}))
-        for t in soup.find_all('span', attrs={'class':'mw-headline'}):
-            title = t.string.strip()
-    else:
-        soup = BeautifulSoup(text, parse_only=SoupStrainer('title'))
-        title = soup.title.string.strip().replace(settings.WIKIPROX_MEDIAWIKI_TITLE, '')
-    return title
-
-def parse_mediawiki_text(text, public=False):
+def parse_mediawiki_text(text, images, public=False):
     """Parses the body of a MediaWiki page.
     """
-    soup = BeautifulSoup(
-        text.replace('<!DOCTYPE html>', '').replace('<p><br />\n</p>', ''),
-        parse_only=SoupStrainer('div', attrs={'class':'mw-content-ltr'}))
+    soup = BeautifulSoup(text.replace('<p><br />\n</p>',''))
     soup = remove_staticpage_titles(soup)
     soup = remove_comments(soup)
     soup = remove_edit_links(soup)
     soup = rewrite_mediawiki_urls(soup)
     soup = rewrite_newpage_links(soup)
     soup = rewrite_prevnext_links(soup)
-    sources = find_primary_sources(soup)
-    #soup = format_primary_sources(soup, sources)
-    soup = remove_primary_sources(soup, sources)
-    soup = rewrite_prevnext_links(soup)
+    soup = add_top_links(soup)
     if public:
         soup = remove_status_markers(soup)
-    soup = add_top_links(soup)
-    return unicode(soup), sources
+    primary_sources = find_primary_sources(images)
+    soup = remove_primary_sources(soup, primary_sources)
+    html = unicode(soup)
+    for tag in ['html','body']:
+        html = html.replace('<%s>' % tag, '').replace('</%s>' % tag, '')
+    return html, primary_sources
 
 def remove_staticpage_titles(soup):
     """strip extra <h1> on "static" pages
@@ -156,18 +148,15 @@ def extract_encyclopedia_id(uri):
         eid,ext = os.path.splitext(filename)
     return eid
     
-def find_primary_sources(soup):
-    """Scan through the soup for <a><img>s and get the ones with encyclopedia IDs.
+def find_primary_sources(images):
+    """Given list of page images, get the ones with encyclopedia IDs.
     """
     sources = []
     imgs = []
     eids = []
-    # all the <a><img>s
-    for a in soup.find_all('a', attrs={'class':'image'}):
-        imgs.append(a.img)
     # anything that might be an encyclopedia_id
-    for img in imgs:
-        encyclopedia_id = extract_encyclopedia_id(img['src'])
+    for img in images:
+        encyclopedia_id = extract_encyclopedia_id(img)
         if encyclopedia_id:
             eids.append(encyclopedia_id)
     # get sources via sources API
@@ -182,32 +171,6 @@ def find_primary_sources(soup):
             for s in response['objects']:
                 sources.append(s)
     return sources
-
-def format_primary_sources(soup, sources):
-    """Rewrite image HTML so primary sources appear in pop-up lightbox with metadata.
-    
-    see http://192.168.0.13/redmine/attachments/4/Encyclopedia-PrimarySourceDraftFlow.pdf
-    """
-    # all the <a><img>s
-    contexts = []
-    num_sources = 0
-    for a in soup.find_all('a', attrs={'class':'image'}):
-        num_sources = num_sources + 1
-    for a in soup.find_all('a', attrs={'class':'image'}):
-        encyclopedia_id = extract_encyclopedia_id(a.img['src'])
-        href = None
-        if encyclopedia_id and (encyclopedia_id in sources.keys()):
-            source = sources[encyclopedia_id]
-            template = 'wikiprox/generic.html'
-            # rewrite more-info URL
-            x,y = a['href'].split('File:')
-            eid,ext = os.path.splitext(y)
-            href = reverse('wikiprox-source', kwargs={'encyclopedia_id': eid })
-        if href:
-            img = BeautifulSoup(format_primary_source(source))
-            # insert back into page
-            a.replace_with(img.body)
-    return soup
 
 def remove_primary_sources(soup, sources):
     """Remove primary sources from the MediaWiki page entirely.

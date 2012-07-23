@@ -28,31 +28,33 @@ def index(request, template_name='index.html'):
 @require_http_methods(['GET',])
 def page(request, page='index', printer=False, template_name='wikiprox/page.html'):
     """
-    Alternatives to BeautifulSoup:
-    - basic string-split
-    - regex
     """
-    url = '%s/%s' % (settings.WIKIPROX_MEDIAWIKI_HTML, page)
-    if request.GET.get('pagefrom', None):
-        url = '?'.join([url, 'pagefrom=%s' % request.GET['pagefrom']])
-    elif request.GET.get('pageuntil', None):
-        url = '?'.join([url, 'pageuntil=%s' % request.GET['pageuntil']])
+    url = mw.page_data_url(page)
+#    if request.GET.get('pagefrom', None):
+#        url = '?'.join([url, 'pagefrom=%s' % request.GET['pagefrom']])
+#    elif request.GET.get('pageuntil', None):
+#        url = '?'.join([url, 'pageuntil=%s' % request.GET['pageuntil']])
     # request
     r = requests.get(url)
     if r.status_code != 200:
         raise Http404
+    pagedata = json.loads(r.text)
     # only allow unpublished pages on :8000
     public = request.META.get('HTTP_X_FORWARDED_FOR',False)
-    published = mw.mw_page_is_published(r.text)
+    published = mw.page_is_published(pagedata)
     if public and not published:
         return render_to_response(
             'wikiprox/unpublished.html',
             {},
             context_instance=RequestContext(request)
         )
+    categories = pagedata['parse']['categories']
+    title = pagedata['parse']['displaytitle']
     # basic page context
-    title = mw.parse_mediawiki_title(r.text)
-    bodycontent,page_sources = mw.parse_mediawiki_text(r.text, public)
+    bodycontent,page_sources = mw.parse_mediawiki_text(
+        pagedata['parse']['text']['*'],
+        pagedata['parse']['images'],
+        public)
     # rewrite media URLs on stage
     # (external URLs not visible to Chrome on Android when connecting through SonicWall)
     if hasattr(settings, 'STAGE') and settings.STAGE:
@@ -63,7 +65,7 @@ def page(request, page='index', printer=False, template_name='wikiprox/page.html
         'title': title,
         'bodycontent': bodycontent,
         'sources': page_sources,
-        'lastmod': mw.mw_page_lastmod(r.text),
+        'lastmod': mw.page_lastmod(page),
         }
     # author page
     if encyclopedia.is_author(title):

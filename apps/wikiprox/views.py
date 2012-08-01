@@ -210,7 +210,11 @@ def contents(request, template_name='wikiprox/contents.html'):
 
 def events(request, template_name='wikiprox/events.html'):
     events = ev.events()
-    if (not events):
+    published = False
+    for event in events:
+        if int(event['published']):
+            published = True
+    if (not published) and (not settings.DEBUG):
         raise Http404
     return render_to_response(
         template_name,

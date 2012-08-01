@@ -209,9 +209,12 @@ def contents(request, template_name='wikiprox/contents.html'):
     )
 
 def events(request, template_name='wikiprox/events.html'):
+    events = ev.events()
+    if (not events):
+        raise Http404
     return render_to_response(
         template_name,
-        {'events': ev.events(),},
+        {'events': events,},
         context_instance=RequestContext(request)
     )
 

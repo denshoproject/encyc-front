@@ -16,6 +16,7 @@ from django.views.decorators.http import require_http_methods
 
 from wikiprox import mediawiki as mw
 from wikiprox import encyclopedia, sources
+from wikiprox import events as ev
 
 
 def index(request, template_name='index.html'):
@@ -204,6 +205,13 @@ def contents(request, template_name='wikiprox/contents.html'):
     return render_to_response(
         template_name,
         {'articles': articles,},
+        context_instance=RequestContext(request)
+    )
+
+def events(request, template_name='wikiprox/events.html'):
+    return render_to_response(
+        template_name,
+        {'events': ev.events(),},
         context_instance=RequestContext(request)
     )
 

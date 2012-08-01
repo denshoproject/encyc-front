@@ -17,6 +17,7 @@ from django.views.decorators.http import require_http_methods
 from wikiprox import mediawiki as mw
 from wikiprox import encyclopedia, sources
 from wikiprox import locations as loc
+from wikiprox import events as ev
 
 
 @require_http_methods(['GET',])
@@ -213,6 +214,13 @@ def locations(request, template_name='wikiprox/locations.html'):
     return render_to_response(
         template_name,
         {'locations': loc.locations(),},
+        context_instance=RequestContext(request)
+    )
+
+def events(request, template_name='wikiprox/events.html'):
+    return render_to_response(
+        template_name,
+        {'events': ev.events(),},
         context_instance=RequestContext(request)
     )
 

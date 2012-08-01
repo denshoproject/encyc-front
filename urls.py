@@ -31,6 +31,7 @@ urlpatterns = patterns(
     url(r'^terminology/$', direct_to_template, {'template': 'terminology.html'}),
     #
     url(r'^locations/$', 'wikiprox.views.locations', name='wikiprox-locations'),
+    url(r'^events/$', 'wikiprox.views.events', name='wikiprox-events'),
     #
     url(r"^sources/(?P<encyclopedia_id>[\w .:_-]+)/$", 'wikiprox.views.source', name='wikiprox-source'),
     #

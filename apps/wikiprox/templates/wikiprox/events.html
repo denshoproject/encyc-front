@@ -1,0 +1,37 @@
+{% extends "wikiprox/base.html" %}
+{% load wikiprox_tags %}
+
+
+{% block title %}Events{% endblock %}
+
+
+{% block css %}{{ block.super }}
+  <style>
+    dl#events dd { margin-bottom:10px; }
+  </style>
+{% endblock css %}
+
+
+{% block contents %}{{ block.super }}
+
+<!-- wikiprox/events.html -->
+<div id="events" class="span12">
+
+<h1 id="firstHeading" class="firstHeading">Events</h1>
+
+<dl id="events">
+{% for event in events %}
+  <dt>
+    {{ event.start_date }}
+    {% if event.end_date %}&mdash;{{ event.end_date }}{% endif %}
+  </dt>
+  <dd>
+    {% if event.title %}{{ event.title }}<br/>{% endif %}
+    {{ event.description }}
+    {% if event.url %}<a href="{{ event.url }}">{{ event.url }}</a><br/>{% endif %}
+  </dd>
+{% endfor %}
+</dl>
+
+</div><!-- #events .span12 -->
+{% endblock contents %}

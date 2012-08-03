@@ -21,7 +21,8 @@ def locations():
         locations = json.loads(cached)
     else:
         url = '%s/locations/' % settings.TANSU_API
-        r = requests.get(url, headers={'content-type':'application/json'})
+        r = requests.get(url, params={'limit':'1000'},
+                         headers={'content-type':'application/json'})
         if r.status_code == 200:
             response = json.loads(r.text)
             for location in response['objects']:

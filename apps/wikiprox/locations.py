@@ -1,6 +1,8 @@
 from datetime import datetime
 import json
 
+from lxml import etree
+from pykml.factory import KML_ElementMaker as KML
 import requests
 
 from django.conf import settings
@@ -29,3 +31,44 @@ def locations():
                 locations.append(location)
         cache.set(cache_key, json.dumps(locations), settings.CACHE_TIMEOUT)
     return locations
+
+def layers(locations):
+    layers = []
+    for l in locations:
+        if l.get('category',None) and l['category']:
+            layer = ( l['category'], l['category_name'] )
+            if layer not in layers:
+                layers.append(layer)
+    return layers
+
+def kml(locations):
+    document = KML.kml(KML.Document(KML.name("Layer example")))
+    # bullets
+    for layer in layers(locations):
+        layer_code = layer[0]
+        style = KML.Style(
+            KML.IconStyle(
+                KML.scale(1.0),
+                KML.Icon(
+                    KML.href('%slocations/%s.png' % (settings.MEDIA_URL, layer_code)),
+                ),
+                id='icon-%s' % layer_code
+            ),
+            id=layer_code
+        )
+        document.append(style)
+    # locations
+    folder = KML.Folder()
+    for location in locations:
+        placemark = KML.Placemark(
+            KML.name(location['title']),
+            KML.description('<![CDATA[ %s ]]>' % location['description']),
+            KML.styleUrl('#%s' % location['category']),
+            KML.Point(
+                KML.coordinates(','.join([location['lng'],location['lat']]))
+                ),
+            )
+        folder.append(placemark)
+    document.append(folder)
+    # rettsugo!
+    return etree.tostring(document)

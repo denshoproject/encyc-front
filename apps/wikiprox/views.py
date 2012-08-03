@@ -211,11 +211,18 @@ def contents(request, template_name='wikiprox/contents.html'):
     )
 
 def locations(request, template_name='wikiprox/locations.html'):
+    locations = loc.locations()
+    layers = loc.layers(locations)
     return render_to_response(
         template_name,
-        {'locations': loc.locations(),},
+        {'layers': layers,
+         'locations': locations,},
         context_instance=RequestContext(request)
     )
+
+def locations_kml(request):
+    kml = loc.kml(loc.locations())
+    return HttpResponse(kml, content_type="text/xml")
 
 def events(request, template_name='wikiprox/events.html'):
     events = ev.events()

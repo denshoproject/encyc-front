@@ -30,6 +30,7 @@ urlpatterns = patterns(
     url(r'^search/$', direct_to_template, {'template': 'search.html'}),
     url(r'^terminology/$', direct_to_template, {'template': 'terminology.html'}),
     #
+    url(r'^locations.kml$', 'wikiprox.views.locations_kml', name='wikiprox-locations-kml'),
     url(r'^locations/$', 'wikiprox.views.locations', name='wikiprox-locations'),
     url(r'^events/$', 'wikiprox.views.events', name='wikiprox-events'),
     #

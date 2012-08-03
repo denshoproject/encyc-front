@@ -23,7 +23,7 @@
 {% for location in locations %}
     var feature = new OpenLayers.Feature.Vector(
         new OpenLayers.Geometry.Point({{ location.lng }},{{ location.lat }}),
-        { some:'data' }, { externalGraphic:'{{ MEDIA_URL }}img/logo-black.png', graphicHeight:30, graphicWidth:43 }
+        { some:'data' }, { externalGraphic:'{{ MEDIA_URL }}locations/{{ location.category }}.png', graphicHeight:30, graphicWidth:30 }
     );
     vectorLayer.addFeatures(feature);
 {% endfor %}

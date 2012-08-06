@@ -210,18 +210,19 @@ def contents(request, template_name='wikiprox/contents.html'):
         context_instance=RequestContext(request)
     )
 
-def locations(request, template_name='wikiprox/locations.html'):
-    locations = loc.locations()
-    layers = loc.layers(locations)
+def locations(request, category=None, template_name='wikiprox/locations.html'):
+    locations = loc.filter_by_category(loc.locations(), category)
+    categories = loc.categories(locations)
     return render_to_response(
         template_name,
-        {'layers': layers,
+        {'categories': categories,
          'locations': locations,},
         context_instance=RequestContext(request)
     )
 
-def locations_kml(request):
-    kml = loc.kml(loc.locations())
+def locations_kml(request, category=None):
+    locations = loc.filter_by_category(loc.locations(), category)
+    kml = loc.kml(locations)
     return HttpResponse(kml, content_type="text/xml")
 
 def events(request, template_name='wikiprox/events.html'):

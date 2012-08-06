@@ -14,22 +14,30 @@
 
 var map = new OpenLayers.Map({
     div: "openlayers-map",
+    controls: [
+        new OpenLayers.Control.Navigation(),
+        new OpenLayers.Control.LayerSwitcher({'ascending':false}),
+        new OpenLayers.Control.ScaleLine(),
+        new OpenLayers.Control.KeyboardDefaults()
+    ],
     layers: [
         new OpenLayers.Layer.WMS(
             "WMS", "http://vmap0.tiles.osgeo.org/wms/vmap0",
             {layers: "basic"}
         ),
-        new OpenLayers.Layer.Vector("KML", {
+{% for category_code,category_name in categories %}
+        new OpenLayers.Layer.Vector("{{ category_name }}", {
             strategies: [new OpenLayers.Strategy.Fixed()],
             protocol: new OpenLayers.Protocol.HTTP({
-                url: "{% url wikiprox-locations-kml %}",
+                url: "{% url wikiprox-locations-kml-category category_code %}",
                 format: new OpenLayers.Format.KML({
                     extractStyles: true,
                     extractAttributes: true,
                     maxDepth: 2
                 })
             })
-        })
+        }){% if not forloop.last %},{% endif %}
+{% endfor %}
     ],
     center: new OpenLayers.LonLat(-100,38),
     zoom: 5

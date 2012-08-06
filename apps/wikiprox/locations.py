@@ -32,20 +32,33 @@ def locations():
         cache.set(cache_key, json.dumps(locations), settings.CACHE_TIMEOUT)
     return locations
 
-def layers(locations):
-    layers = []
+def categories(locations):
+    """Returns list of (code,name) tuples describing facility categories
+    """
+    categories = []
     for l in locations:
         if l.get('category',None) and l['category']:
-            layer = ( l['category'], l['category_name'] )
-            if layer not in layers:
-                layers.append(layer)
-    return layers
+            category = ( l['category'], l['category_name'] )
+            if category not in categories:
+                categories.append(category)
+    return categories
+
+def filter_by_category(locations, category=None):
+    if category:
+        filtered = []
+        for l in locations:
+            if (l.get('category',None) and l['category'] == category):
+                filtered.append(l)
+        return filtered
+    return locations
 
 def kml(locations):
+    """KML file for the locations
+    """
+    # create document
     document = KML.kml(KML.Document(KML.name("Layer example")))
     # bullets
-    for layer in layers(locations):
-        layer_code = layer[0]
+    for layer_code,layer_name in categories(locations):
         style = KML.Style(
             KML.IconStyle(
                 KML.scale(1.0),

@@ -1,70 +1,92 @@
-{% extends "base-openlayers.html" %}
-
-
-
-{% block title %}Locations{% endblock %}
-
-
-
-{% block javascript %}
-<script type="text/javascript" src="http://openlayers.org/api/OpenLayers.js"></script>
-<script type="text/javascript">
-  $(document).ready(function(){
-
-
-var map = new OpenLayers.Map({
-    div: "openlayers-map",
-    controls: [
-        new OpenLayers.Control.Navigation(),
-        new OpenLayers.Control.LayerSwitcher({'ascending':false}),
-        new OpenLayers.Control.ScaleLine(),
-        new OpenLayers.Control.KeyboardDefaults()
-    ],
-    layers: [
-        new OpenLayers.Layer.WMS(
-            "WMS", "http://vmap0.tiles.osgeo.org/wms/vmap0",
-            {layers: "basic"}
-        ),
-{% for category_code,category_name in categories %}
-        new OpenLayers.Layer.Vector("{{ category_name }}", {
-            strategies: [new OpenLayers.Strategy.Fixed()],
-            protocol: new OpenLayers.Protocol.HTTP({
-                url: "{% url wikiprox-locations-kml-category category_code %}",
-                format: new OpenLayers.Format.KML({
-                    extractStyles: true,
-                    extractAttributes: true,
-                    maxDepth: 2
-                })
-            })
-        }){% if not forloop.last %},{% endif %}
-{% endfor %}
-    ],
-    center: new OpenLayers.LonLat(-100,38),
-    zoom: 5
-});
-
-
-
-  });
-</script>
-{% endblock javascript %}
-
-
-
-{% block contents %}
-
-<h1 id="firstHeading" class="firstHeading">
-Locations
-</h1>
-
-<p>
-<a href="{% url wikiprox-locations-kml %}">locations.kml</a>
-</p>
-
-<p>
-layers: {{ layers }}
-</p>
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Full Screen Example</title>        
+  <link rel="stylesheet" href="http://openlayers.org/dev/theme/default/style.css" type="text/css">
+  <link rel="stylesheet" href="http://openlayers.org/dev/examples/style.css" type="text/css">
+  <style type="text/css">
+      html, body, #map {
+          margin: 0;
+          width: 100%;
+          height: 100%;
+      }
+      #text {
+          position: absolute;
+          top: 330px;
+          right: 10px;
+          width: 190px;
+          z-index: 20000;
+          background-color: white;
+          padding: 0 0.5em 0.5em 0.5em;
+      }
+  </style>
+</head>
+<body>
 
 <div id="openlayers-map" style="width:100%; height:100%"></div>
 
-{% endblock contents %}
+<div id="text">
+<h1 id="title">Full-screen Map</h1>
+<div id="docs">
+<p>
+This square is just a regular CSS div.
+We can put whatever text we want in here.
+</p>
+<p>
+I thought I knew how to center and zoom the map,
+but for whatever reason this iteration will not cooperate.
+</p>
+</div>
+</div>
+
+
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
+<script type="text/javascript" src="http://openlayers.org/api/OpenLayers.js"></script>
+<script type="text/javascript">
+  $(document).ready(function(){
+      var map = new OpenLayers.Map('openlayers-map');
+      var urls = [
+          "http://a.tile.openstreetmap.org/${z}/${x}/${y}.png",
+          "http://b.tile.openstreetmap.org/${z}/${x}/${y}.png",
+          "http://c.tile.openstreetmap.org/${z}/${x}/${y}.png"
+      ];
+      map.addLayer(
+          new OpenLayers.Layer.XYZ("OSM (with buffer)",
+          urls, {
+              transitionEffect: "resize",
+              buffer: 2,
+              sphericalMercator: true,
+              attribution: "Data CC-By-SA by <a href='http://openstreetmap.org/'>OpenStreetMap</a>"
+          }
+      ));
+{% for category_code,category_name in categories %}
+      map.addLayer(
+          new OpenLayers.Layer.Vector("{{ category_name }}", {
+              strategies: [new OpenLayers.Strategy.Fixed()],
+              protocol: new OpenLayers.Protocol.HTTP({
+                  url: "{% url wikiprox-locations-kml-category category_code %}",
+                  format: new OpenLayers.Format.KML({
+                      extractStyles: true,
+                      extractAttributes: true,
+                      maxDepth: 2
+                  })
+              })
+          })
+      );
+{% endfor %}
+      if (!map.getCenter()) {
+          map.setCenter(new OpenLayers.LonLat(-71, 42), 3);
+      }
+      map.addControl(
+          new OpenLayers.Control.Navigation({ dragPanOptions: {enableKinetic:true} })
+      );
+      map.addControl(new OpenLayers.Control.Attribution());
+      map.addControl(new OpenLayers.Control.LayerSwitcher());
+  });
+</script>
+
+</body>
+</html>

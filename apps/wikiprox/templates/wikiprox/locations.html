@@ -79,7 +79,12 @@ but for whatever reason this iteration will not cooperate.
       );
 {% endfor %}
       if (!map.getCenter()) {
-          map.setCenter(new OpenLayers.LonLat(-71, 42), 3);
+          var center = new OpenLayers.LonLat(-100.0, 39.0);
+          // project center coord from WGS84 (EPSG:4326) lat/lng
+          // to map's current projection (Spherical Mercator)
+          center.transform(new OpenLayers.Projection('EPSG:4326'),
+                           map.getProjectionObject());
+          map.setCenter(center, 5);
       }
       map.addControl(
           new OpenLayers.Control.Navigation({ dragPanOptions: {enableKinetic:true} })

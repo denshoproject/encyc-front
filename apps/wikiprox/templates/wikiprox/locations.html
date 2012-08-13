@@ -15,9 +15,9 @@
       }
       #text {
           position: absolute;
-          top: 330px;
-          right: 10px;
-          width: 190px;
+          bottom: 25px;
+          right: 0px;
+          width: 201px;
           z-index: 20000;
           background-color: white;
           padding: 0 0.5em 0.5em 0.5em;
@@ -90,7 +90,13 @@ but for whatever reason this iteration will not cooperate.
           new OpenLayers.Control.Navigation({ dragPanOptions: {enableKinetic:true} })
       );
       map.addControl(new OpenLayers.Control.Attribution());
-      map.addControl(new OpenLayers.Control.LayerSwitcher());
+      var layerSwitcher = new OpenLayers.Control.LayerSwitcher({
+          roundedCorner: false,
+          autoActivate: true
+      });
+      map.addControl(layerSwitcher);
+      layerSwitcher.maximizeControl();
+
   });
 </script>
 

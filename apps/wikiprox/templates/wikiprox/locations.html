@@ -13,11 +13,11 @@
           width: 100%;
           height: 100%;
       }
-      #text {
+      #locationdetails {
           position: absolute;
-          bottom: 25px;
+          top: 0px;
           right: 0px;
-          width: 201px;
+          width: 300px;
           z-index: 20000;
           background-color: white;
           padding: 0 0.5em 0.5em 0.5em;
@@ -26,79 +26,104 @@
 </head>
 <body>
 
+
+
 <div id="openlayers-map" style="width:100%; height:100%"></div>
 
-<div id="text">
-<h1 id="title">Full-screen Map</h1>
-<div id="docs">
-<p>
-This square is just a regular CSS div.
-We can put whatever text we want in here.
-</p>
-<p>
-I thought I knew how to center and zoom the map,
-but for whatever reason this iteration will not cooperate.
-</p>
-</div>
-</div>
+
+
+<div id="locationdetails">
+
+  <ul style="list-style-type:none; padding:0px;">
+{% for category in categories %}
+    <li>
+      <img src="{{ MEDIA_URL }}locations/{{ category.0 }}.png" width="20" /> {{ category.1 }}
+    </li>
+{% endfor %}
+  </ul>
+
+  <div id="initial" class="location" style="display:block;">
+    <h2>Facilities</h2>
+    <p>
+Details of individual facilities will be displayed here.
+    </p>
+    <p>
+NOTE: Not all of these have pages in the wiki, and some of the pages have different titles in the wiki. We'll need to think about how to handle those links.
+    </p>
+    <p>
+NOTE: Sorry, the layers function has gone away. I'm as sad as you are. :(
+    </p>
+  </div>
+{% for location in locations %}
+  <div id="{{ location.uid }}" class="location" style="display:none;">
+    <h2><a href="{% url wikiprox-page location.title %}">{{ location.title }}</a></h2>
+    <p>
+    Location: {{ location.location_name }}<br/>
+    Type: {{ location.category_name }}<br/>
+    </p>
+    <p>
+    {{ location.description }}
+    </p>
+    <p><a href="{% url wikiprox-page location.title %}">More info &raquo;</a></p>
+  </div>
+{% endfor %}
+
+</div><!-- #location-details -->
+
 
 
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
 <script type="text/javascript" src="http://openlayers.org/api/OpenLayers.js"></script>
 <script type="text/javascript">
-  $(document).ready(function(){
-      var map = new OpenLayers.Map('openlayers-map');
-      var urls = [
-          "http://a.tile.openstreetmap.org/${z}/${x}/${y}.png",
-          "http://b.tile.openstreetmap.org/${z}/${x}/${y}.png",
-          "http://c.tile.openstreetmap.org/${z}/${x}/${y}.png"
-      ];
-      map.addLayer(
-          new OpenLayers.Layer.XYZ("OSM (with buffer)",
-          urls, {
-              transitionEffect: "resize",
-              buffer: 2,
-              sphericalMercator: true,
-              attribution: "Data CC-By-SA by <a href='http://openstreetmap.org/'>OpenStreetMap</a>",
-              displayInLayerSwitcher: false
-          }
-      ));
-{% for category_code,category_name in categories %}
-      map.addLayer(
-          new OpenLayers.Layer.Vector("{{ category_name }}", {
-              strategies: [new OpenLayers.Strategy.Fixed()],
-              protocol: new OpenLayers.Protocol.HTTP({
-                  url: "{% url wikiprox-locations-kml-category category_code %}",
-                  format: new OpenLayers.Format.KML({
-                      extractStyles: true,
-                      extractAttributes: true,
-                      maxDepth: 2
-                  })
-              })
-          })
-      );
-{% endfor %}
-      if (!map.getCenter()) {
-          var center = new OpenLayers.LonLat(-100.0, 39.0);
-          // project center coord from WGS84 (EPSG:4326) lat/lng
-          // to map's current projection (Spherical Mercator)
-          center.transform(new OpenLayers.Projection('EPSG:4326'),
-                           map.getProjectionObject());
-          map.setCenter(center, 5);
-      }
-      map.addControl(
-          new OpenLayers.Control.Navigation({ dragPanOptions: {enableKinetic:true} })
-      );
-      map.addControl(new OpenLayers.Control.Attribution());
-      var layerSwitcher = new OpenLayers.Control.LayerSwitcher({
-          roundedCorner: false,
-          autoActivate: true
-      });
-      map.addControl(layerSwitcher);
-      layerSwitcher.maximizeControl();
+$(document).ready(function(){
+    var projection = new OpenLayers.Projection("EPSG:4326");
+    map = new OpenLayers.Map('openlayers-map');
+    
+    var urls = [
+        "http://a.tile.openstreetmap.org/${z}/${x}/${y}.png",
+        "http://b.tile.openstreetmap.org/${z}/${x}/${y}.png",
+        "http://c.tile.openstreetmap.org/${z}/${x}/${y}.png"
+    ];
+    var base = new OpenLayers.Layer.XYZ(
+        "OSM (with buffer)",
+        urls, {
+            transitionEffect: "resize",
+            buffer: 2,
+            sphericalMercator: true,
+            'maxExtent': new OpenLayers.Bounds(-20037508.34, -20037508.34, 20037508.34, 20037508.34),
+            attribution: "Data CC-By-SA by <a href='http://openstreetmap.org/'>OpenStreetMap</a>",
+            displayInLayerSwitcher: false
+        }
+    );
+    var locations = new OpenLayers.Layer.Vector("Locations");
+    map.addLayers([base, locations]);
+    
+{% for location in locations %}
+    locations.addFeatures([
+        new OpenLayers.Feature.Vector(
+            new OpenLayers.Geometry.Point({{ location.lng }},{{ location.lat }}).transform(projection, map.getProjectionObject()),
+            {'uid':'{{ location.uid }}'},
+            {'externalGraphic':'{{ MEDIA_URL }}locations/{{ location.category }}.png',
+             'graphicWidth':20, 'graphicHeight':20}
+        )
+    ]);{% endfor %}
 
-  });
+    function selected(event) {
+        $('#locationdetails .location').css('display', 'none');
+        $('#'+event.feature.data.uid).css('display', 'block');
+    }
+    locations.events.register("featureselected", locations, selected);
+    var control = new OpenLayers.Control.SelectFeature(locations);
+    map.addControl(control);
+    control.activate();
+    
+    var lonlat = new OpenLayers.LonLat(-100.0, 39.0);
+    lonlat.transform(projection, map.getProjectionObject());
+    map.setCenter(lonlat, 5);
+});
 </script>
+
+
 
 </body>
 </html>

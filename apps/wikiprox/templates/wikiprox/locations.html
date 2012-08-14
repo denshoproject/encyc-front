@@ -117,7 +117,7 @@
     <ul class="legend">
 {% for category in categories %}
       <li>
-        <img src="{{ MEDIA_URL }}locations/{{ category.0 }}.png" width="15" /> {{ category.1 }}
+        <img src="{{ MEDIA_URL }}locations/{{ category.0 }}-selected.png" width="15" /> {{ category.1 }}
       </li>
 {% endfor %}
     </ul>
@@ -180,25 +180,39 @@ $(document).ready(function(){
             displayInLayerSwitcher: false
         }
     );
-    var locations = new OpenLayers.Layer.Vector("Locations");
+
+    var styles = new OpenLayers.StyleMap({
+        "default": {
+            externalGraphic: "{{ MEDIA_URL }}locations/${category}.png",
+            pointRadius: 10
+        },
+        "select": {
+            externalGraphic: "{{ MEDIA_URL }}locations/${category}-selected.png",
+            pointRadius: 30
+        }
+    });
+
+    var locations = new OpenLayers.Layer.Vector("Locations", {
+        styleMap: styles
+    });
     map.addLayers([base, locations]);
     
 {% for location in locations %}
     locations.addFeatures([
         new OpenLayers.Feature.Vector(
             new OpenLayers.Geometry.Point({{ location.lng }},{{ location.lat }}).transform(projection, map.getProjectionObject()),
-            {'uid':'{{ location.uid }}'},
-            {'externalGraphic':'{{ MEDIA_URL }}locations/{{ location.category }}.png',
-             'graphicWidth':20, 'graphicHeight':20}
+            {'uid':'{{ location.uid }}', 'category':'{{ location.category }}'}
         )
-    ]);{% endfor %}
+    ]);
+{% endfor %}
 
-    function selected(event) {
-        $('#text .location').css('display', 'none');
-        $('#'+event.feature.data.uid).css('display', 'block');
-    }
-    locations.events.register("featureselected", locations, selected);
-    var control = new OpenLayers.Control.SelectFeature(locations);
+    var control = new OpenLayers.Control.SelectFeature(locations, {
+        onSelect: function(feature) {
+            // display details in sidebar
+            $('#text .location').css('display', 'none');
+            $('#'+feature.data.uid).css('display', 'block');
+        }
+    });
     map.addControl(control);
     control.activate();
     

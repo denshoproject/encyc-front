@@ -16,7 +16,6 @@ from django.views.decorators.http import require_http_methods
 
 from wikiprox import mediawiki as mw
 from wikiprox import encyclopedia, sources
-from wikiprox import events as ev
 
 
 @require_http_methods(['GET',])
@@ -206,20 +205,6 @@ def contents(request, template_name='wikiprox/contents.html'):
     return render_to_response(
         template_name,
         {'articles': articles,},
-        context_instance=RequestContext(request)
-    )
-
-def events(request, template_name='wikiprox/events.html'):
-    events = ev.events()
-    published = False
-    for event in events:
-        if int(event['published']):
-            published = True
-    if (not published) and (not settings.DEBUG):
-        raise Http404
-    return render_to_response(
-        template_name,
-        {'events': events,},
         context_instance=RequestContext(request)
     )
 

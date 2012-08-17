@@ -60,12 +60,15 @@ def page(request, page='index', printed=False, template_name='wikiprox/page.html
     # (external URLs not visible to Chrome on Android when connecting through SonicWall)
     if hasattr(settings, 'STAGE') and settings.STAGE:
         page_sources = sources.replace_source_urls(page_sources, request)
+    # find coordinates listed in the page, if any
+    coordinates_camp = mw.find_databoxcamps_coordinates(pagedata['parse']['text']['*'])
     context = {
         'request': request,
         'page': page,
         'title': title,
         'bodycontent': bodycontent,
         'sources': page_sources,
+        'coordinates': coordinates_camp,
         'lastmod': mw.page_lastmod(page),
         'print': printed,
         }

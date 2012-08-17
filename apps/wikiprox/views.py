@@ -16,7 +16,6 @@ from django.views.decorators.http import require_http_methods
 
 from wikiprox import mediawiki as mw
 from wikiprox import encyclopedia, sources
-from wikiprox import locations as loc
 from wikiprox import events as ev
 
 
@@ -209,21 +208,6 @@ def contents(request, template_name='wikiprox/contents.html'):
         {'articles': articles,},
         context_instance=RequestContext(request)
     )
-
-def locations(request, category=None, template_name='wikiprox/locations.html'):
-    locations = loc.filter_by_category(loc.locations(), category)
-    categories = loc.categories(locations)
-    return render_to_response(
-        template_name,
-        {'categories': categories,
-         'locations': locations,},
-        context_instance=RequestContext(request)
-    )
-
-def locations_kml(request, category=None):
-    locations = loc.filter_by_category(loc.locations(), category)
-    kml = loc.kml(locations)
-    return HttpResponse(kml, content_type="text/xml")
 
 def events(request, template_name='wikiprox/events.html'):
     events = ev.events()

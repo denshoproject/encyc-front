@@ -39,7 +39,6 @@
           top: 0px;
           right: 0px;
           width: 300px;
-          height: 100%;
           z-index: 20000;
           background-color: white;
           padding: 0px;
@@ -52,9 +51,9 @@
       #header h2 {
           background: #333;
           color: white;
+          line-height: 1;
           font-size: 20px;
           font-weight: 400;
-          line-height: 1;
           margin:0px;
           padding:5px;
       }
@@ -68,11 +67,12 @@
           list-style-type:none;
           margin: 0px;
           padding: 0px;
+          padding-bottom: 10px;
+      }
+      #text #legend, #text .location {
+          padding-top: 10px;
       }
       #text .location {
-          margin-top: 20px;
-          border-top: 1px solid #efefef;
-          padding-top: 20px;
           overflow-y: auto;
       }
       #text h1, #text h2, #text .location h2 {
@@ -93,6 +93,66 @@
       a {
           text-decoration: none;
       }
+
+      @media screen and (max-width: 768px) {
+          #textbox {
+              width: 200px;
+          }
+          #header h2 {
+              font-size: 20px;
+          }
+          #header h2 img {
+              height: 30px;
+          }
+          #text {
+              font-size: small;
+          }
+          #text ul {
+              display: none;
+          }
+          #text .location {
+              margin-top: 0;
+              border: none;
+          }
+      }/*/mediaquery*/
+	
+      @media screen and (max-width: 520px) {
+          #textbox {
+              width: 150px;
+          }
+          #header h2 {
+              font-size: 15px;
+          }
+          #header h2 img {
+              height: 20px;
+          }
+          #text {
+              font-size: smaller;
+          }
+          #text ul {
+              display: none;
+          }
+          #text .location {
+              margin-top: 0;
+              border: none;
+          }
+      }/*/mediaquery*/
+
+      @media screen and (min-width: 980px) {
+          #textbox {
+              width: 300px;
+          }
+          #header h2 {
+              font-size: 20px;
+          }
+          #header h2 img {
+              height: 30px;
+          }
+          #text {
+              font-size: normal;
+          }
+      }/*/mediaquery*/
+
   </style>
 
 </head>
@@ -107,20 +167,29 @@
 <div id="textbox">
 
   <div id="header">
-    <h2><a href="/"><img src="{{ MEDIA_URL }}img/logo-white.png" height="30" /> Densho Encyclopedia</a></h2>
+    <h2><a href="/"><img src="{{ MEDIA_URL }}img/logo-white.png" /> Densho Encyclopedia</a></h2>
   </div>
 
   <div id="text">
 
     <h1>Title Goes Here</h1>
 
-    <ul class="legend">
+    <div id="legend" style="display:block;">
+      <h2>
+      <a id="legendflip" href="#">
+        <img class="open"   width="10" src="{{ MEDIA_URL }}locations/flip-open.png" />
+        <img class="closed" width="10" src="{{ MEDIA_URL }}locations/flip-closed.png" />
+        Facility Types
+      </a>
+      </h2>
+      <ul>
 {% for category in categories %}
-      <li>
-        <img src="{{ MEDIA_URL }}locations/{{ category.0 }}-selected.png" width="15" /> {{ category.1 }}
-      </li>
+        <li>
+          <img src="{{ MEDIA_URL }}locations/{{ category.0 }}-selected.png" width="15" /> {{ category.1 }}
+        </li>
 {% endfor %}
-    </ul>
+      </ul>
+    </div><!-- #legend -->
 
     <div id="initial" class="location" style="display:block;">
       <h2>Facilities</h2>
@@ -158,6 +227,37 @@
 
 
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+    /* set initial state of textbox based on window width */
+    $('#legendflip img.closed').hide();
+    function resizeTextbox() {
+        var msg = $(window).width();
+        if (Modernizr.mq('screen and (max-width: 520px)')) {
+            $('#legend ul').hide();
+            $('#legendflip img.open').hide();
+            $('#legendflip img.closed').show();
+        }
+        if (Modernizr.mq('screen and (max-width: 768px)')) {
+            $('#legend ul').hide();
+            $('#legendflip img.open').hide();
+            $('#legendflip img.closed').show();
+        }
+        if (Modernizr.mq('screen and (min-width: 980px)')) {
+            $('#legend ul').show();
+            $('#legendflip img.open').show();
+            $('#legendflip img.closed').hide();
+        }
+    }
+    resizeTextbox();
+    /* flip textbox when clicked */
+    $('#legendflip').click(function(event){
+        $('#legend ul').toggle('fast');
+        $('#legendflip img').toggle();
+    });
+});
+</script>
+
 <script type="text/javascript" src="http://openlayers.org/api/OpenLayers.js"></script>
 <script type="text/javascript">
 $(document).ready(function(){
@@ -211,6 +311,9 @@ $(document).ready(function(){
             // display details in sidebar
             $('#text .location').css('display', 'none');
             $('#'+feature.data.uid).css('display', 'block');
+            $('#legend ul').hide('fast');
+            $('#legendflip img.open').hide();
+            $('#legendflip img.closed').show();
         }
     });
     map.addControl(control);

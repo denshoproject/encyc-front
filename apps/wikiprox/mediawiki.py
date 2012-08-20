@@ -52,6 +52,7 @@ def parse_mediawiki_text(text, images, public=False, printed=False):
     soup = remove_staticpage_titles(soup)
     soup = remove_comments(soup)
     soup = remove_edit_links(soup)
+    soup = wrap_sections(soup)
     soup = rewrite_mediawiki_urls(soup)
     soup = rewrite_newpage_links(soup)
     soup = rewrite_prevnext_links(soup)
@@ -95,6 +96,38 @@ def remove_edit_links(soup):
     """
     for e in soup.find_all('span', attrs={'class':'editsection'}):
         e.decompose()
+    return soup
+
+def wrap_sections(soup):
+    """Wraps each <h2> and cluster of <p>s in a <section> tag.
+    
+    Makes it possible to make certain sections collapsable.
+    
+    The thing that makes this complicated is that with BeautifulSoup you can't just drop tags into a <div>.  You have to 
+    """
+    n = 0
+    for s in soup.find_all('span', 'mw-headline'):
+        # get the <h2> tag
+        h = s.parent
+        # extract the rest of the section from soup
+        siblings = []
+        for sibling in h.next_siblings:
+            if hasattr(sibling, 'name') and sibling.name == 'h2':
+                break
+            siblings.append(sibling)
+        [sibling.extract() for sibling in siblings]
+        # wrap h in a <div>
+        div = soup.new_tag('div')
+        div['id'] = 'section-%s' % n
+        div['class'] = 'section'
+        h = h.wrap(div)
+        # append section contents into <div>
+        div2 = soup.new_tag('div')
+        div2['class'] = 'section_content'
+        div2.contents = siblings
+        h.append(div2)
+        # done
+        n = n + 1
     return soup
 
 def remove_status_markers(soup):

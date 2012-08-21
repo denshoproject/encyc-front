@@ -50,15 +50,11 @@
       }
       #header h2 {
           background: #333;
-          color: white;
-          line-height: 1;
-          font-size: 20px;
-          font-weight: 400;
           margin:0px;
           padding:5px;
       }
-      #header h2 a {
-          color: white;
+      #header h2 img {
+          border: 0;
       }
       #text {
           padding: 20px;
@@ -98,11 +94,11 @@
           #textbox {
               width: 200px;
           }
-          #header h2 {
-              font-size: 20px;
+          #header img#title {
+              width: 150px;
           }
-          #header h2 img {
-              height: 30px;
+          #header img#toggle {
+              width: 30px;
           }
           #text {
               font-size: small;
@@ -118,13 +114,13 @@
 	
       @media screen and (max-width: 520px) {
           #textbox {
+              width: 200px;
+          }
+          #header img#title {
               width: 150px;
           }
-          #header h2 {
-              font-size: 15px;
-          }
-          #header h2 img {
-              height: 20px;
+          #header img#toggle {
+              width: 30px;
           }
           #text {
               font-size: smaller;
@@ -141,9 +137,6 @@
       @media screen and (min-width: 980px) {
           #textbox {
               width: 300px;
-          }
-          #header h2 {
-              font-size: 20px;
           }
           #header h2 img {
               height: 30px;
@@ -168,8 +161,8 @@
 
   <div id="header">
     <h2>
-    <span id="showtextbox" style="float:right;"><a href="#"><img src="{{ MEDIA_URL }}locations/header-toggle.png" alt="open/close" title="open/close" /></a></span>
-    <a href="/"><img src="{{ MEDIA_URL }}img/logo-white.png" /> Densho Encyclopedia</a>
+    <span id="showtextbox" style="float:right;"><a href="#"><img id="toggle" src="{{ MEDIA_URL }}locations/header-toggle.png" alt="open/close" title="open/close" /></a></span>
+    <a href="/"><img id="title" src="{{ MEDIA_URL }}locations/header-title.png" alt="Densho Encyclopedia" /></a>
     </h2>
   </div>
 

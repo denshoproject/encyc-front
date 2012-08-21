@@ -221,6 +221,7 @@
 
 
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
+<script type="text/javascript" src="http://openlayers.org/api/OpenLayers.js"></script>
 <script type="text/javascript">
 $(document).ready(function(){
     /* set initial state of textbox based on window width */
@@ -250,13 +251,6 @@ $(document).ready(function(){
         $('#legendflip img').toggle();
     });
     
-    /* textbox area closed by default on smaller screens */
-    function defaultTextboxVisibility() {
-        if (Modernizr.mq('screen and (max-width: 520px)')) {
-            $('#text').hide();
-        }
-    }
-    defaultTextboxVisibility();
     /* open/close the white textbox area on click */
     $('#showtextbox a').click(function(event){
         $('#text').toggle('fast');
@@ -264,8 +258,6 @@ $(document).ready(function(){
     
 });
 </script>
-
-<script type="text/javascript" src="http://openlayers.org/api/OpenLayers.js"></script>
 <script type="text/javascript">
 $(document).ready(function(){
     var projection = new OpenLayers.Projection("EPSG:4326");

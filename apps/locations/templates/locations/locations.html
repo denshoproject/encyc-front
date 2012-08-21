@@ -231,8 +231,8 @@
 <script type="text/javascript">
 $(document).ready(function(){
     /* set initial state of textbox based on window width */
-    $('#legendflip img.closed').hide();
-    function resizeTextbox() {
+    function defaultFacilityTypes() {
+        $('#legendflip img.closed').hide();
         var msg = $(window).width();
         if (Modernizr.mq('screen and (max-width: 520px)')) {
             $('#legend ul').hide();
@@ -250,7 +250,7 @@ $(document).ready(function(){
             $('#legendflip img.closed').hide();
         }
     }
-    resizeTextbox();
+    defaultFacilityTypes();
     /* flip textbox when clicked */
     $('#legendflip').click(function(event){
         $('#legend ul').toggle('fast');
@@ -323,6 +323,7 @@ $(document).ready(function(){
     var control = new OpenLayers.Control.SelectFeature(locations, {
         onSelect: function(feature) {
             // display details in sidebar
+            $('#text').show('fast');
             $('#text .location').css('display', 'none');
             $('#'+feature.data.uid).css('display', 'block');
             $('#legend ul').hide('fast');
@@ -333,9 +334,28 @@ $(document).ready(function(){
     map.addControl(control);
     control.activate();
     
-    var lonlat = new OpenLayers.LonLat(-85.0, 39.0);
+    /* set initial map center & zoom based on window width*/
+    var lng = '-93.0';
+    var lat = '39.0';
+    var zoom = 4;
+    if (Modernizr.mq('screen and (max-width: 400px)')) {
+        lng = '-100.0';
+        lat = '42';
+        zoom = 3;
+    }
+    if (Modernizr.mq('screen and (min-width: 401px) and (max-width: 520px)')) {
+        lng = '-106.0';
+    }
+    if (Modernizr.mq('screen and (min-width: 521px) and (max-width: 768px)')) {
+        lng = '-100.0';
+    }
+    if (Modernizr.mq('screen and (min-width: 980px)')) {
+        lng = '-103.0';
+        zoom = 5;
+    }
+    var lonlat = new OpenLayers.LonLat(lng, lat);
     lonlat.transform(projection, map.getProjectionObject());
-    map.setCenter(lonlat, 4);
+    map.setCenter(lonlat, zoom);
 });
 </script>
 

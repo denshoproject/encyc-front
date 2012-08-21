@@ -6,6 +6,7 @@ Django
 django-debug-toolbar
 gunicorn
 iPython
+pykml
 python-memcached
 staticgenerator
 

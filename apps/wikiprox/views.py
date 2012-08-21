@@ -16,9 +16,9 @@ from django.views.decorators.http import require_http_methods
 
 from wikiprox import mediawiki as mw
 from wikiprox import encyclopedia, sources
-from wikiprox import events as ev
 
 
+@require_http_methods(['GET',])
 def index(request, template_name='index.html'):
     return render_to_response(
         template_name,
@@ -60,12 +60,15 @@ def page(request, page='index', printed=False, template_name='wikiprox/page.html
     # (external URLs not visible to Chrome on Android when connecting through SonicWall)
     if hasattr(settings, 'STAGE') and settings.STAGE:
         page_sources = sources.replace_source_urls(page_sources, request)
+    # find coordinates listed in the page, if any
+    coordinates_camp = mw.find_databoxcamps_coordinates(pagedata['parse']['text']['*'])
     context = {
         'request': request,
         'page': page,
         'title': title,
         'bodycontent': bodycontent,
         'sources': page_sources,
+        'coordinates': coordinates_camp,
         'lastmod': mw.page_lastmod(page),
         'print': printed,
         }
@@ -205,20 +208,6 @@ def contents(request, template_name='wikiprox/contents.html'):
     return render_to_response(
         template_name,
         {'articles': articles,},
-        context_instance=RequestContext(request)
-    )
-
-def events(request, template_name='wikiprox/events.html'):
-    events = ev.events()
-    published = False
-    for event in events:
-        if int(event['published']):
-            published = True
-    if (not published) and (not settings.DEBUG):
-        raise Http404
-    return render_to_response(
-        template_name,
-        {'events': events,},
         context_instance=RequestContext(request)
     )
 

@@ -220,6 +220,24 @@ def remove_primary_sources(soup, sources):
             a.decompose()
     return soup
     
+def find_databoxcamps_coordinates(text):
+    """Given the raw wikitext, search for coordinates with Databox-Camps.
+    
+    NOTE: We have some major assumptions here:
+    - That there will be only one lng/lat pair in the Databox-Camps.
+    - That the lng/lat pair will appear within the Databox-Camps.
+    """
+    coordinates = []
+    if text.find('databox-Camps') > -1:
+        lng = None; lat = None;
+        for l in re.findall(re.compile('GISLo*ng: (-*[0-9]+.[0-9]+)'), text):
+            lng = float(l)
+        for l in re.findall(re.compile('GISLat: (-*[0-9]+.[0-9]+)'), text):
+            lat = float(l)
+        if lng and lat:
+            coordinates = (lng,lat)
+    return coordinates
+    
 def add_top_links(soup):
     import copy
     TOPLINK_TEMPLATE = '<div class="toplink"><a href="#top"><i class="icon-chevron-up"></i> Top</a></div>'

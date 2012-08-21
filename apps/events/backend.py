@@ -27,4 +27,10 @@ def events():
             for obj in response['objects']:
                 objects.append(obj)
         cache.set(cache_key, json.dumps(objects), settings.CACHE_TIMEOUT)
+    # convert all the dates
+    for obj in objects:
+        if obj.get('start_date',None):
+            obj['start_date'] = datetime.strptime(obj['start_date'], '%Y-%m-%d')
+        if obj.get('end_date',None):
+            obj['end_date'] = datetime.strptime(obj['end_date'], '%Y-%m-%d')
     return objects

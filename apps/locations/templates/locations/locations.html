@@ -8,7 +8,7 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   
-  <title>Full Screen Example</title>        
+  <title>Locations | Densho Encyclopedia</title>
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -167,12 +167,13 @@
 <div id="textbox">
 
   <div id="header">
-    <h2><a href="/"><img src="{{ MEDIA_URL }}img/logo-white.png" /> Densho Encyclopedia</a></h2>
+    <h2>
+    <span id="showtextbox" style="float:right;"><a href="#"><img src="{{ MEDIA_URL }}locations/header-toggle.png" alt="open/close" title="open/close" /></a></span>
+    <a href="/"><img src="{{ MEDIA_URL }}img/logo-white.png" /> Densho Encyclopedia</a>
+    </h2>
   </div>
 
   <div id="text">
-
-    <h1>Title Goes Here</h1>
 
     <div id="legend" style="display:block;">
       <h2>
@@ -192,7 +193,7 @@
     </div><!-- #legend -->
 
     <div id="initial" class="location" style="display:block;">
-      <h2>Facilities</h2>
+      <h1>Facilities</h1>
       <p>
       Details of individual facilities will be displayed here.
       </p>
@@ -255,6 +256,19 @@ $(document).ready(function(){
         $('#legend ul').toggle('fast');
         $('#legendflip img').toggle();
     });
+    
+    /* textbox area closed by default on smaller screens */
+    function defaultTextboxVisibility() {
+        if (Modernizr.mq('screen and (max-width: 520px)')) {
+            $('#text').hide();
+        }
+    }
+    defaultTextboxVisibility();
+    /* open/close the white textbox area on click */
+    $('#showtextbox a').click(function(event){
+        $('#text').toggle('fast');
+    });
+    
 });
 </script>
 

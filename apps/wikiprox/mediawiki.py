@@ -52,7 +52,7 @@ def parse_mediawiki_text(text, images, public=False, printed=False):
     soup = remove_staticpage_titles(soup)
     soup = remove_comments(soup)
     soup = remove_edit_links(soup)
-    soup = wrap_sections(soup)
+    #soup = wrap_sections(soup)
     soup = rewrite_mediawiki_urls(soup)
     soup = rewrite_newpage_links(soup)
     soup = rewrite_prevnext_links(soup)
@@ -105,7 +105,6 @@ def wrap_sections(soup):
     
     The thing that makes this complicated is that with BeautifulSoup you can't just drop tags into a <div>.  You have to 
     """
-    n = 0
     for s in soup.find_all('span', 'mw-headline'):
         # get the <h2> tag
         h = s.parent
@@ -118,7 +117,6 @@ def wrap_sections(soup):
         [sibling.extract() for sibling in siblings]
         # wrap h in a <div>
         div = soup.new_tag('div')
-        div['id'] = 'section-%s' % n
         div['class'] = 'section'
         h = h.wrap(div)
         # append section contents into <div>
@@ -126,8 +124,6 @@ def wrap_sections(soup):
         div2['class'] = 'section_content'
         div2.contents = siblings
         h.append(div2)
-        # done
-        n = n + 1
     return soup
 
 def remove_status_markers(soup):

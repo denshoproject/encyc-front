@@ -307,7 +307,7 @@ $(document).ready(function(){
 
     var control = new OpenLayers.Control.SelectFeature(locations, {
         onSelect: function(feature) {
-            // display details in sidebar
+            /* display details in sidebar */
             $('#text').show('fast');
             $('#text .location').css('display', 'none');
             $('#'+feature.data.uid).css('display', 'block');

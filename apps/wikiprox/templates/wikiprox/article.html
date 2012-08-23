@@ -21,40 +21,40 @@
       function addLightboxClass() {
           var msg = $(window).width();
           if (Modernizr.mq('screen and (min-width: 768px)')) {
-              // image
+              /* image */
               $('div.primarysource a.image img').each(function() {
-                  // add lightview class, point link to img src
+                  /* add lightview class, point link to img src */
                   $(this).parent().addClass('lightview');
                   $(this).parent().attr({ href:$(this).attr('large') });
               });
-              // document
+              /* document */
               $('div.primarysource a.document img').each(function() {
-                  // add lightview class, point link to img src
+                  /* add lightview class, point link to img src */
                   $(this).parent().addClass('lightview');
                   $(this).parent().attr({ href:$(this).attr('large') });
               });
-              // video
+              /* video */
               $('div.primarysource a.video img').each(function() {
-                  // add lightview class, point link to img src
+                  /* add lightview class, point link to img src */
                   $(this).parent().addClass('lightview');
               });
           }
           else {
-              // image
+              /* image */
               $('div.primarysource a.image img').each(function() {
-                  // remove lightview class, point link to primarysource page
+                  /* remove lightview class, point link to primarysource page */
                   $(this).parent().removeClass('lightview');
                   $(this).parent().attr({ href:$(this).attr('more') });
               });
-              // document
+              /* document */
               $('div.primarysource a.document img').each(function() {
-                  // remove lightview class, point link to primarysource page
+                  /* remove lightview class, point link to primarysource page */
                   $(this).parent().removeClass('lightview');
                   $(this).parent().attr({ href:$(this).attr('more') });
               });
-              // video
+              /* video */
               $('div.primarysource a.video img').each(function() {
-                  // remove lightview class, point link to primarysource page
+                  /* remove lightview class, point link to primarysource page */
                   $(this).parent().removeClass('lightview');
                   $(this).parent().attr({ href:$(this).attr('more') });
               });

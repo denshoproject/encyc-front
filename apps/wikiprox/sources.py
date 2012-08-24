@@ -44,7 +44,7 @@ def published_sources():
         cache.set(cache_key, json.dumps(sources), settings.CACHE_TIMEOUT)
     return sources
 
-def format_primary_source(source):
+def format_primary_source(source, lightbox=False):
     template = 'wikiprox/generic.html'
     # context
     common = {'encyclopedia_id': source['encyclopedia_id'],
@@ -54,7 +54,8 @@ def format_primary_source(source):
               'SOURCE_MEDIA_URL': settings.TANSU_MEDIA_URL,
               'href': reverse('wikiprox-source', args=[source['encyclopedia_id']]),
               'caption': source['caption'],
-              'courtesy': source['courtesy'],}
+              'courtesy': source['courtesy'],
+              'lightbox': lightbox,}
     specific = {}
     # video
     if source['media_format'] == 'video':

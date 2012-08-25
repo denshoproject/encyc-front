@@ -17,8 +17,8 @@
   
   <script type="text/javascript" src="{{ STATIC_URL }}modernizr/modernizr-dev-2.5.3.js"></script>
   
-  <link rel="stylesheet" href="http://openlayers.org/dev/theme/default/style.css" type="text/css">
-  <link rel="stylesheet" href="http://openlayers.org/dev/examples/style.css" type="text/css">
+  <link rel="stylesheet" href="{{ STATIC_URL }}openlayers-2.12/theme/default/style.css" type="text/css">
+  <link rel="stylesheet" href="{{ STATIC_URL }}openlayers-2.12/examples/style.css" type="text/css">
   
   <style type="text/css">
       html, body, #map {
@@ -221,7 +221,9 @@
 
 
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
-<script type="text/javascript" src="http://openlayers.org/api/OpenLayers.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}openlayers-2.12/OpenLayers.js"></script>
+
+
 <script type="text/javascript">
 $(document).ready(function(){
     /* set initial state of textbox based on window width */
@@ -258,6 +260,8 @@ $(document).ready(function(){
     
 });
 </script>
+
+
 <script type="text/javascript">
 $(document).ready(function(){
     var projection = new OpenLayers.Projection("EPSG:4326");
@@ -319,30 +323,16 @@ $(document).ready(function(){
     map.addControl(control);
     control.activate();
     
-    /* set initial map center & zoom based on window width*/
-    var lng = '-93.0';
+    /* set initial map center & zoom based on window width */
+    var lng = '-100.0';
     var lat = '39.0';
     var zoom = 4;
-    if (Modernizr.mq('screen and (max-width: 400px)')) {
-        lng = '-100.0';
-        lat = '42';
-        zoom = 3;
-    }
-    if (Modernizr.mq('screen and (min-width: 401px) and (max-width: 520px)')) {
-        lng = '-106.0';
-    }
-    if (Modernizr.mq('screen and (min-width: 521px) and (max-width: 768px)')) {
-        lng = '-100.0';
-    }
-    if (Modernizr.mq('screen and (min-width: 980px)')) {
-        lng = '-103.0';
-        zoom = 5;
-    }
     var lonlat = new OpenLayers.LonLat(lng, lat);
     lonlat.transform(projection, map.getProjectionObject());
     map.setCenter(lonlat, zoom);
 });
 </script>
+
 
 
 

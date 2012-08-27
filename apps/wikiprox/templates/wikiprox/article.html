@@ -6,64 +6,18 @@
 
 
 {% block css %}{{ block.super }}
-  <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}lightview-3.1.4/css/lightview/lightview.css"/>
+  <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}lightview-3.2.2/css/lightview/lightview.css"/>
 {% endblock css %}
 
 
 {% block javascript %}{{ block.super }}
 <!--[if lt IE 9]>
-<script type="text/javascript" src="{{ STATIC_URL }}lightview-3.1.4/js/excanvas/excanvas.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}lightview-3.2.2/js/excanvas/excanvas.js"></script>
 <![endif]-->
-<script type="text/javascript" src="{{ STATIC_URL }}lightview-3.1.4/js/spinners/spinners.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}lightview-3.1.4/js/lightview/lightview.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}lightview-3.2.2/js/spinners/spinners.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}lightview-3.2.2/js/lightview/lightview.js"></script>
 <script type='text/javascript'>
   $(document).ready(function(){
-      function addLightboxClass() {
-          var msg = $(window).width();
-          if (Modernizr.mq('screen and (min-width: 768px)')) {
-              // image
-              $('div.primarysource a.image img').each(function() {
-                  // add lightview class, point link to img src
-                  $(this).parent().addClass('lightview');
-                  $(this).parent().attr({ href:$(this).attr('large') });
-              });
-              // document
-              $('div.primarysource a.document img').each(function() {
-                  // add lightview class, point link to img src
-                  $(this).parent().addClass('lightview');
-                  $(this).parent().attr({ href:$(this).attr('large') });
-              });
-              // video
-              $('div.primarysource a.video img').each(function() {
-                  // add lightview class, point link to img src
-                  $(this).parent().addClass('lightview');
-              });
-          }
-          else {
-              // image
-              $('div.primarysource a.image img').each(function() {
-                  // remove lightview class, point link to primarysource page
-                  $(this).parent().removeClass('lightview');
-                  $(this).parent().attr({ href:$(this).attr('more') });
-              });
-              // document
-              $('div.primarysource a.document img').each(function() {
-                  // remove lightview class, point link to primarysource page
-                  $(this).parent().removeClass('lightview');
-                  $(this).parent().attr({ href:$(this).attr('more') });
-              });
-              // video
-              $('div.primarysource a.video img').each(function() {
-                  // remove lightview class, point link to primarysource page
-                  $(this).parent().removeClass('lightview');
-                  $(this).parent().attr({ href:$(this).attr('more') });
-              });
-          }
-      }
-      addLightboxClass();
-      $(window).resize(function() {
-          addLightboxClass();
-      });
       Lightview.setDefaultSkin('mac');
   });
 </script>
@@ -140,7 +94,6 @@
   <a href="{% url wikiprox-page-cite title %}"
      class="lightview"
      data-lightview-type="iframe"
-     data-lightview-group="cite-sidebar"
      data-lightview-options="width: 1000, height: '100%'">
   <i class="icon-bookmark"></i>Cite
   </a>
@@ -195,7 +148,7 @@
 
 
 {% block sidebar_right %}
-<div id="sidebar-right" class="span3">
+<div id="sidebar-right" class="span3 visible-phone">
 
   <a name="primary-sources"></a>
   <div class="block primarysources">
@@ -218,7 +171,31 @@
     </p>
   </div><!-- .block -->
 
-</div><!-- #sidebar-right .span2 -->
+</div><!-- #sidebar-right .span2 .visible-phone -->
+<div id="sidebar-right" class="span3 hidden-phone">
+
+  <a name="primary-sources"></a>
+  <div class="block primarysources">
+{% for source in sources %}
+{% primarysource_lightbox source %}
+{% endfor %}
+  </div><!-- .block .primarysources -->
+
+  <div class="toplink visible-phone"><a href="#top"><i class="icon-chevron-up"></i> Top</a></div>
+
+  <div class="block">
+    <p>
+    <strong>
+	<!--What Does an American Look Like?
+	For that matter, what does an enemy look like? And what can happen to those people who look like the enemy? In 1943, President Franklin D. Roosevelt said, "The principle on which this country was founded and by which it has always been governed is that Americanism is a matter of mind and heart; Americanism is not, and never was, a matter of race or ancestry." [1]
+	A year earlier, however, Roosevelt had authorized incarcerating more than 110,000 innocent people based on their ancestry, in what he called "concentration camps." Although two-thirds were U.S. citizens, they were targeted because of their ancestry and the way they looked. How could this happen?-->
+    <a href="/history/">About the Incarceration</a><br/>
+    <a href="/terminology/">Do Words Matter?</a><br/>
+    </strong>
+    </p>
+  </div><!-- .block -->
+
+</div><!-- #sidebar-right .span2 .hidden-phone -->
 {% endblock sidebar_right %}
 
 

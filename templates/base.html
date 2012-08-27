@@ -21,15 +21,21 @@
   <link rel="stylesheet" href="{{ STATIC_URL }}css/mediawiki-common.css" />
   
   <style>
+    /* brown:        #5C5823 */
+    /* dark orange:  #ED5417 */
+    /* light orange: #F2A885 */
+
     .navbar {
-      background: #333;
-      padding-left: 10px;
+        margin-bottom: 20px;
     }
 
 	.navbar .brand {
-		color: #ffffff;
 		font-weight:400;
 	}
+
+    h1, h2, h3, h4 {
+        color: #ED5417;
+    }
 
     .footer {
       margin-top: 32px;
@@ -46,7 +52,7 @@
 <body>
 
 
-	<div class="navbar">
+	<div class="navbar navbar-static-top">
 	  <div class="navbar-inner">
 	    <div class="container">
 	      <a class="brand" href="/">

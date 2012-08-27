@@ -1,8 +1,8 @@
-<div class="primarysource">
+{% if lightbox %}
+<div class="primarysource"><!-- lightbox -->
   <a href="mediaspace-{{ encyclopedia_id }}"
-     class="video"
+     class="video lightview"
      data-lightview-type="inline"
-     data-lightview-group="mixed"
      data-lightview-options="
          keyboard: { esc: false },
          afterUpdate: function(element, position) {
@@ -56,3 +56,14 @@
   </span>
 </div>
 <div id="mediaspace-{{ encyclopedia_id }}" style="display:none;width:{{ xyms.0 }}px;height:{{ xyms.1 }}px;">This div will end up in the lightbox</div>
+{% else %}
+<div class="primarysource">
+  <a href="{{ href }}"><img src="{{ thumb_sm }}" /></a>
+  <br/>
+  <span class="caption">
+    {{ caption }}
+    {{ courtesy }}
+    <a class="more" href="{{ href }}">More info &raquo;</a>
+  </span>
+</div>
+{% endif %}{# lightbox #}

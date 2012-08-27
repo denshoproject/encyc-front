@@ -1,7 +1,7 @@
-<div class="primarysource">
-  <a href="{{ href }}" class="image"
-     data-lightview-caption="{{ caption }} {{ courtesy }} <a class='more' href='{{ href }}'>More info &raquo;</a>"
-     data-lightview-group="mixed">
+{% if lightbox %}
+<div class="primarysource"><!-- lightbox -->
+  <a href="{{ thumb_lg }}" class="image lightview"
+     data-lightview-caption="{{ caption }} {{ courtesy }} <a class='more' href='{{ href }}'>More info &raquo;</a>">
     <img src="{{ thumb_sm }}"
          large="{{ thumb_lg }}"
          more="{{ href }}" />
@@ -13,3 +13,14 @@
     <a class="more" href="{{ href }}">More info &raquo;</a>
   </span>
 </div>
+{% else %}
+<div class="primarysource">
+  <a href="{{ href }}"><img src="{{ thumb_sm }}" /></a>
+  <br/>
+  <span class="caption">
+    {{ caption }}
+    {{ courtesy }}
+    <a class="more" href="{{ href }}">More info &raquo;</a>
+  </span>
+</div>
+{% endif %}{# lightbox #}

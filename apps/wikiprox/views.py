@@ -52,6 +52,7 @@ def page(request, page='index', printed=False, template_name='wikiprox/page.html
     categories = pagedata['parse']['categories']
     title = pagedata['parse']['displaytitle']
     # basic page context
+    page_sources_raw = pagedata['parse']['images']
     bodycontent,page_sources = mw.parse_mediawiki_text(
         pagedata['parse']['text']['*'],
         pagedata['parse']['images'],

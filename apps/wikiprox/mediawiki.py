@@ -182,7 +182,6 @@ def find_primary_sources(images):
     """Given list of page images, get the ones with encyclopedia IDs.
     """
     sources = []
-    imgs = []
     eids = []
     # anything that might be an encyclopedia_id
     for img in images:
@@ -198,8 +197,11 @@ def find_primary_sources(images):
         r = requests.get(url, headers={'content-type':'application/json'})
         if r.status_code == 200:
             response = json.loads(r.text)
-            for s in response['objects']:
-                sources.append(s)
+            response_objects = response['objects']
+            for eid in eids:
+                for s in response['objects']:
+                    if (eid == s['encyclopedia_id']) and (s not in sources):
+                        sources.append(s)
     return sources
 
 def remove_primary_sources(soup, sources):

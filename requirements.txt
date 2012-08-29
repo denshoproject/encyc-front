@@ -9,6 +9,7 @@ ipython==0.12.1
 pykml==0.1.0
 python-memcached==1.48
 staticgenerator==1.4.1
+twill
 
 # wikiprox
 beautifulsoup4==4.1.0

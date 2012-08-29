@@ -1,0 +1,6 @@
+# twill-sh tests/locations.twill -n --url http://encyclopedia.densho.org/
+
+echo "\n\n\nlocations.twill ===========================================================\n"
+
+go /map/
+code 200

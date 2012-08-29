@@ -1,0 +1,43 @@
+# twill-sh tests/django.twill -n --url http://encyclopedia.densho.org/
+
+echo "\n\n\nwikiprox.twill ===========================================================\n"
+
+
+go /
+code 200
+
+go /search/
+code 200
+
+go /categories/
+code 200
+
+go /contents/
+code 200
+
+go /authors/
+code 200
+
+go /Brian%20Niiya/
+code 200
+
+go /A.L.%20Wirin/
+code 200
+go /Aiko%20Herzig-Yoshinaga/
+code 200
+go /Amache%20(Granada)/
+code 200
+go /Ansel%20Adams/
+code 200
+go /December%207,%201941/
+code 200
+#go /Hawai'i/
+#code 200
+#go /Informants%20/%20"inu"/
+#code 200
+
+go /sources/en-denshopd-i206-00001-1/
+code 200
+
+go /sources/en-denshovh-fbob-01-0019-1/
+code 200

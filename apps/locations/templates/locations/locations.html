@@ -21,6 +21,9 @@
   <link rel="stylesheet" href="{{ STATIC_URL }}openlayers-2.12/examples/style.css" type="text/css">
   
   <style type="text/css">
+      /* brown:        #5C5823 */
+      /* dark orange:  #ED5417 */
+      /* light orange: #F2A885 */
       html, body, #openlayersmap {
           margin: 0;
           width: 100%;
@@ -49,7 +52,7 @@
           margin-top: none;
       }
       #header h2 {
-          background: #333;
+          background: #5C5823;
           margin:0px;
           padding:5px;
       }
@@ -86,8 +89,13 @@
           text-align: right;
           padding-right: 5px;
       }
-      a {
+      #text a {
+          color:#ED5417;
           text-decoration: none;
+      }
+      #text a:hover {
+          color:#F2A885;
+          text-decoration: underline;
       }
 
       @media screen and (max-width: 768px) {

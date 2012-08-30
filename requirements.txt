@@ -2,7 +2,9 @@
 # Install using pip: http://pip.openplans.org/
 # File format: http://pip.openplans.org/requirement-format.html
 
+coverage
 Django==1.4
+django-coverage
 django-debug-toolbar==0.9.4
 gunicorn==0.14.3
 ipython==0.12.1

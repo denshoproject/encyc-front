@@ -25,26 +25,10 @@
     /* dark orange:  #ED5417 */
     /* light orange: #F2A885 */
 
-    .navbar {
-        margin-bottom: 20px;
-    }
-
-	.navbar .brand {
-		font-weight:400;
-		color: white;
-	}
-
-	.navbar .nav li a { 
-		color: white; 
-	}
-
-	.navbar .nav li a:hover { 
-		color: white; 
-	}
-
-	.carousel .carousel-caption h4 { 
-		font-size: 18px; 
-		line-height: 16px;
+	body {
+	  font-family: Verdana, "Helvetica Neue", Arial, sans-serif;
+	  font-size: 12px;
+	  line-height: 18px;
 	}
 
     h1 {
@@ -65,8 +49,27 @@
 	a:hover { 
 		color:#F2A885; 
 	}
+	
+	.lead {
+		line-height: 24px;
+	}
 
-.primarysource .caption { }
+    .navbar {
+        margin-bottom: 20px;
+    }
+
+	.navbar .brand {
+		font-weight:400;
+		color: white;
+	}
+
+	.navbar .nav li a { 
+		color: white; 
+	}
+	
+	.navbar .nav li a:hover { 
+		color: white; 
+	}
 
     .footer {
       margin-top: 32px;
@@ -74,9 +77,19 @@
       padding-top: 32px;
       padding-bottom: 32px;
 	}
+
+	.carousel .carousel-caption h4 { 
+		font-size: 18px; 
+	}
+
+	.carousel-caption p {
+		line-height: 18px;
+	}
+
 	.carousel img {
 		max-width: 100%;
 	}
+
   </style>
 
   {% block css %}{% endblock css %}

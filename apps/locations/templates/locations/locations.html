@@ -205,7 +205,7 @@
 {% for location in locations %}
     <div id="{{ location.uid }}" class="location" style="display:none;">
       <h2 class="title">
-      <a href="{% url wikiprox-page location.title %}">{{ location.title }}</a>
+      <a href="{% url wikiprox-page location.location_uri %}">{{ location.title }}</a>
       </h2>
       <p class="type">
       <b>Location</b>: {{ location.location_name }}<br/>
@@ -215,7 +215,7 @@
       {{ location.description }}
       </p>
       <p class="more">
-      <a href="{% url wikiprox-page location.title %}">More info &raquo;</a>
+      <a href="{% url wikiprox-page location.location_uri %}">More info &raquo;</a>
       </p>
     </div>
 {% endfor %}

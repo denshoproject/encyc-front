@@ -25,34 +25,51 @@
     /* dark orange:  #ED5417 */
     /* light orange: #F2A885 */
 
+	body {
+	  font-family: Verdana, "Helvetica Neue", Arial, sans-serif;
+	  font-size: 12px;
+	  line-height: 18px;
+	}
+
+    h1 {
+        color: #ED5417;
+        font-size: 24px;
+		line-height: 30px;
+		font-weight: bold;
+    }
+   h2, h3, h4 {
+        color: #555;
+        font-size: 20px;
+		line-height: 24px;
+    }
+
+	a { 
+		color:#ED5417; 
+	}
+	a:hover { 
+		color:#F2A885; 
+	}
+	
+	.lead {
+		line-height: 24px;
+	}
+
     .navbar {
         margin-bottom: 20px;
     }
 
 	.navbar .brand {
 		font-weight:400;
-                color: white;
+		color: white;
 	}
 
-.navbar .nav li a { color: white; }
-.navbar .nav li a:hover { color: white; }
-
-.carousel .carousel-caption h4 { font-size:22px; }
-
-    h1 {
-        color: #ED5417;
-        font-size: 30px;
-	font-weight: bold;
-    }
-    #article h2, #article h3, #article h4 {
-        color: #555;
-        font-size: 24px;
-    }
-
-.span6 p a, .span12 p a, #sidebar-left p a, #sidebar-right p a, #article a, .primarysource .caption a { color:#ED5417; }
-.span6 p a:hover, .span12 p a:hover, #sidebar-left p a:hover, #sidebar-right p a:hover, #article a:hover, .primarysource .caption a:hover { color:#F2A885; }
-
-.primarysource .caption { }
+	.navbar .nav li a { 
+		color: white; 
+	}
+	
+	.navbar .nav li a:hover { 
+		color: white; 
+	}
 
     .footer {
       margin-top: 32px;
@@ -60,10 +77,21 @@
       padding-top: 32px;
       padding-bottom: 32px;
 	}
+
+	.carousel .carousel-caption h4 { 
+		font-size: 18px; 
+	}
+
+	.carousel-caption p {
+		line-height: 18px;
+	}
+
 	.carousel img {
 		max-width: 100%;
 	}
+
   </style>
+
   {% block css %}{% endblock css %}
 </head>
 <body>
@@ -74,7 +102,6 @@
 	    <div class="container">
 	      <a class="brand" href="/">
 	        <img src="{{ MEDIA_URL }}img/logo-white.png" height="30" /> Densho Encyclopedia
-	        <span class="label label-info">Beta</span>
 	      </a>
 		 <button type="buton" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
 		 	<span class="icon-bar"></span>

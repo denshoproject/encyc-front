@@ -113,11 +113,11 @@
   <div id="media-pointer" style="text-align:right; background:#fff; padding-left:20px; padding-bottom:10px; margin-left:20px; margin-bottom:20px; float:right;">
     <a href="#primary-sources">
       <img src="{{ sources.0.thumbnail_sm }}" style="width:100px;" title="" alt="" />
-      <h4><i class="icon-chevron-down"></i>&nbsp;Media</h4>
+      <strong><i class="icon-chevron-down"></i>&nbsp;Media</strong>
     </a>
   </div>
 {% endif %}
-  <h4>
+  <strong>
   Category:
 {% for category in page_categories %}
     <a href="/categories/#{{ category }}">{{ category }}</a>
@@ -128,21 +128,21 @@
   | <a href="{% url wikiprox-categories %}">By Category</a>
   <br/>
 <table border="0">
-  <tr>
-    <td>Previous:</td>
+{% if prev_page %}<tr>
+    <td><a href="/{{ prev_page }}/">&laquo;&nbsp;Previous:</a></td>
     <td>
-{% if prev_page %}<a href="/{{ prev_page }}/">&laquo;&nbsp;{{ prev_page|truncatechars:40 }}</a>{% endif %}
+{{ prev_page|truncatechars:40 }}
     </td>
-  </tr>
-  <tr>
-    <td>Next:</td>
+  </tr>{% endif %}
+{% if next_page %}<tr>
+    <td><a href="/{{ next_page }}/">&raquo;&nbsp;Next:</a></td>
     <td>
-{% if next_page %}<a href="/{{ next_page }}/">&raquo;&nbsp;{{ next_page|truncatechars:40 }}</a>{% endif %}
+{{ next_page|truncatechars:40 }}
     </td>
-  </tr>
+  </tr>{% endif %}
 </table>
   <a href="/about/#usingandciting">Creative Commons</a><br/>
-  </h4>
+  </strong>
 </div><!-- #sidebar-left .visible-phone -->
 {% endblock sidebar_left %}
 

@@ -12,7 +12,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <link rel="SHORTCUT ICON" href="{{ STATIC_URL }}favicon.ico">
+  <!-- <link rel="SHORTCUT ICON" href="{{ STATIC_URL }}favicon.ico"> -->
 
   <script type="text/javascript" src="{{ STATIC_URL }}modernizr/modernizr-dev-2.5.3.js"></script>
 
@@ -25,13 +25,50 @@
     /* dark orange:  #ED5417 */
     /* light orange: #F2A885 */
 
+	body {
+	  font-family: Verdana, "Helvetica Neue", Arial, sans-serif;
+	  font-size: 12px;
+	  line-height: 18px;
+	}
+
+    h1 {
+        color: #ED5417;
+        font-size: 24px;
+		line-height: 30px;
+		font-weight: bold;
+    }
+   h2, h3, h4 {
+        color: #555;
+        font-size: 20px;
+		line-height: 24px;
+    }
+
+	a { 
+		color:#ED5417; 
+	}
+	a:hover { 
+		color:#F2A885; 
+	}
+	
+	.lead {
+		line-height: 24px;
+	}
+
     .navbar {
         margin-bottom: 20px;
     }
 
 	.navbar .brand {
 		font-weight:400;
+		color: white;
 	}
+      .navbar .nav li a { 
+              color: white; 
+      }
+      
+      .navbar .nav li a:hover { 
+              color: white; 
+      }
 
     .footer {
       margin-top: 32px;
@@ -39,10 +76,21 @@
       padding-top: 32px;
       padding-bottom: 32px;
 	}
+
+	.carousel .carousel-caption h4 { 
+		font-size: 18px; 
+	}
+
+	.carousel-caption p {
+		line-height: 18px;
+	}
+
 	.carousel img {
 		max-width: 100%;
 	}
+
   </style>
+
   {% block css %}{% endblock css %}
 </head>
 <body>
@@ -53,7 +101,6 @@
 	    <div class="container">
 	      <a class="brand" href="/">
 	        <img src="{{ MEDIA_URL }}img/logo-white.png" height="30" /> Densho Encyclopedia
-	        <span class="label label-info">Beta</span>
 	      </a>
 		 <button type="buton" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
 		 	<span class="icon-bar"></span>

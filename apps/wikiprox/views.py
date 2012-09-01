@@ -52,6 +52,7 @@ def page(request, page='index', printed=False, template_name='wikiprox/page.html
     categories = pagedata['parse']['categories']
     title = pagedata['parse']['displaytitle']
     # basic page context
+    page_sources_raw = pagedata['parse']['images']
     bodycontent,page_sources = mw.parse_mediawiki_text(
         pagedata['parse']['text']['*'],
         pagedata['parse']['images'],
@@ -183,7 +184,7 @@ def source(request, encyclopedia_id, template_name='wikiprox/source.html'):
     )
 
 def authors(request, template_name='wikiprox/authors.html'):
-    authors = encyclopedia.category_authors()
+    authors = encyclopedia.published_authors()
     return render_to_response(
         template_name,
         {'authors': columnizer(authors, 4),},

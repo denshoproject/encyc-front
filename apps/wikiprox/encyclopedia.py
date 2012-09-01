@@ -241,6 +241,25 @@ def published_pages():
         cache.set(cache_key, json.dumps(pages), settings.CACHE_TIMEOUT)
     return pages
 
+def published_authors():
+    """Returns a list of *published* authors (pages), with timestamp of latest revision.
+    """
+    cache_key = make_cache_key('wikiprox:encyclopedia:published_authors')
+    cached = cache.get(cache_key)
+    if cached:
+        published_authors = json.loads(cached)
+    else:
+        published_authors = []
+        titles = []
+        for page in published_pages():
+            if page['title'] not in titles:
+                titles.append(page['title'])
+        for author in category_authors():
+            if author in titles:
+               published_authors.append(author)
+        cache.set(cache_key, json.dumps(published_authors), settings.CACHE_TIMEOUT)
+    return published_authors
+
 def what_links_here(title):
     """Returns titles of published pages that link to this one.
     """

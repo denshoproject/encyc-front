@@ -17,16 +17,19 @@
   
   <script type="text/javascript" src="{{ STATIC_URL }}modernizr/modernizr-dev-2.5.3.js"></script>
   
-  <link rel="stylesheet" href="http://openlayers.org/dev/theme/default/style.css" type="text/css">
-  <link rel="stylesheet" href="http://openlayers.org/dev/examples/style.css" type="text/css">
+  <link rel="stylesheet" href="{{ STATIC_URL }}openlayers-2.12/theme/default/style.css" type="text/css">
+  <link rel="stylesheet" href="{{ STATIC_URL }}openlayers-2.12/examples/style.css" type="text/css">
   
   <style type="text/css">
-      html, body, #map {
+      /* brown:        #5C5823 */
+      /* dark orange:  #ED5417 */
+      /* light orange: #F2A885 */
+      html, body, #openlayersmap {
           margin: 0;
           width: 100%;
           height: 100%;
       }
-      #map #attribution {
+      #openlayersmap #attribution {
           width: 250px;
           text-align: right;
           position: absolute;
@@ -44,12 +47,15 @@
           padding: 0px;
           font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
       }
+      #text h1, #text h2, #text h3 {
+          font: Verdana;
+      }
       #textbox h1, #textbox h2 {
           border: none;
           margin-top: none;
       }
       #header h2 {
-          background: #333;
+          background: #5C5823;
           margin:0px;
           padding:5px;
       }
@@ -86,8 +92,13 @@
           text-align: right;
           padding-right: 5px;
       }
-      a {
+      #text a {
+          color:#ED5417;
           text-decoration: none;
+      }
+      #text a:hover {
+          color:#F2A885;
+          text-decoration: underline;
       }
 
       @media screen and (max-width: 768px) {
@@ -153,7 +164,7 @@
 
 
 
-<div id="map" style="width:100%; height:100%"></div>
+<div id="openlayersmap" style="width:100%; height:100%"></div>
 
 
 
@@ -161,8 +172,8 @@
 
   <div id="header">
     <h2>
-    <span id="showtextbox" style="float:right;"><a href="#"><img id="toggle" src="{{ MEDIA_URL }}locations/header-toggle.png" alt="open/close" title="open/close" /></a></span>
-    <a href="/"><img id="title" src="{{ MEDIA_URL }}locations/header-title.png" alt="Densho Encyclopedia" /></a>
+    <span id="showtextbox" style="float:right;"><a href="#"><img id="toggle" src="{{ STATIC_URL }}locations/header-toggle.png" alt="open/close" title="open/close" /></a></span>
+    <a href="/"><img id="title" src="{{ STATIC_URL }}locations/header-title.png" alt="Densho Encyclopedia" /></a>
     </h2>
   </div>
 
@@ -171,36 +182,30 @@
     <div id="legend" style="display:block;">
       <h2>
       <a id="legendflip" href="#">
-        <img class="open"   width="10" src="{{ MEDIA_URL }}locations/flip-open.png" />
-        <img class="closed" width="10" src="{{ MEDIA_URL }}locations/flip-closed.png" />
+        <img class="open"   width="10" src="{{ STATIC_URL }}locations/flip-open.png" />
+        <img class="closed" width="10" src="{{ STATIC_URL }}locations/flip-closed.png" />
         Facility Types
       </a>
       </h2>
       <ul>
 {% for category in categories %}
         <li>
-          <img src="{{ MEDIA_URL }}locations/{{ category.0 }}-selected.png" width="15" /> {{ category.1 }}
+          <img src="{{ STATIC_URL }}locations/{{ category.0 }}-selected.png" width="15" /> {{ category.1 }}
         </li>
 {% endfor %}
       </ul>
     </div><!-- #legend -->
 
     <div id="initial" class="location" style="display:block;">
-      <h1>Facilities</h1>
+      <h1>Map</h1>
       <p>
-      Details of individual facilities will be displayed here.
-      </p>
-      <p>
-      NOTE: Not all of these have pages in the wiki, and some of the pages have different titles in the wiki. We'll need to think about how to handle those links.
-      </p>
-      <p>
-      NOTE: Sorry, the layers function has gone away. I'm as sad as you are. :(
-      </p>
+	During WWII, the United States imprisoned more than 120,000 people of Japanese ancestry -- two-thirds of whom were US citizens, along with others designated as, "enemy aliens." The government established a vast network of confinement facilities across the continental United States, Hawaii and Alaska administered by a number of agencies. 
+	</p>
     </div>
 {% for location in locations %}
     <div id="{{ location.uid }}" class="location" style="display:none;">
       <h2 class="title">
-      <a href="{% url wikiprox-page location.title %}">{{ location.title }}</a>
+      <a href="{% url wikiprox-page location.location_uri %}">{{ location.title }}</a>
       </h2>
       <p class="type">
       <b>Location</b>: {{ location.location_name }}<br/>
@@ -210,7 +215,7 @@
       {{ location.description }}
       </p>
       <p class="more">
-      <a href="{% url wikiprox-page location.title %}">More info &raquo;</a>
+      <a href="{% url wikiprox-page location.location_uri %}">More info &raquo;</a>
       </p>
     </div>
 {% endfor %}
@@ -221,7 +226,9 @@
 
 
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
-<script type="text/javascript" src="http://openlayers.org/api/OpenLayers.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}openlayers-2.12/OpenLayers.js"></script>
+
+
 <script type="text/javascript">
 $(document).ready(function(){
     /* set initial state of textbox based on window width */
@@ -258,10 +265,12 @@ $(document).ready(function(){
     
 });
 </script>
+
+
 <script type="text/javascript">
 $(document).ready(function(){
     var projection = new OpenLayers.Projection("EPSG:4326");
-    map = new OpenLayers.Map('map');
+    map = new OpenLayers.Map('openlayersmap');
     
     var urls = [
         "http://a.tile.openstreetmap.org/${z}/${x}/${y}.png",
@@ -282,11 +291,11 @@ $(document).ready(function(){
 
     var styles = new OpenLayers.StyleMap({
         "default": {
-            externalGraphic: "{{ MEDIA_URL }}locations/${category}.png",
+            externalGraphic: "{{ STATIC_URL }}locations/${category}.png",
             pointRadius: 10
         },
         "select": {
-            externalGraphic: "{{ MEDIA_URL }}locations/${category}-selected.png",
+            externalGraphic: "{{ STATIC_URL }}locations/${category}-selected.png",
             pointRadius: 30
         }
     });
@@ -319,30 +328,16 @@ $(document).ready(function(){
     map.addControl(control);
     control.activate();
     
-    /* set initial map center & zoom based on window width*/
-    var lng = '-93.0';
+    /* set initial map center & zoom based on window width */
+    var lng = '-100.0';
     var lat = '39.0';
     var zoom = 4;
-    if (Modernizr.mq('screen and (max-width: 400px)')) {
-        lng = '-100.0';
-        lat = '42';
-        zoom = 3;
-    }
-    if (Modernizr.mq('screen and (min-width: 401px) and (max-width: 520px)')) {
-        lng = '-106.0';
-    }
-    if (Modernizr.mq('screen and (min-width: 521px) and (max-width: 768px)')) {
-        lng = '-100.0';
-    }
-    if (Modernizr.mq('screen and (min-width: 980px)')) {
-        lng = '-103.0';
-        zoom = 5;
-    }
     var lonlat = new OpenLayers.LonLat(lng, lat);
     lonlat.transform(projection, map.getProjectionObject());
     map.setCenter(lonlat, zoom);
 });
 </script>
+
 
 
 

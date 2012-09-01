@@ -1,0 +1,5 @@
+# twill-sh tests/site.twill -n --url http://encyclopedia.densho.org/
+
+runfile tests/events.twill
+runfile tests/locations.twill
+runfile tests/wikiprox.twill

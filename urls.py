@@ -34,8 +34,8 @@ urlpatterns = patterns(
     #
     url(r'^locations-(?P<category>[\w]+).kml$', 'locations.views.locations_kml', name='locations-kml-category'),
     url(r'^locations.kml$', 'locations.views.locations_kml', name='locations-kml'),
-    url(r'^locations/(?P<category>[\w]+)/$', 'locations.views.locations', name='locations-category'),
-    url(r'^locations/$', 'locations.views.locations', name='locations-index'),
+    url(r'^map/(?P<category>[\w]+)/$', 'locations.views.locations', name='locations-category'),
+    url(r'^map/$', 'locations.views.locations', name='locations-index'),
     #
     url(r"^sources/(?P<encyclopedia_id>[\w .:_-]+)/$", 'wikiprox.views.source', name='wikiprox-source'),
     #

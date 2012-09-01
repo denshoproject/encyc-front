@@ -2,18 +2,21 @@
 # Install using pip: http://pip.openplans.org/
 # File format: http://pip.openplans.org/requirement-format.html
 
-Django
-django-debug-toolbar
-gunicorn
-iPython
-pykml
-python-memcached
-staticgenerator
+coverage
+Django==1.4
+django-coverage
+django-debug-toolbar==0.9.4
+gunicorn==0.14.3
+ipython==0.12.1
+pykml==0.1.0
+python-memcached==1.48
+staticgenerator==1.4.1
+twill
 
 # wikiprox
-beautifulsoup4
+beautifulsoup4==4.1.0
 # sudo apt-get install libxml2 libxslt1.1 libxslt1-dev python-dev
-lxml
-python-dateutil
-requests
-simplejson
+lxml==2.3.4
+python-dateutil==2.1
+requests==0.13.0
+simplejson==2.5.2

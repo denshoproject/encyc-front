@@ -1,0 +1,6 @@
+# twill-sh tests/events.twill -n --url http://encyclopedia.densho.org/
+
+echo "\n\n\nevents.twill ===========================================================\n"
+
+go /timeline/
+code 200

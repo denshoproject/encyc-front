@@ -26,8 +26,8 @@
     {% if event.end_date %}&mdash;{{ event.end_date|date:"F j, Y" }}{% endif %}
   </dt>
   <dd>
-    {% if event.title %}{{ event.title }}<br/>{% endif %}
-    {{ event.description }}
+    {% if event.title %}{{ event.title|safe }}<br/>{% endif %}
+    {{ event.description|safe }}
     {% if event.url %}For more information: <a href="{{ event.url }}">{{ event.url }}</a><br/>{% endif %}
   </dd>
 {% endfor %}

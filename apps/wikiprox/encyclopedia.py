@@ -55,7 +55,8 @@ def articles_a_z():
                    and ('Category' not in page['title']) \
                    and (page['title'] not in titles):
                 titles.append(page['title'])
-        titles.sort()
+        #assert False
+        #titles.sort()
         cache.set(cache_key, json.dumps(titles), settings.CACHE_TIMEOUT)
     return titles
 
@@ -117,7 +118,7 @@ def category_members(category_name, namespace_id=None):
         pages = json.loads(cached)
     else:
         LIMIT = 5000
-        url = '%s?format=json&action=query&list=categorymembers&cmsort=sortkey&cmtitle=Category:%s&cmlimit=5000' % (settings.WIKIPROX_MEDIAWIKI_API, category_name)
+        url = '%s?format=json&action=query&list=categorymembers&cmsort=sortkey&cmprop=sortkeyprefix|title&cmtitle=Category:%s&cmlimit=5000' % (settings.WIKIPROX_MEDIAWIKI_API, category_name)
         if namespace_id != None:
             url = '%s&gcmnamespace=%s' % (url, namespace_id)
         r = requests.get(url, headers={'content-type':'application/json'})

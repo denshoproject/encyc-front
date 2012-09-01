@@ -204,8 +204,10 @@ def categories(request, template_name='wikiprox/categories.html'):
 
 def contents(request, template_name='wikiprox/contents.html'):
     articles = []
-    for title in sorted(encyclopedia.articles_a_z(), key=unicode.lower):
+    articles_a_z = encyclopedia.articles_a_z()
+    for title in sorted(articles_a_z, key=unicode.lower):
         articles.append( {'first_letter':title[0].upper(), 'title':title} )
+    assert False
     return render_to_response(
         template_name,
         {'articles': articles,},

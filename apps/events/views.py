@@ -10,12 +10,6 @@ from events import backend as ev
 
 def events(request, template_name='events/events.html'):
     events = ev.events()
-    published = False
-    for event in events:
-        if int(event['published']):
-            published = True
-    if (not published) and (not settings.DEBUG):
-        raise Http404
     return render_to_response(
         template_name,
         {'events': events,},

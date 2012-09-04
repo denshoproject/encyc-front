@@ -48,11 +48,14 @@ def articles_a_z():
     if cached:
         titles = json.loads(cached)
     else:
+        authors = []
+        [authors.append(page['title']) for page in published_authors()]
         NON_ARTICLE_PAGES.extend(category_authors())
         for page in category_members('Published', namespace_id=namespaces_reversed()['Default']):
             if (page['title'] not in NON_ARTICLE_PAGES) \
                    and ('Category' not in page['title']) \
-                   and (page['title'] not in titles):
+                   and (page['title'] not in titles) \
+                   and (page['title'] not in authors):
                 titles.append(page)
         cache.set(cache_key, json.dumps(titles), settings.CACHE_TIMEOUT)
     return titles

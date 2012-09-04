@@ -115,7 +115,10 @@ def author_articles(title):
 def category_members(category_name, namespace_id=None):
     """Returns titles of pages with specified Category: tag.
     
-    Returns list of dicts containing namespace id, title, and sortkey.
+    NOTE: Rather than just returning a list of title strings, this returns
+    a list of _dicts_ containing namespace id, title, and sortkey.
+    This is so certain views (e.g. Contents A-Z can grab the first letter
+    of the title (or sortkey) to use for grouping purposes.
     """
     pages = []
     cache_key = make_cache_key('wikiprox:encyclopedia:category_members:%s:%s' % (category_name, namespace_id))

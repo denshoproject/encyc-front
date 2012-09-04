@@ -184,7 +184,8 @@ def source(request, encyclopedia_id, template_name='wikiprox/source.html'):
     )
 
 def authors(request, template_name='wikiprox/authors.html'):
-    authors = encyclopedia.published_authors()
+    authors = []
+    [authors.append(page['title']) for page in encyclopedia.published_authors()]
     return render_to_response(
         template_name,
         {'authors': columnizer(authors, 4),},
@@ -195,7 +196,9 @@ def categories(request, template_name='wikiprox/categories.html'):
     articles_by_category = []
     categories,titles_by_category = encyclopedia.articles_by_category()
     for category in categories:
-        articles_by_category.append( (category,titles_by_category[category]) )
+        titles = []
+        [titles.append(page['title']) for page in titles_by_category[category]]
+        articles_by_category.append( (category,titles) )
     return render_to_response(
         template_name,
         {'articles_by_category': articles_by_category,},
@@ -205,9 +208,8 @@ def categories(request, template_name='wikiprox/categories.html'):
 def contents(request, template_name='wikiprox/contents.html'):
     articles = []
     articles_a_z = encyclopedia.articles_a_z()
-    for title in sorted(articles_a_z, key=unicode.lower):
-        articles.append( {'first_letter':title[0].upper(), 'title':title} )
-    assert False
+    for page in articles_a_z:
+        articles.append( {'first_letter':page['sortkey'][0].upper(), 'title':page['title']} )
     return render_to_response(
         template_name,
         {'articles': articles,},

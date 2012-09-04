@@ -1,5 +1,6 @@
 from datetime import datetime
 import json
+from operator import itemgetter
 
 import requests
 
@@ -40,8 +41,6 @@ def all_pages():
 
 def articles_a_z():
     """Returns a list of published article titles arranged A-Z.
-    
-    TODO: display people according to last name
     """
     titles = []
     cache_key = make_cache_key('wikiprox:encyclopedia:articles_a_z')
@@ -54,9 +53,7 @@ def articles_a_z():
             if (page['title'] not in NON_ARTICLE_PAGES) \
                    and ('Category' not in page['title']) \
                    and (page['title'] not in titles):
-                titles.append(page['title'])
-        #assert False
-        #titles.sort()
+                titles.append(page)
         cache.set(cache_key, json.dumps(titles), settings.CACHE_TIMEOUT)
     return titles
 
@@ -64,21 +61,23 @@ def articles_by_category():
     """Returns list of published articles grouped by category.
     """
     categories = []
+    titles_by_category = {}
     cache_key = make_cache_key('wikiprox:encyclopedia:articles_by_category')
     cached = cache.get(cache_key)
     if cached:
         categories = json.loads(cached)
     else:
-        titles_by_category = {}
         published = []
         [published.append(page['title']) for page in published_pages()]
-        for category in category_article_types():
+        cat_titles = []
+        [cat_titles.append(page['title']) for page in category_article_types()]
+        for category in cat_titles:
             category = category.replace('Category:','')
             titles = []
             for page in category_members(category,
                                          namespace_id=namespaces_reversed()['Default']):
                 if page['title'] in published:
-                    titles.append(page['title'])
+                    titles.append(page)
             if titles:
                 categories.append(category)
                 titles_by_category[category] = titles
@@ -88,7 +87,8 @@ def articles_by_category():
 def article_next(title):
     """Returns the title of the next article in the A-Z list.
     """
-    titles = articles_a_z()
+    titles = []
+    [titles.append(page['title']) for page in articles_a_z()]
     try:
         return titles[titles.index(title) + 1]
     except:
@@ -98,7 +98,8 @@ def article_next(title):
 def article_prev(title):
     """Returns the title of the previous article in the A-Z list.
     """
-    titles = articles_a_z()
+    titles = []
+    [titles.append(page['title']) for page in articles_a_z()]
     try:
         return titles[titles.index(title) - 1]
     except:
@@ -110,6 +111,8 @@ def author_articles(title):
 
 def category_members(category_name, namespace_id=None):
     """Returns titles of pages with specified Category: tag.
+    
+    Returns list of dicts containing namespace id, title, and sortkey.
     """
     pages = []
     cache_key = make_cache_key('wikiprox:encyclopedia:category_members:%s:%s' % (category_name, namespace_id))
@@ -118,7 +121,7 @@ def category_members(category_name, namespace_id=None):
         pages = json.loads(cached)
     else:
         LIMIT = 5000
-        url = '%s?format=json&action=query&list=categorymembers&cmsort=sortkey&cmprop=sortkeyprefix|title&cmtitle=Category:%s&cmlimit=5000' % (settings.WIKIPROX_MEDIAWIKI_API, category_name)
+        url = '%s?format=json&action=query&list=categorymembers&cmsort=sortkey&cmprop=ids|sortkeyprefix|title&cmtitle=Category:%s&cmlimit=5000' % (settings.WIKIPROX_MEDIAWIKI_API, category_name)
         if namespace_id != None:
             url = '%s&gcmnamespace=%s' % (url, namespace_id)
         r = requests.get(url, headers={'content-type':'application/json'})
@@ -126,22 +129,29 @@ def category_members(category_name, namespace_id=None):
             response = json.loads(r.text)
             if response and response['query'] and response['query']['categorymembers']:
                 for page in response['query']['categorymembers']:
+                    page['sortkey'] = page['sortkeyprefix']
+                    page.pop('sortkeyprefix')
+                    if page['title'] and not page['sortkey']:
+                        page['sortkey'] = page['title']
+                    if page['sortkey']:
+                        page['sortkey'] = page['sortkey'].lower()
                     pages.append(page)
+                pages = sorted(pages, key=itemgetter('sortkey'))
         cache.set(cache_key, json.dumps(pages), settings.CACHE_TIMEOUT)
     return pages
 
 def category_article_types():
     """Returns list of subcategories underneath 'Article'."""
     titles = []
-    [titles.append(page['title']) for page in category_members('Articles')]
+    [titles.append(page) for page in category_members('Articles')]
     return titles
 def category_authors():
     titles = []
-    [titles.append(page['title']) for page in category_members('Authors')]
+    [titles.append(page) for page in category_members('Authors')]
     return titles
 def category_supplemental():
     titles = []
-    [titles.append(page['title']) for page in category_members('Supplemental_Materials')]
+    [titles.append(page) for page in category_members('Supplemental_Materials')]
     return titles
 
 def is_article(title):
@@ -152,8 +162,9 @@ def is_article(title):
     return False
 
 def is_author(title):
-    if title in category_authors():
-        return True
+    for page in category_authors():
+        if title == page['title']:
+            return True
     return False
 
 def namespaces():
@@ -203,7 +214,7 @@ def page_categories(title, whitelist=[]):
     else:
         if not whitelist:
             whitelist = category_article_types()
-        [article_categories.append(c) for c in whitelist]
+        [article_categories.append(c['title']) for c in whitelist]
         #
         url = '%s?format=json&action=query&prop=categories&titles=%s' % (settings.WIKIPROX_MEDIAWIKI_API, title)
         r = requests.get(url, headers={'content-type':'application/json'})
@@ -233,8 +244,8 @@ def published_pages():
             page['timestamp'] = datetime.strptime(page['timestamp'], TS_FORMAT)
     else:
         pids = []  # published_article_ids
-        for article in category_members('Published', namespace_id=namespaces_reversed()['Default']):
-            pids.append(article['pageid'])
+        for page in category_members('Published', namespace_id=namespaces_reversed()['Default']):
+            pids.append(page['pageid'])
         for page in all_pages():
             if page['pageid'] in pids:
                 page['timestamp'] = page['revisions'][0]['timestamp']
@@ -255,9 +266,9 @@ def published_authors():
         for page in published_pages():
             if page['title'] not in titles:
                 titles.append(page['title'])
-        for author in category_authors():
-            if author in titles:
-               published_authors.append(author)
+        for page in category_authors():
+            if page['title'] in titles:
+               published_authors.append(page)
         cache.set(cache_key, json.dumps(published_authors), settings.CACHE_TIMEOUT)
     return published_authors
 

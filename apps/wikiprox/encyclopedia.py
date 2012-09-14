@@ -1,7 +1,9 @@
 from datetime import datetime
 import json
 from operator import itemgetter
+from urlparse import urlparse
 
+from bs4 import BeautifulSoup
 import requests
 
 from django.conf import settings
@@ -14,6 +16,68 @@ NON_ARTICLE_PAGES = ['about', 'categories', 'contact', 'contents', 'search',]
 TS_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
 
 
+def api_login_round1(username, password):
+    url = '%s?action=login&format=xml' % (settings.WIKIPROX_MEDIAWIKI_API)
+    domain = urlparse(url).netloc
+    if domain.find(':') > -1:
+        domain = domain.split(':')[0]
+    payload = {'lgname':username, 'lgpassword':password}
+    r = requests.post(url, data=payload)
+    soup = BeautifulSoup(r.text)
+    login = soup.find('login')
+    result = {
+        'result': login['result'],
+        'domain': domain,
+        'cookieprefix': login['cookieprefix'],
+        'sessionid': login['sessionid'],
+        'token': login['token'],
+        }
+    return result
+
+def api_login_round2(username, password, result):
+    url = '%s?action=login&format=xml' % (settings.WIKIPROX_MEDIAWIKI_API)
+    domain = urlparse(url).netloc
+    if domain.find(':') > -1:
+        domain = domain.split(':')[0]
+    payload = {'lgname':username, 'lgpassword':password, 'lgtoken':result['token'],}
+    cookies = {'%s_session' % result['cookieprefix']: result['sessionid'], 'domain':domain,}
+    r = requests.post(url, data=payload, cookies=cookies)
+    soup = BeautifulSoup(r.text)
+    login = soup.find('login')
+    result = {
+        'result': login['result'],
+        'lguserid': login['lguserid'],
+        'lgusername': login['lgusername'],
+        'lgtoken': login['lgtoken'],
+        'cookieprefix': login['cookieprefix'],
+        'sessionid': login['sessionid'],
+        'domain': domain,
+        'cookies': r.cookies,
+        }
+    return result
+
+def api_login():
+    """Tries to perform a MediaWiki API login.
+    
+    Returns a set of MediaWiki cookies for use by subsequent
+    HTTP requests.
+    """
+    cookies = []
+    username = settings.WIKIPROX_MEDIAWIKI_API_USERNAME
+    password = settings.WIKIPROX_MEDIAWIKI_API_PASSWORD
+    round1 = api_login_round1(username, password)
+    round2 = api_login_round2(username, password, round1)
+    if round2.get('result',None) \
+           and (round2['result'] == 'Success') \
+           and round2.get('cookies',None):
+        cookies = round2['cookies']
+    return cookies
+
+def api_logout():
+    url = '%s?action=logout' % (settings.WIKIPROX_MEDIAWIKI_API)
+    headers = {'content-type': 'application/json'}
+    r = requests.post(url, headers=headers)
+
 def all_pages():
     """Returns a list of all pages, with timestamp of latest revision.
     """
@@ -25,10 +89,11 @@ def all_pages():
         for page in pages:
             page['timestamp'] = datetime.strptime(page['timestamp'], TS_FORMAT)
     else:
+        cookies = api_login()
         # all articles
         LIMIT=5000
         url = '%s?action=query&generator=allpages&prop=revisions&rvprop=timestamp&gaplimit=5000&format=json' % (settings.WIKIPROX_MEDIAWIKI_API)
-        r = requests.get(url, headers={'content-type':'application/json'})
+        r = requests.get(url, headers={'content-type':'application/json'}, cookies=cookies)
         if r.status_code == 200:
             response = json.loads(r.text)
             if response and response['query'] and response['query']['pages']:
@@ -36,6 +101,7 @@ def all_pages():
                     page = response['query']['pages'][id]
                     page['timestamp'] = page['revisions'][0]['timestamp']
                     pages.append(page)
+        api_logout()
         cache.set(cache_key, json.dumps(pages), settings.CACHE_TIMEOUT)
     return pages
 
@@ -126,11 +192,12 @@ def category_members(category_name, namespace_id=None):
     if cached:
         pages = json.loads(cached)
     else:
+        cookies = api_login()
         LIMIT = 5000
         url = '%s?format=json&action=query&list=categorymembers&cmsort=sortkey&cmprop=ids|sortkeyprefix|title&cmtitle=Category:%s&cmlimit=5000' % (settings.WIKIPROX_MEDIAWIKI_API, category_name)
         if namespace_id != None:
             url = '%s&gcmnamespace=%s' % (url, namespace_id)
-        r = requests.get(url, headers={'content-type':'application/json'})
+        r = requests.get(url, headers={'content-type':'application/json'}, cookies=cookies)
         if r.status_code == 200:
             response = json.loads(r.text)
             if response and response['query'] and response['query']['categorymembers']:
@@ -143,6 +210,7 @@ def category_members(category_name, namespace_id=None):
                         page['sortkey'] = page['sortkey'].lower()
                     pages.append(page)
                 pages = sorted(pages, key=itemgetter('sortkey'))
+        api_logout()
         cache.set(cache_key, json.dumps(pages), settings.CACHE_TIMEOUT)
     return pages
 

@@ -40,18 +40,20 @@ def page(request, page='index', printed=False, template_name='wikiprox/page.html
     if r.status_code != 200:
         raise Http404
     pagedata = json.loads(r.text)
-    # only allow unpublished pages on :8000
+    # hide unpublished pages on public systems
     public = request.META.get('HTTP_X_FORWARDED_FOR',False)
+    # note: header is added by Nginx, should not appear when connected directly
+    # to the app server.
     published = mw.page_is_published(pagedata)
-    if public and not published:
+    if (not published) and (not settings.WIKIPROX_SHOW_UNPUBLISHED):
         return render_to_response(
             'wikiprox/unpublished.html',
             {},
             context_instance=RequestContext(request)
         )
+    # basic page context
     categories = pagedata['parse']['categories']
     title = pagedata['parse']['displaytitle']
-    # basic page context
     page_sources_raw = pagedata['parse']['images']
     bodycontent,page_sources = mw.parse_mediawiki_text(
         pagedata['parse']['text']['*'],

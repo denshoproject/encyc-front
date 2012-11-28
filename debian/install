@@ -1,0 +1,2 @@
+debian/etc/supervisor/conf.d/front.conf etc/supervisor/conf.d
+src/* usr/share

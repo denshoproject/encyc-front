@@ -1,0 +1,31 @@
+Create Debian Linux packages (2003)
+http://www.ibm.com/developerworks/linux/library/l-debpkg/index.html
+
+Rolling your own Debian packages (part 1) (2006)
+http://www.debian-administration.org/articles/336
+
+The right way to remove an obsolete conffile in a Debian package
+http://raphaelhertzog.com/2010/10/07/the-right-way-to-remove-an-obsolete-conffile-in-a-debian-package/
+
+dpkg−maintscript−helper
+http://man.cx/dpkg-maintscript-helper
+
+Conf files and static files in a deb package
+http://stackoverflow.com/questions/4704756/conf-files-and-static-files-in-a-deb-package?rq=1
+
+Create your own Debian or Ubuntu packages
+http://users.telenet.be/mydotcom/howto/linux/package.htm
+
+
+PROCESS, THUS FAR:
+
+
+cp -R front tmp/front-YYYYMMDD
+cd tmp/front-YYYYMMDD
+sudo debuild -us -uc
+
+# (each time update something in debian/ )
+sudo rm -Rf debian/*; cp -R ../../front/debian/* ./debian/  &&  sudo debuild -us -uc
+
+# copy to testing VM
+scp ../front_20121127_all.deb gjost@10.0.4.101:~

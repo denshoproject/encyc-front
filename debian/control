@@ -1,0 +1,15 @@
+Source: front
+Section: web
+Priority: optional
+Maintainer: geoffrey jost <geoffrey.jost@densho.org>
+Build-Depends: debhelper (>= 8.0.0), dpkg (>= 1.15.7.2)
+Standards-Version: 3.9.3
+Homepage: https://github.com/densho/front
+Vcs-Git: https://github.com/densho/front.git
+
+Package: front
+Architecture: all
+Depends: memcached, nginx, ${python:Depends}, python2.7, python-virtualenv, supervisor, virtualenvwrapper
+Description: A front-end interface for encyclopedia.densho.org
+ Longer description of front, the front-end interface for
+ encyclopedia.densho.org.

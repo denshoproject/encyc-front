@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# TODO set up virtualenv in /usr/share/densho/front/env/
+
+dpkg-maintscript-helper rm_conffile /etc/supervisor/conf.d/front.conf 20121127 -- "$@"

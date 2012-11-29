@@ -1,2 +1,3 @@
 debian/etc/supervisor/conf.d/front.conf etc/supervisor/conf.d
-src/* usr/share
+debian/etc/nginx/sites-available/front.conf etc/nginx/sites-available
+front/ usr/share

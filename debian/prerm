@@ -1,3 +1,20 @@
 #!/bin/sh
 
-dpkg-maintscript-helper rm_conffile /etc/supervisor/conf.d/front.conf 20121127 -- "$@"
+set -e
+
+# conf files
+dpkg-maintscript-helper rm_conffile /etc/supervisor/conf.d/front.conf 20121128 -- "$@"
+dpkg-maintscript-helper rm_conffile /etc/nginx/sites-available/front.conf 20121128 -- "$@"
+
+APP_NAME=front
+case "$1" in
+    upgrade|failed-upgrade|abort-install|abort-upgrade|disappear|purge|remove)
+        echo "Shutting down front"
+        supervisorctl stop $APP_NAME
+    ;;
+
+    *)
+        echo "prerm called with unknown argument \`$1'" >&2
+        exit 1
+    ;;
+esac

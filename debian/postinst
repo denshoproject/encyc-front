@@ -1,5 +1,28 @@
 #!/bin/sh
 
-# TODO set up virtualenv in /usr/share/densho/front/env/
+set -e
 
-dpkg-maintscript-helper rm_conffile /etc/supervisor/conf.d/front.conf 20121127 -- "$@"
+# conf files
+dpkg-maintscript-helper rm_conffile /etc/supervisor/conf.d/front.conf 20121128 -- "$@"
+dpkg-maintscript-helper rm_conffile /etc/nginx/sites-available/front.conf 20121128 -- "$@"
+
+APP_NAME=front
+VENV="${APP_NAME}env"
+case "$1" in
+    configure)
+        echo "Recreating virtualenv files"
+        virtualenv /usr/share/$APP_NAME/$VENV
+        echo "Reloading Supervisor configs"
+        supervisorctl reload
+        echo "Starting front"
+        supervisorctl start $APP_NAME
+    ;;
+
+    abort-upgrade|abort-remove|abort-deconfigure)
+    ;;
+
+    *)
+        echo "Postinst called with unknown argument \`$1'" >&2
+        exit 1
+    ;;
+esac

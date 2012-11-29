@@ -8,7 +8,7 @@ Homepage: https://github.com/densho/front
 Vcs-Git: https://github.com/densho/front.git
 
 Package: front
-Architecture: all
+Architecture: i386
 Depends: memcached, nginx, ${python:Depends}, python2.7, python-virtualenv, supervisor, virtualenvwrapper
 Description: A front-end interface for encyclopedia.densho.org
  Longer description of front, the front-end interface for

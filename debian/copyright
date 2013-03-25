@@ -1,0 +1,7 @@
+Format-Specification: http://svn.debian.org/wsvn/dep/web/deps/dep5.mdwn?op=file&rev=135
+Name: encyc-front
+Maintainer: geoffrey jost <geoffrey.jost@densho.org>
+Source: https://github.com/densho/front
+
+Copyright: 2013 Densho <contact@densho.org>
+License: BSD

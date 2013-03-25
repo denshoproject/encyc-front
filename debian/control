@@ -1,0 +1,14 @@
+Source: encyc-front
+Section: web
+Priority: optional
+Maintainer: geoffrey jost <geoffrey.jost@densho.org>
+Build-Depends: debhelper (>= 8.0.0), dpkg (>= 1.15.7.2)
+Standards-Version: 3.9.3
+Homepage: https://github.com/densho/front
+Vcs-Git: https://github.com/densho/front.git
+
+Package: encyc-front
+Architecture: i386
+Depends: ${misc:Depends}, libssl-dev, python2.6, python-virtualenv, ${python:Depends}
+Description: Front end for Densho Encyclopedia
+ Django app that sits in front of MediaWiki and encyc-psms.

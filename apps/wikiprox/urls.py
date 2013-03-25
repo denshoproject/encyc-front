@@ -6,7 +6,7 @@ from wikiprox import views
 
 urlpatterns = patterns(
     '',
-    url(r'^citehelp/$', direct_to_template, {'template': 'citehelp.html'}, name='citehelp'),
+    url(r'^citehelp/$', direct_to_template, {'template': 'wikiprox/citehelp.html'}, name='citehelp'),
     url(r"^index.php/(?P<page>[\w\W]+)/$", views.page, name='wikiprox-page'),
     url(r"^(?P<page>[\w\W]+)/$", views.page, name='wikiprox-page'),
     #

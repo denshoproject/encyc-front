@@ -40,6 +40,9 @@ urlpatterns = patterns(
     #
     url(r"^sources/(?P<encyclopedia_id>[\w .:_-]+)/$", 'wikiprox.views.source', name='wikiprox-source'),
     #
+    # temp cite functionality patch 2013-03-26 gf
+    url(r'^citehelp/$', direct_to_template, {'template': 'citehelp.html'}, name='citehelp'),
+    #
     url(r"^cite/source/(?P<encyclopedia_id>[\w .:_-]+)/$", 'wikiprox.views.source_cite', name='wikiprox-source-cite'),
     url(r"^cite/page/(?P<page>[\w\W]+)/$", 'wikiprox.views.page_cite', name='wikiprox-page-cite'),
     #

@@ -20,7 +20,7 @@ def surname_givenname_initials(parsed):
     givens = []
     for n,g in enumerate(parsed[1].split(' ')):
         if n:
-            givens.append('{}.'.format(g[0]))
+            givens.append('{0}.'.format(g[0]))
         else:
             givens.append(g)
     givens = ' '.join(givens)
@@ -41,7 +41,7 @@ def surname_initials(parsed):
     >>> surname_initials(  ['Endo','Kenny Butthead'] )
     'Endo, K. B.'
     """
-    givens = ['{}.'.format(g[0]) for g in parsed[1].split(' ')]
+    givens = ['{0}.'.format(g[0]) for g in parsed[1].split(' ')]
     givens = ' '.join(givens)
     surname = parsed[0]
     return ', '.join([surname, givens])
@@ -87,7 +87,7 @@ def format_authors_apa(authors):
             commas = ', '.join(names) # there will be a space after last comma
             cite = 'and '.join([ commas, last ])
         if cite and not (cite[-1] == '.'):
-            cite = '{}.'.format(cite)
+            cite = '{0}.'.format(cite)
     return cite
 
 def format_authors_bibtex(authors):
@@ -114,7 +114,7 @@ def format_authors_bibtex(authors):
             names = [surname_initials(n) for n in authors]
             cite = ' and '.join(names)
         if cite and not (cite[-1] == '.'):
-            cite = '{}.'.format(cite)
+            cite = '{0}.'.format(cite)
     return cite
 
 def format_authors_chicago(authors):
@@ -146,9 +146,9 @@ def format_authors_chicago(authors):
             commas = ', '.join(names) # there will be a space after last comma
             cite = ' and '.join([ commas, last ])
         elif len(authors) >= 4:
-            cite = '{} et al'.format(givenname_surname(authors[0]))
+            cite = '{0} et al'.format(givenname_surname(authors[0]))
         if cite and not (cite[-1] == '.'):
-            cite = '{}.'.format(cite)
+            cite = '{0}.'.format(cite)
     return cite
 
 def format_authors_cse(authors):
@@ -178,7 +178,7 @@ def format_authors_cse(authors):
             names = [surname_initials_cse(n) for n in authors]
             cite = ', '.join(names)
         if cite and not (cite[-1] == '.'):
-            cite = '{}.'.format(cite)
+            cite = '{0}.'.format(cite)
     return cite
 
 def format_authors_mhra(authors):
@@ -210,9 +210,9 @@ def format_authors_mhra(authors):
             commas = ', '.join(names) # there will be a space after last comma
             cite = ' and '.join([ commas, last ])
         elif len(authors) >= 4:
-            cite = '{} and others'.format(givenname_surname(authors[0]))
+            cite = '{0} and others'.format(givenname_surname(authors[0]))
         if cite and not (cite[-1] == '.'):
-            cite = '{}.'.format(cite)
+            cite = '{0}.'.format(cite)
     return cite
 
 def format_authors_mla(authors):
@@ -252,9 +252,9 @@ def format_authors_mla(authors):
             commas = ', '.join(names) # there will be a space after last comma
             cite = 'and '.join([ commas, last ])
         elif len(authors) >= 4:
-            cite = '{}, et al'.format(surname_givenname(authors[0]))
+            cite = '{0}, et al'.format(surname_givenname(authors[0]))
         if cite:
-            cite = '{}.'.format(cite)
+            cite = '{0}.'.format(cite)
     return cite
 
 if __name__ == "__main__":

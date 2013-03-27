@@ -1,4 +1,4 @@
-DEFAULT = 'Densho Encyclopedia contributors'
+DEFAULT = 'Densho Encyclopedia contributors.'
 
 
 def surname_givenname(parsed):

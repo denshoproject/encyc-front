@@ -73,7 +73,6 @@
   <h3 id="MHRA">MHRA style</h3>
   <p>
   {{ authors_mhra }}
-  Densho Encyclopedia contributors,
   '{{ title }}',
   <i>Densho Encyclopedia</i>
   25 June 2012, 22:19 UTC,
@@ -84,7 +83,6 @@
   <h3 id="Chicago">Chicago style</h3>
   <p>
   {{ authors_chicago }}
-  Densho Encyclopedia contributors,
   "{{ title }},"
   <i>Densho Encyclopedia</i>
   <a class="offsite" href="{{ href }}" rel="nofollow">{{ href }}</a>
@@ -93,7 +91,7 @@
 
   <h3 id="CBE.2FCS">CBE/CSE style</h3>
   <p>
-  Densho Encyclopedia contributors.
+  {{ authors_cse }}
   {{ title }}
   [Internet].
   Densho Encyclopedia;
@@ -114,7 +112,7 @@
 
   <h3 id="BibTeX_entry">BibTeX</h3>
 <pre> @misc{ wiki:xxx,
-   author = "Densho Encyclopedia",
+   author = "{{ authors_bibtex }}",
    title = "{{ title }} --- Densho Encyclopedia{,} ",
    year = "{{ retrieved|date:"Y" }}",
    url = "<a class="offsite" href="{{ href }}" rel="nofollow">{{ href }}</a>",
@@ -124,7 +122,7 @@
   <p>When using the LaTeX package url (<code>\usepackage{url}</code> somewhere in the preamble) which tends to give much more nicely formatted web addresses, the following may be preferred:
   </p>
 <pre> @misc{ wiki:xxx,
-   author = "Densho Encyclopedia",
+   author = "{{ authors_bibtex }}",
    title = "{{ title }} --- Densho Encyclopedia ",
    year = "{{ retrieved|date:"Y" }}",
    url = "<b>\url{</b><a class="offsite" href="{{ href }}" rel="nofollow">{{ href }}</a><b>}</b>",

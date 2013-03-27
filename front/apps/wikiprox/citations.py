@@ -1,15 +1,57 @@
+DEFAULT = 'Densho Encyclopedia contributors'
+
+
 def surname_givenname(parsed):
+    """
+    >>> surname_givenname(  ['Scheiber','Harry'] )
+    'Scheiber, Harry'
+    >>> surname_givenname(  ['Endo','Kenny Butthead'] )
+    'Endo, Kenny Butthead'
+    """
     return ', '.join(parsed)
+def surname_givenname_initials(parsed):
+    """
+    >>> surname_givenname_initials(  ['Scheiber','Harry'] )
+    'Scheiber, Harry'
+    >>> surname_givenname_initials(  ['Endo','Kenny Butthead'] )
+    'Endo, Kenny B.'
+    """
+    surname = parsed[0]
+    givens = []
+    for n,g in enumerate(parsed[1].split(' ')):
+        if n:
+            givens.append('{}.'.format(g[0]))
+        else:
+            givens.append(g)
+    givens = ' '.join(givens)
+    return ', '.join([surname, givens])
 def givenname_surname(parsed):
+    """
+    >>> givenname_surname(  ['Scheiber','Harry'] )
+    'Harry Scheiber'
+    >>> givenname_surname(  ['Endo','Kenny Butthead'] )
+    'Kenny Butthead Endo'
+    """
     parsed.reverse()
     return ' '.join(parsed)
 def surname_initials(parsed):
+    """
+    >>> surname_initials(  ['Scheiber','Harry'] )
+    'Scheiber, H.'
+    >>> surname_initials(  ['Endo','Kenny Butthead'] )
+    'Endo, K. B.'
+    """
     givens = ['{}.'.format(g[0]) for g in parsed[1].split(' ')]
     givens = ' '.join(givens)
     surname = parsed[0]
     return ', '.join([surname, givens])
 def surname_initials_cse(parsed):
-    """no comma or period"""
+    """
+    >>> surname_initials_cse(  ['Scheiber','Harry'] )
+    'Scheiber H'
+    >>> surname_initials_cse(  ['Endo','Kenny Butthead'] )
+    'Endo K B'
+    """
     givens = [g[0] for g in parsed[1].split(' ')]
     givens = ' '.join(givens)
     surname = parsed[0]
@@ -18,37 +60,59 @@ def surname_initials_cse(parsed):
 def format_authors_apa(authors):
     """Takes output of mediawiki.find_author_info() and formats in APA style.
     
-    >>> a = [[u'Scheiber', u'Jane']]
-    >>> b = [[u'Scheiber',u'Jane'], [u'Scheiber',u'Harry']]
-    >>> c = [[u'Scheiber',u'Jane'], [u'Scheiber',u'Harry'], [u'Endo',u'Kenny Butthead']]
-    >>> d = [[u'Scheiber',u'Jane'], [u'Scheiber',u'Harry'], [u'Endo',u'Kenny Butthead'], [u'Doe',u'John']]
-    >>> format_authors_mla(a)
-    Scheiber, J.
-    >>> format_authors_mla(b)
-    Scheiber, J., & Scheiber, H.
-    >>> format_authors_mla(c)
-    Scheiber, J., Scheiber, H., & Endo, K. B.
-    >>> format_authors_mla(d)
-    Scheiber, J., Scheiber, H., Endo, K. B., & Doe, J.
+    >>> a = [['Scheiber', 'Jane']]
+    >>> b = [['Scheiber','Jane'], ['Scheiber','Harry']]
+    >>> c = [['Scheiber','Jane'], ['Scheiber','Harry'], ['Endo','Kenny Butthead']]
+    >>> d = [['Scheiber','Jane'], ['Scheiber','Harry'], ['Endo','Kenny Butthead'], ['Doe','John']]
+    >>> format_authors_apa(a)
+    'Scheiber, Jane.'
+    >>> format_authors_apa(b)
+    'Scheiber, Jane, and Scheiber, Harry.'
+    >>> format_authors_apa(c)
+    'Scheiber, Jane, Scheiber, Harry, and Endo, Kenny B.'
+    >>> format_authors_apa(d)
+    'Scheiber, Jane, Scheiber, Harry, Endo, Kenny B., and Doe, John.'
     
     source: http://www.umuc.edu/library/libhow/mla_examples.cfm
     """
-    cite = ''
+    cite = DEFAULT
     if authors:
         if len(authors) == 1:
-            # Scheiber, J.
             cite = surname_givenname(authors[0])
         elif len(authors) > 1:
-            # Scheiber, J., & Scheiber, H.
-            # Scheiber, J., Scheiber, H., & Endo, K. B.
-            # Scheiber, J., Scheiber, H., Endo, K. B., & Doe, J.
-            names = []
-            [names.append(surname_initials(n)) for n in authors]
+            names = [surname_givenname_initials(n) for n in authors]
             # last two names separated by ampersand
             last = names.pop()
             names.append('') # to add that last comma
             commas = ', '.join(names) # there will be a space after last comma
-            cite = '&amp; '.join([ commas, last ])
+            cite = 'and '.join([ commas, last ])
+        if cite and not (cite[-1] == '.'):
+            cite = '{}.'.format(cite)
+    return cite
+
+def format_authors_bibtex(authors):
+    """Takes output of mediawiki.find_author_info() and formats BibTeX style.
+    
+    >>> a = [['Scheiber', 'Jane']]
+    >>> b = [['Scheiber','Jane'], ['Scheiber','Harry']]
+    >>> c = [['Scheiber','Jane'], ['Scheiber','Harry'], ['Endo','Kenny Butthead']]
+    >>> d = [['Scheiber','Jane'], ['Scheiber','Harry'], ['Endo','Kenny Butthead'], ['Doe','John']]
+    >>> format_authors_bibtex(a)
+    'Scheiber, J.'
+    >>> format_authors_bibtex(b)
+    'Scheiber, J. and Scheiber, H.'
+    >>> format_authors_bibtex(c)
+    'Scheiber, J. and Scheiber, H. and Endo, K. B.'
+    >>> format_authors_bibtex(d)
+    'Scheiber, J. and Scheiber, H. and Endo, K. B. and Doe, J.'
+    
+    source: http://en.wikibooks.org/wiki/LaTeX/Bibliography_Management
+    """
+    cite = DEFAULT
+    if authors:
+        if len(authors):
+            names = [surname_initials(n) for n in authors]
+            cite = ' and '.join(names)
         if cite and not (cite[-1] == '.'):
             cite = '{}.'.format(cite)
     return cite
@@ -56,37 +120,32 @@ def format_authors_apa(authors):
 def format_authors_chicago(authors):
     """Takes output of mediawiki.find_author_info() and formats Chicago style.
     
-    >>> a = [[u'Scheiber', u'Jane']]
-    >>> b = [[u'Scheiber',u'Jane'], [u'Scheiber',u'Harry']]
-    >>> c = [[u'Scheiber',u'Jane'], [u'Scheiber',u'Harry'], [u'Endo',u'Kenny Butthead']]
-    >>> d = [[u'Scheiber',u'Jane'], [u'Scheiber',u'Harry'], [u'Endo',u'Kenny Butthead'], [u'Doe',u'John']]
+    >>> a = [['Scheiber', 'Jane']]
+    >>> b = [['Scheiber','Jane'], ['Scheiber','Harry']]
+    >>> c = [['Scheiber','Jane'], ['Scheiber','Harry'], ['Endo','Kenny Butthead']]
+    >>> d = [['Scheiber','Jane'], ['Scheiber','Harry'], ['Endo','Kenny Butthead'], ['Doe','John']]
     >>> format_authors_chicago(a)
-    Jane Scheiber.
+    'Jane Scheiber.'
     >>> format_authors_chicago(b)
-    Jane Scheiber and Harry Scheiber.
+    'Jane Scheiber and Harry Scheiber.'
     >>> format_authors_chicago(c)
-    Jane Scheiber, Harry Scheiber and Kenny Butthead Endo.
+    'Jane Scheiber, Harry Scheiber and Kenny Butthead Endo.'
     >>> format_authors_chicago(d)
-    Jane Scheiber et al.
+    'Jane Scheiber et al.'
     
     source: http://ilrb.cf.ac.uk/citingreferences/mhra/page13.html
     """
-    cite = ''
+    cite = DEFAULT
     if authors:
         if len(authors) == 1:
-            # Jane Scheiber.
             cite = givenname_surname(authors[0])
         elif len(authors) < 4:
-            # Jane Scheiber and Harry Scheiber.
-            # Jane Scheiber, Harry Scheiber and Kenny Butthead Endo.
-            names = []
-            [names.append(givenname_surname(n)) for n in authors]
+            names = [givenname_surname(n) for n in authors]
             # last two names separated by 'and'
             last = names.pop()
             commas = ', '.join(names) # there will be a space after last comma
             cite = ' and '.join([ commas, last ])
         elif len(authors) >= 4:
-            # Jane Scheiber et al.
             cite = '{} et al'.format(givenname_surname(authors[0]))
         if cite and not (cite[-1] == '.'):
             cite = '{}.'.format(cite)
@@ -95,31 +154,28 @@ def format_authors_chicago(authors):
 def format_authors_cse(authors):
     """Takes output of mediawiki.find_author_info() and formats CSE/CBE style.
     
-    >>> a = [[u'Scheiber', u'Jane']]
-    >>> b = [[u'Scheiber',u'Jane'], [u'Scheiber',u'Harry']]
-    >>> c = [[u'Scheiber',u'Jane'], [u'Scheiber',u'Harry'], [u'Endo',u'Kenny Butthead']]
-    >>> d = [[u'Scheiber',u'Jane'], [u'Scheiber',u'Harry'], [u'Endo',u'Kenny Butthead'], [u'Doe',u'John']]
-    >>> format_authors_chicago(a)
-    Scheiber J.
-    >>> format_authors_chicago(b)
-    Scheiber J, Scheiber H.
-    >>> format_authors_chicago(c)
-    Scheiber J, Scheiber H, Endo K B.
-    >>> format_authors_chicago(d)
-    Scheiber J, Scheiber H, Endo K B, Doe J.
+    >>> a0 = [['Coffman', 'Tom']]
+    >>> a = [['Scheiber', 'Jane']]
+    >>> b = [['Scheiber','Jane'], ['Scheiber','Harry']]
+    >>> c = [['Scheiber','Jane'], ['Scheiber','Harry'], ['Endo','Kenny Butthead']]
+    >>> d = [['Scheiber','Jane'], ['Scheiber','Harry'], ['Endo','Kenny Butthead'], ['Doe','John']]
+    >>> format_authors_cse(a0)
+    'Coffman T.'
+    >>> format_authors_cse(a)
+    'Scheiber J.'
+    >>> format_authors_cse(b)
+    'Scheiber J, Scheiber H.'
+    >>> format_authors_cse(c)
+    'Scheiber J, Scheiber H, Endo K B.'
+    >>> format_authors_cse(d)
+    'Scheiber J, Scheiber H, Endo K B, Doe J.'
     
     source: http://ilrb.cf.ac.uk/citingreferences/mhra/page13.html
     """
-    cite = ''
+    cite = DEFAULT
     if authors:
         if len(authors):
-            # Scheiber J.
-            # Scheiber J, Scheiber H.
-            # Scheiber J, Scheiber H, Endo K B.
-            # Scheiber J, Scheiber H, Endo K B, Doe J.
-            names = []
-            [names.append(surname_initials_cse(n)) for n in authors]
-            # last two names separated by ampersand
+            names = [surname_initials_cse(n) for n in authors]
             cite = ', '.join(names)
         if cite and not (cite[-1] == '.'):
             cite = '{}.'.format(cite)
@@ -128,37 +184,32 @@ def format_authors_cse(authors):
 def format_authors_mhra(authors):
     """Takes output of mediawiki.find_author_info() and formats MHRA style.
     
-    >>> a = [[u'Scheiber', u'Jane']]
-    >>> b = [[u'Scheiber',u'Jane'], [u'Scheiber',u'Harry']]
-    >>> c = [[u'Scheiber',u'Jane'], [u'Scheiber',u'Harry'], [u'Endo',u'Kenny Butthead']]
-    >>> d = [[u'Scheiber',u'Jane'], [u'Scheiber',u'Harry'], [u'Endo',u'Kenny Butthead'], [u'Doe',u'John']]
+    >>> a = [['Scheiber', 'Jane']]
+    >>> b = [['Scheiber','Jane'], ['Scheiber','Harry']]
+    >>> c = [['Scheiber','Jane'], ['Scheiber','Harry'], ['Endo','Kenny Butthead']]
+    >>> d = [['Scheiber','Jane'], ['Scheiber','Harry'], ['Endo','Kenny Butthead'], ['Doe','John']]
     >>> format_authors_mhra(a)
-    Jane Scheiber.
+    'Jane Scheiber.'
     >>> format_authors_mhra(b)
-    Jane Scheiber and Harry Scheiber.
+    'Jane Scheiber and Harry Scheiber.'
     >>> format_authors_mhra(c)
-    Jane Scheiber, Harry Scheiber, and Kenny Butthead Endo.
+    'Jane Scheiber, Harry Scheiber and Kenny Butthead Endo.'
     >>> format_authors_mhra(d)
-    Jane Scheiber and others.
+    'Jane Scheiber and others.'
     
     source: http://ilrb.cf.ac.uk/citingreferences/mhra/page13.html
     """
-    cite = ''
+    cite = DEFAULT
     if authors:
         if len(authors) == 1:
-            # Jane Scheiber.
             cite = givenname_surname(authors[0])
         elif len(authors) < 4:
-            # Jane Scheiber and Harry Scheiber.
-            # Jane Scheiber, Harry Scheiber, and Kenny Butthead Endo.
-            names = []
-            [names.append(givenname_surname(n)) for n in authors]
+            names = [givenname_surname(n) for n in authors]
             # last two names separated by 'and'
             last = names.pop()
             commas = ', '.join(names) # there will be a space after last comma
             cite = ' and '.join([ commas, last ])
         elif len(authors) >= 4:
-            # Jane Scheiber and others.
             cite = '{} and others'.format(givenname_surname(authors[0]))
         if cite and not (cite[-1] == '.'):
             cite = '{}.'.format(cite)
@@ -167,29 +218,26 @@ def format_authors_mhra(authors):
 def format_authors_mla(authors):
     """Takes output of mediawiki.find_author_info() and formats MLA style.
     
-    >>> a = [[u'Scheiber', u'Jane']]
-    >>> b = [[u'Scheiber',u'Jane'], [u'Scheiber',u'Harry']]
-    >>> c = [[u'Scheiber',u'Jane'], [u'Scheiber',u'Harry'], [u'Endo',u'Kenny Butthead']]
-    >>> d = [[u'Scheiber',u'Jane'], [u'Scheiber',u'Harry'], [u'Endo',u'Kenny Butthead'], [u'Doe',u'John']]
+    >>> a = [['Scheiber', 'Jane']]
+    >>> b = [['Scheiber','Jane'], ['Scheiber','Harry']]
+    >>> c = [['Scheiber','Jane'], ['Scheiber','Harry'], ['Endo','Kenny Butthead']]
+    >>> d = [['Scheiber','Jane'], ['Scheiber','Harry'], ['Endo','Kenny Butthead'], ['Doe','John']]
     >>> format_authors_mla(a)
-    Scheiber, Jane.
+    'Scheiber, Jane.'
     >>> format_authors_mla(b)
-    Scheiber, Jane, and Harry Scheiber.
+    'Scheiber, Jane, and Harry Scheiber.'
     >>> format_authors_mla(c)
-    Scheiber, Jane, Harry Scheiber, and Kenny Butthead Endo.
+    'Scheiber, Jane, Harry Scheiber, and Kenny Butthead Endo.'
     >>> format_authors_mla(d)
-    Scheiber, Jane, et al.
+    'Scheiber, Jane, et al.'
     
     source: http://www.umuc.edu/library/libhow/mla_examples.cfm
     """
-    cite = ''
+    cite = DEFAULT
     if authors:
         if len(authors) == 1:
-            # Scheiber, Jane.
             cite = surname_givenname(authors[0])
         elif len(authors) < 4:
-            # Scheiber, Jane, and Harry Scheiber.
-            # Scheiber, Jane, Harry Scheiber, and Kenny Endo.
             names = []
             # pop off the first name; it's surname,given
             l = authors
@@ -204,42 +252,13 @@ def format_authors_mla(authors):
             commas = ', '.join(names) # there will be a space after last comma
             cite = 'and '.join([ commas, last ])
         elif len(authors) >= 4:
-            # Scheiber, Jane, et al.
             cite = '{}, et al'.format(surname_givenname(authors[0]))
         if cite:
             cite = '{}.'.format(cite)
     return cite
 
-x = """
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
 
-from wikiprox.encyclopedia import format_authors_apa, format_authors_chicago, format_authors_cse, format_authors_mhra, format_authors_mla
-a = [[u'Scheiber',u'Jane']]
-b = [[u'Scheiber',u'Jane'], [u'Scheiber',u'Harry']]
-c = [[u'Scheiber',u'Jane'], [u'Scheiber',u'Harry'], [u'Endo',u'Kenny Butthead']]
-d = [[u'Scheiber',u'Jane'], [u'Scheiber',u'Harry'], [u'Endo',u'Kenny Butthead'], [u'Doe',u'John']]
-
-format_authors_apa(a)
-format_authors_apa(b)
-format_authors_apa(c)
-format_authors_apa(d)
-
-format_authors_chicago(a)
-format_authors_chicago(b)
-format_authors_chicago(c)
-format_authors_chicago(d)
-
-format_authors_cse(a)
-format_authors_cse(b)
-format_authors_cse(c)
-format_authors_cse(d)
-
-format_authors_mhra(a)
-format_authors_mhra(b)
-format_authors_mhra(c)
-format_authors_mhra(d)
-
-format_authors_mla(a)
-format_authors_mla(b)
-format_authors_mla(c)
-format_authors_mla(d)
-"""
+# Kenny Endo asserts that he is the only one who can be called a "taiko artist".

@@ -117,12 +117,17 @@ def page_cite(request, page=None, template_name='wikiprox/cite.html'):
             r = requests.get(page_url)
             pagedata = json.loads(r.text)
             authors = mw.find_author_info(pagedata['parse']['text']['*'])
+            # For some reason, if next line is added to context with the others,
+            # surname and givenname are reversed. Weird.
+            authors_cse = citations.format_authors_cse(authors['parsed'])
             return render_to_response(
                 template_name,
                 {'title': pageinfo['title'],
                  'authors': authors,
                  'authors_apa':     citations.format_authors_apa(    authors['parsed']),
+                 'authors_bibtex':  citations.format_authors_bibtex( authors['parsed']),
                  'authors_chicago': citations.format_authors_chicago(authors['parsed']),
+                 'authors_cse':     authors_cse,
                  'authors_mhra':    citations.format_authors_mhra(   authors['parsed']),
                  'authors_mla':     citations.format_authors_mla(    authors['parsed']),
                  'lastmod': lastmod,

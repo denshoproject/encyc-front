@@ -23,7 +23,12 @@
       Page name: {{ title }}
     </li>
     <li>
-      Author: Densho Encyclopedia contributors
+      Author(s):
+{% if authors.display %}
+      {{ authors.display|join:", " }}
+{% else %}
+      Densho Encyclopedia contributors
+{% endif %}
     </li>
     <li>
       Publisher: <i>Densho Encyclopedia</i>.
@@ -48,6 +53,7 @@
 
   <h3 id="APA">APA style</h3>
   <p>
+  {{ authors_apa }}
   {{ title }}.
   ({{ lastmod|date:"Y, F j" }}).
   <i>Densho Encyclopedia</i>.
@@ -56,6 +62,7 @@
 
   <h3 id="MLA">MLA style</h3>
   <p>
+  {{ authors_mla }}
   "{{ title }}."
   <i>Densho Encyclopedia</i>.
   {{ lastmod|date:"j M Y, H:i T" }}.
@@ -65,6 +72,7 @@
 
   <h3 id="MHRA">MHRA style</h3>
   <p>
+  {{ authors_mhra }}
   Densho Encyclopedia contributors,
   '{{ title }}',
   <i>Densho Encyclopedia</i>
@@ -75,6 +83,7 @@
 
   <h3 id="Chicago">Chicago style</h3>
   <p>
+  {{ authors_chicago }}
   Densho Encyclopedia contributors,
   "{{ title }},"
   <i>Densho Encyclopedia</i>
@@ -94,12 +103,14 @@
   <a class="offsite" href="{{ href }}" rel="nofollow">{{ href }}</a>.
   </p>
 
+<!--
   <h3 id="Bluebook_style">Bluebook style</h3>
   <p>
   {{ title }},
   <a class="offsite" href="{{ href }}" rel="nofollow">{{ href }}</a>
   (last visited {{ retrieved|date:"F j, Y" }}).
   </p>
+-->
 
   <h3 id="BibTeX_entry">BibTeX</h3>
 <pre> @misc{ wiki:xxx,

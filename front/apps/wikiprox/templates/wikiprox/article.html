@@ -34,12 +34,12 @@
 <div id="share">
   <a href="{% url wikiprox-page-print title %}"><i class="icon-print"></i> Print</a>
   &nbsp;
-  <a href="/citehelp/"
+  <a href="{% url wikiprox-page-cite title %}"
      class="lightview"
      data-lightview-type="iframe"
      data-lightview-group="cite-header"
      data-lightview-options="width: 1000, height: '100%'">
-  <i class="icon-bookmark"></i>Cite Help
+  <i class="icon-bookmark"></i>Cite
   </a>
   &nbsp;
   <!-- AddThis Button BEGIN -->
@@ -91,11 +91,11 @@
     </dl>
     <p>
     <a href="{% url wikiprox-page-print title %}"><i class="icon-print"></i> Printer-friendly</a><br/>
-  <a href="/citehelp/"
+  <a href="{% url wikiprox-page-cite title %}"
      class="lightview"
      data-lightview-type="iframe"
      data-lightview-options="width: 1000, height: '100%'">
-  <i class="icon-bookmark"></i>Cite Help
+  <i class="icon-bookmark"></i>Cite
   </a>
     </p>
     <p>

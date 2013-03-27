@@ -252,3 +252,44 @@ def add_top_links(soup):
         n = n + 1
     soup.append(copy.copy(toplink))
     return soup
+
+def find_author_info(text):
+    """Given raw HTML, extract author display and citation formats.
+    
+    Example 1:
+    <div id="authorByline">
+      <b>
+        Authored by
+        <a href="/Tom_Coffman" title="Tom Coffman">Tom Coffman</a>
+      </b>
+    </div>
+    <div id="citationAuthor" style="display:none;">
+      Coffman, Tom
+    </div>
+    
+    Example 2:
+    <div id="authorByline">
+      <b>
+        Authored by
+        <a href="/mediawiki/index.php/Jane_L._Scheiber" title="Jane L. Scheiber">Jane L. Scheiber</a>
+        and
+        <a href="/mediawiki/index.php/Harry_N._Scheiber" title="Harry N. Scheiber">Harry N. Scheiber</a>
+      </b>
+    </div>
+    <div id="citationAuthor" style="display:none;">
+      Scheiber,Jane; Scheiber,Harry
+    </div>
+    """
+    authors = {'display':[], 'parsed':[],}
+    soup = BeautifulSoup(text.replace('<p><br />\n</p>',''))
+    for byline in soup.find_all('div', id='authorByline'):
+        for a in byline.find_all('a'):
+            if hasattr(a,'contents') and a.contents:
+                authors['display'].append(a.contents[0])
+    for citation in soup.find_all('div', id='citationAuthor'):
+        if hasattr(citation,'contents') and citation.contents:
+            for n in citation.contents[0].split(';'):
+                surname,givenname = n.strip().split(',')
+                name = [surname.strip(), givenname.strip()]
+                authors['parsed'].append(name)
+    return authors

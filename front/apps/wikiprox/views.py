@@ -15,7 +15,7 @@ from django.template import RequestContext
 from django.views.decorators.http import require_http_methods
 
 from wikiprox import mediawiki as mw
-from wikiprox import encyclopedia, sources
+from wikiprox import encyclopedia, sources, citations
 
 
 @require_http_methods(['GET',])
@@ -100,8 +100,9 @@ def page(request, page='index', printed=False, template_name='wikiprox/page.html
 
 @require_http_methods(['GET',])
 def page_cite(request, page=None, template_name='wikiprox/cite.html'):
-    url = '%s?format=json&action=query&prop=info&prop=revisions&titles=%s' % (settings.WIKIPROX_MEDIAWIKI_API, page)
-    r = requests.get(url)
+    page_url = mw.page_data_url(page)
+    cite_url = '%s?format=json&action=query&prop=info&prop=revisions&titles=%s' % (settings.WIKIPROX_MEDIAWIKI_API, page)
+    r = requests.get(cite_url)
     if r.status_code == 200:
         r_text = r.text
         response = json.loads(r.text)
@@ -112,9 +113,18 @@ def page_cite(request, page=None, template_name='wikiprox/cite.html'):
             timestamp = pageinfo['revisions'][0]['timestamp']
             lastmod = datetime.strptime(timestamp, TS_FORMAT)
             href = 'http://%s%s' % (request.META['HTTP_HOST'], reverse('wikiprox-page', args=[page]))
+            # get author info
+            r = requests.get(page_url)
+            pagedata = json.loads(r.text)
+            authors = mw.find_author_info(pagedata['parse']['text']['*'])
             return render_to_response(
                 template_name,
                 {'title': pageinfo['title'],
+                 'authors': authors,
+                 'authors_apa':     citations.format_authors_apa(    authors['parsed']),
+                 'authors_chicago': citations.format_authors_chicago(authors['parsed']),
+                 'authors_mhra':    citations.format_authors_mhra(   authors['parsed']),
+                 'authors_mla':     citations.format_authors_mla(    authors['parsed']),
                  'lastmod': lastmod,
                  'retrieved': datetime.now(),
                  'href': href,},

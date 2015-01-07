@@ -94,7 +94,7 @@ def remove_edit_links(soup):
     
     Security precaution: we don't want people to be able to edit, or to find edit links.
     """
-    for e in soup.find_all('span', attrs={'class':'editsection'}):
+    for e in soup.find_all('span', attrs={'class':'mw-editsection'}):
         e.decompose()
     return soup
 

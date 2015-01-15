@@ -53,7 +53,6 @@ def parse_mediawiki_text(text, images, public=False, printed=False):
     soup = remove_comments(soup)
     soup = remove_edit_links(soup)
     #soup = wrap_sections(soup)
-    soup = rewrite_mediawiki_urls(soup)
     soup = rewrite_newpage_links(soup)
     soup = rewrite_prevnext_links(soup)
     if public:
@@ -63,6 +62,7 @@ def parse_mediawiki_text(text, images, public=False, printed=False):
     primary_sources = find_primary_sources(images)
     soup = remove_primary_sources(soup, primary_sources)
     html = unicode(soup)
+    html = rewrite_mediawiki_urls(html)
     for tag in ['html','body']:
         html = html.replace('<%s>' % tag, '').replace('</%s>' % tag, '')
     return html, primary_sources
@@ -134,12 +134,16 @@ def remove_status_markers(soup):
             d.decompose()
     return soup
 
-def rewrite_mediawiki_urls(soup):
-    """Rewrites /mediawiki/index.php/... URLs to /...
+def rewrite_mediawiki_urls(html):
+    """Removes /mediawiki/index.php stub from URLs
     """
-    for a in soup.find_all('a', href=re.compile('/mediawiki/index.php')):
-        a['href'] = a['href'].replace('/mediawiki/index.php', '')
-    return soup
+    PATTERNS = [
+        '/mediawiki/index.php',
+        '/mediawiki',
+    ]
+    for pattern in PATTERNS:
+        re.sub(pattern, '', html)
+    return html
 
 def rewrite_newpage_links(soup):
     """Rewrites new-page links

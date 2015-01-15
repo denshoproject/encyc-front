@@ -142,7 +142,7 @@ def rewrite_mediawiki_urls(html):
         '/mediawiki',
     ]
     for pattern in PATTERNS:
-        re.sub(pattern, '', html)
+        html = re.sub(pattern, '', html)
     return html
 
 def rewrite_newpage_links(soup):

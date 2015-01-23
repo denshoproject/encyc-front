@@ -319,7 +319,7 @@ def published_pages():
     if cached:
         pages = json.loads(cached)
         for page in pages:
-            page['timestamp'] = datetime.strptime(page['timestamp'], mediawiki.TS_FORMAT)
+            page['timestamp'] = datetime.strptime(page['timestamp'], mediawiki.TS_FORMAT_ZONED)
     else:
         pids = []  # published_article_ids
         for page in category_members('Published', namespace_id=namespaces_reversed()['Default']):

@@ -2,15 +2,15 @@
 {% load wikiprox_tags %}
 
 
-{% block title %}{{ title }}{% endblock %}
+{% block title %}{{ page.title }}{% endblock %}
 
 
 {% block article %}
 <!-- wikiprox/article-print.html -->
 
-<h1 id="firstHeading" class="firstHeading">{{ title }}</h1>
+<h1 id="firstHeading" class="firstHeading">{{ page.title }}</h1>
 
-{{ bodycontent|safe }}
+{{ page.body|safe }}
 
 {% endblock article %}
 
@@ -22,7 +22,7 @@
     <h2>
     Primary Sources
     </h2>
-{% for source in sources %}
+{% for source in page.sources %}
     <div class="primarysource-print" style="margin-bottom:32px;">
 {% if source.thumbnail_lg %}
 <img src="{{ source.thumbnail_lg }}" style="width:500px; float:left; padding-right:10px;" />

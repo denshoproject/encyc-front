@@ -1,16 +1,16 @@
 {% extends "wikiprox/base.html" %}
 
 
-{% block title %}{{ title }}{% endblock %}
+{% block title %}{{ page.title }}{% endblock %}
 
 
 {% block contents %}
 <!-- wikiprox/page.html -->
 <div class="span12">
 
-<h1 id="firstHeading" class="firstHeading">{{ title }}</h1>
+<h1 id="firstHeading" class="firstHeading">{{ page.title }}</h1>
 
-{{ bodycontent|safe }}
+{{ page.body|safe }}
 
 </div><!-- .span12 -->
 {% endblock contents %}

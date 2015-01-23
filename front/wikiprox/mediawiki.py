@@ -1,31 +1,42 @@
 from datetime import datetime
 import json
-import os.path
+import logging
+logger = logging.getLogger(__name__)
+import os
 import re
 
 from bs4 import BeautifulSoup, SoupStrainer, Comment
 import requests
 
-from django.conf import settings
-from django.core.urlresolvers import reverse
-
-from wikiprox.sources import format_primary_source
+TS_FORMAT = '%Y-%m-%dT%H:%M:%S'
+TS_FORMAT_ZONED = '%Y-%m-%dT%H:%M:%SZ'
 
 
-def page_data_url(page_title):
+def page_data_url(api_url, page_title):
     """URL of MediaWiki API call to get page info.
+    
+    @parap api_url: str Base URL for MediaWiki API.
+    @param page_title: Page title from MediaWiki URL.
+    @returns: url
     """
-    return '%s?action=parse&format=json' \
-           '&page=%s' % (settings.WIKIPROX_MEDIAWIKI_API, page_title)
+    url = '%s?action=parse&format=json&page=%s'
+    return url % (api_url, page_title)
 
-def lastmod_data_url(page_title):
+def lastmod_data_url(api_url, page_title):
     """URL of MediaWiki API call to get page revision lastmod.
+    
+    @parap api_url: str Base URL for MediaWiki API.
+    @param page_title: Page title from MediaWiki URL.
+    @returns: url
     """
-    return '%s?action=query&format=json&prop=revisions&rvprop=ids|timestamp' \
-           '&titles=%s' % (settings.WIKIPROX_MEDIAWIKI_API, page_title)
+    url = '%s?action=query&format=json&prop=revisions&rvprop=ids|timestamp&titles=%s'
+    return url % (api_url, page_title)
 
 def page_is_published(pagedata):
-    """Indicates whether MediaWiki page contains Category:Published template.
+    """Indicates whether page contains Category:Published template.
+    
+    @param pagedata: dict Output of API call.
+    @returns: Boolean
     """
     published = False
     for category in pagedata['parse']['categories']:
@@ -33,20 +44,31 @@ def page_is_published(pagedata):
             published = True
     return published
 
-def page_lastmod(page_title):
+def page_lastmod(api_url, page_title):
     """Retrieves timestamp of last modification.
+    
+    @parap api_url: str Base URL for MediaWiki API.
+    @param page_title: Page title from MediaWiki URL.
+    @returns: datetime or None
     """
     lastmod = None
-    url = lastmod_data_url(page_title)
+    url = lastmod_data_url(api_url, page_title)
+    logging.debug(url)
     r = requests.get(url)
     if r.status_code == 200:
         pagedata = json.loads(r.text)
         ts = pagedata['query']['pages'].values()[0]['revisions'][0]['timestamp']
-        lastmod = datetime.strptime(ts, '%Y-%m-%dT%H:%M:%SZ')
+        lastmod = datetime.strptime(ts, TS_FORMAT_ZONED)
     return lastmod
 
-def parse_mediawiki_text(text, images, public=False, printed=False):
+def parse_mediawiki_text(text, primary_sources, public=False, printed=False):
     """Parses the body of a MediaWiki page.
+    
+    @param text: str HTML contents of page body.
+    @param primary_sources: list
+    @param public: Boolean
+    @param printed: Boolean
+    @returns: html, list of primary sources
     """
     soup = BeautifulSoup(text.replace('<p><br />\n</p>',''))
     soup = remove_staticpage_titles(soup)
@@ -59,20 +81,23 @@ def parse_mediawiki_text(text, images, public=False, printed=False):
         soup = remove_status_markers(soup)
     if not printed:
         soup = add_top_links(soup)
-    primary_sources = find_primary_sources(images)
     soup = remove_primary_sources(soup, primary_sources)
     html = unicode(soup)
     html = rewrite_mediawiki_urls(html)
     for tag in ['html','body']:
         html = html.replace('<%s>' % tag, '').replace('</%s>' % tag, '')
-    return html, primary_sources
+    return html
 
 def remove_staticpage_titles(soup):
     """strip extra <h1> on "static" pages
-
+    
+    Called by parse_mediawiki_text.
     "Static" pages will have an extra <h1> in the page body.
     This is extracted by parse_mediawiki_title so now we need
     to remove it.
+    
+    @param soup: BeautifulSoup object
+    @returns: soup
     """
     h1s = soup.find_all('h1')
     if h1s:
@@ -82,6 +107,11 @@ def remove_staticpage_titles(soup):
 
 def remove_comments(soup):
     """TODO Removes MediaWiki comments from page text
+    
+    Called by parse_mediawiki_text.
+    
+    @param soup: BeautifulSoup object
+    @returns: soup
     """
     #def iscomment(tag):
     #    return isinstance(text, Comment)
@@ -92,7 +122,12 @@ def remove_comments(soup):
 def remove_edit_links(soup):
     """Removes [edit] spans (ex: <span class="editsection">)
     
-    Security precaution: we don't want people to be able to edit, or to find edit links.
+    Called by parse_mediawiki_text.
+    Security precaution: we don't want people to be able to edit,
+    or to find edit links.
+    
+    @param soup: BeautifulSoup object
+    @returns: soup
     """
     for e in soup.find_all('span', attrs={'class':'mw-editsection'}):
         e.decompose()
@@ -101,9 +136,13 @@ def remove_edit_links(soup):
 def wrap_sections(soup):
     """Wraps each <h2> and cluster of <p>s in a <section> tag.
     
+    Called by parse_mediawiki_text.
     Makes it possible to make certain sections collapsable.
+    The thing that makes this complicated is that with BeautifulSoup
+    you can't just drop tags into a <div>.  You have to 
     
-    The thing that makes this complicated is that with BeautifulSoup you can't just drop tags into a <div>.  You have to 
+    @param soup: BeautifulSoup object
+    @returns: soup
     """
     for s in soup.find_all('span', 'mw-headline'):
         # get the <h2> tag
@@ -128,6 +167,11 @@ def wrap_sections(soup):
 
 def remove_status_markers(soup):
     """Remove the "Published", "Needs Primary Sources" tables.
+    
+    Called by parse_mediawiki_text.
+    
+    @param soup: BeautifulSoup object
+    @returns: soup
     """
     for d in soup.find_all('div', attrs={'class':'alert'}):
         if 'published' in d['class']:
@@ -136,6 +180,11 @@ def remove_status_markers(soup):
 
 def rewrite_mediawiki_urls(html):
     """Removes /mediawiki/index.php stub from URLs
+    
+    Called by parse_mediawiki_text.
+    
+    @param html: str
+    @returns: html
     """
     PATTERNS = [
         '/mediawiki/index.php',
@@ -148,7 +197,11 @@ def rewrite_mediawiki_urls(html):
 def rewrite_newpage_links(soup):
     """Rewrites new-page links
     
+    Called by parse_mediawiki_text.
     ex: http://.../mediawiki/index.php?title=Nisei&amp;action=edit&amp;redlink=1
+    
+    @param soup: BeautifulSoup object
+    @returns: soup
     """
     for a in soup.find_all('a', href=re.compile('action=edit')):
         a['href'] = a['href'].replace('?title=', '/')
@@ -159,7 +212,11 @@ def rewrite_newpage_links(soup):
 def rewrite_prevnext_links(soup):
     """Rewrites previous/next links
     
+    Called by parse_mediawiki_text.
     ex: http://.../mediawiki/index.php?title=Category:Pages_Needing_Primary_Sources&pagefrom=Mary+Oyama+Mittwer
+    
+    @param soup: BeautifulSoup object
+    @returns: soup
     """
     for a in soup.find_all('a', href=re.compile('pagefrom=')):
         a['href'] = a['href'].replace('?title=', '/')
@@ -173,6 +230,9 @@ def extract_encyclopedia_id(uri):
     """Attempts to extract a valid Densho encyclopedia ID from the URI
     
     TODO Check if valid encyclopedia ID
+    
+    @param uri: str
+    @returns: eid
     """
     if 'thumb' in uri:
         path,filename = os.path.split(os.path.dirname(uri))
@@ -182,9 +242,17 @@ def extract_encyclopedia_id(uri):
         eid,ext = os.path.splitext(filename)
     return eid
     
-def find_primary_sources(images):
+def find_primary_sources(api_url, images):
     """Given list of page images, get the ones with encyclopedia IDs.
+    
+    Called by parse_mediawiki_text.
+    
+    @param api_url: TANSU_URL
+    @param images: list
+    @returns: list of sources
     """
+    logging.debug('find_primary_sources(%s, %s)' % (api_url, images))
+    logging.debug('looking for %s' % len(images))    
     sources = []
     eids = []
     # anything that might be an encyclopedia_id
@@ -197,7 +265,7 @@ def find_primary_sources(images):
         eid_args = []
         for eid in eids:
             eid_args.append('encyclopedia_id__in=%s' % eid)
-        url = '%s/primarysource/?%s' % (settings.TANSU_API, '&'.join(eid_args))
+        url = '%s/primarysource/?%s' % (api_url, '&'.join(eid_args))
         r = requests.get(url, headers={'content-type':'application/json'})
         if r.status_code == 200:
             response = json.loads(r.text)
@@ -206,13 +274,19 @@ def find_primary_sources(images):
                 for s in response['objects']:
                     if (eid == s['encyclopedia_id']) and (s not in sources):
                         sources.append(s)
+    logging.debug('retrieved %s' % len(sources))
     return sources
 
 def remove_primary_sources(soup, sources):
     """Remove primary sources from the MediaWiki page entirely.
     
+    Called by parse_mediawiki_text.
     see http://192.168.0.13/redmine/attachments/4/Encyclopedia-PrimarySourceDraftFlow.pdf
     ...and really look at it.  Primary sources are all displayed in sidebar_right.
+    
+    @param soup: BeautifulSoup object
+    @param sources: list
+    @returns: soup
     """
     # all the <a><img>s
     contexts = []
@@ -232,6 +306,9 @@ def find_databoxcamps_coordinates(text):
     NOTE: We have some major assumptions here:
     - That there will be only one lng/lat pair in the Databox-Camps.
     - That the lng/lat pair will appear within the Databox-Camps.
+    
+    @param text: str HTML
+    @returns: list of coordinate tuples (lng,lat)
     """
     coordinates = []
     if text.find('databox-Camps') > -1:
@@ -245,6 +322,13 @@ def find_databoxcamps_coordinates(text):
     return coordinates
     
 def add_top_links(soup):
+    """Adds ^top links at the end of page sections.
+    
+    Called by parse_mediawiki_text.
+    
+    @param soup: BeautifulSoup object
+    @returns: soup
+    """
     import copy
     TOPLINK_TEMPLATE = '<div class="toplink"><a href="#top"><i class="icon-chevron-up"></i> Top</a></div>'
     toplink = BeautifulSoup(TOPLINK_TEMPLATE,
@@ -283,6 +367,9 @@ def find_author_info(text):
     <div id="citationAuthor" style="display:none;">
       Scheiber,Jane; Scheiber,Harry
     </div>
+    
+    @param text: str HTML
+    @returns: dict of authors
     """
     authors = {'display':[], 'parsed':[],}
     soup = BeautifulSoup(text.replace('<p><br />\n</p>',''))

@@ -16,16 +16,16 @@
 
 <div class="hero-unit" style="margin-top:20px; padding:20px;">
   <h2>
-  Bibliographic details for {{ title }}
+  Bibliographic details for {{ citation.title }}
   </h2>
   <ul>
     <li>
-      Page name: {{ title }}
+      Page name: {{ citation.title }}
     </li>
     <li>
       Author(s):
 {% if authors.display %}
-      {{ authors.display|join:", " }}
+      {{ citation.authors.display|join:", " }}
 {% else %}
       Densho Encyclopedia contributors
 {% endif %}
@@ -34,13 +34,13 @@
       Publisher: <i>Densho Encyclopedia</i>.
     </li>
     <li>
-      Date of last revision: {{ lastmod|date:"j F Y H:i T" }}
+      Date of last revision: {{ citation.lastmod|date:"j F Y H:i T" }}
     </li>
     <li>
-      Date retrieved: {{ retrieved|date:"j F Y H:i T" }}
+      Date retrieved: {{ citation.retrieved|date:"j F Y H:i T" }}
     </li>
     <li>
-      Permanent URL: <a class="offsite" href="{{ href }}" rel="nofollow">{{ href }}</a>
+      Permanent URL: <a class="offsite" href="{{ citation.href }}" rel="nofollow">{{ citation.href }}</a>
     </li>
   </ul>
 </div><!-- .hero-unit -->
@@ -48,85 +48,85 @@
 <div class="plainlinks">
 
   <h2>
-  Citation styles for {{ title }}
+  Citation styles for {{ citation.title }}
   </h2>
 
   <h3 id="APA">APA style</h3>
   <p>
-  {{ authors_apa }}
-  {{ title }}.
-  ({{ lastmod|date:"Y, F j" }}).
+  {{ citation.authors_apa }}
+  {{ citation.title }}.
+  ({{ citation.lastmod|date:"Y, F j" }}).
   <i>Densho Encyclopedia</i>.
-  Retrieved {{ retrieved|date:"H:i, F j, Y" }} from <a class="offsite" href="{{ href }}" rel="nofollow">{{ href }}</a>.
+  Retrieved {{ citation.retrieved|date:"H:i, F j, Y" }} from <a class="offsite" href="{{ citation.href }}" rel="nofollow">{{ citation.href }}</a>.
   </p>
 
   <h3 id="MLA">MLA style</h3>
   <p>
-  {{ authors_mla }}
-  "{{ title }}."
+  {{ citation.authors_mla }}
+  "{{ citation.title }}."
   <i>Densho Encyclopedia</i>.
-  {{ lastmod|date:"j M Y, H:i T" }}.
-  {{ retrieved|date:"j M Y, H:i" }}
-  &lt;<a class="offsite" href="{{ href }}" rel="nofollow">{{ href }}</a>&gt;.
+  {{ citation.lastmod|date:"j M Y, H:i T" }}.
+  {{ citation.retrieved|date:"j M Y, H:i" }}
+  &lt;<a class="offsite" href="{{ citation.href }}" rel="nofollow">{{ citation.href }}</a>&gt;.
   </p>
 
   <h3 id="MHRA">MHRA style</h3>
   <p>
-  {{ authors_mhra }}
-  '{{ title }}',
+  {{ citation.authors_mhra }}
+  '{{ citation.title }}',
   <i>Densho Encyclopedia</i>
   25 June 2012, 22:19 UTC,
-  &lt;<a class="offsite" href="{{ href }}" rel="nofollow">{{ href }}</a>&gt;
-  [accessed {{ retrieved|date:"j M Y" }}]
+  &lt;<a class="offsite" href="{{ citation.href }}" rel="nofollow">{{ citation.href }}</a>&gt;
+  [accessed {{ citation.retrieved|date:"j M Y" }}]
   </p>
 
   <h3 id="Chicago">Chicago style</h3>
   <p>
-  {{ authors_chicago }}
-  "{{ title }},"
+  {{ citation.authors_chicago }}
+  "{{ citation.title }},"
   <i>Densho Encyclopedia</i>
-  <a class="offsite" href="{{ href }}" rel="nofollow">{{ href }}</a>
-  (accessed {{ retrieved|date:"M j Y" }}).
+  <a class="offsite" href="{{ citation.href }}" rel="nofollow">{{ citation.href }}</a>
+  (accessed {{ citation.retrieved|date:"M j Y" }}).
   </p>
 
   <h3 id="CBE.2FCS">CBE/CSE style</h3>
   <p>
-  {{ authors_cse }}
-  {{ title }}
+  {{ citation.authors_cse }}
+  {{ citation.title }}
   [Internet].
   Densho Encyclopedia;
-  {{ lastmod|date:"Y M j, H:i T" }}
-  [cited {{ retrieved|date:"Y F j" }}].
+  {{ citation.lastmod|date:"Y M j, H:i T" }}
+  [cited {{ citation.retrieved|date:"Y F j" }}].
   Available from:
-  <a class="offsite" href="{{ href }}" rel="nofollow">{{ href }}</a>.
+  <a class="offsite" href="{{ citation.href }}" rel="nofollow">{{ citation.href }}</a>.
   </p>
 
 <!--
   <h3 id="Bluebook_style">Bluebook style</h3>
   <p>
-  {{ title }},
-  <a class="offsite" href="{{ href }}" rel="nofollow">{{ href }}</a>
-  (last visited {{ retrieved|date:"F j, Y" }}).
+  {{ citation.title }},
+  <a class="offsite" href="{{ citation.href }}" rel="nofollow">{{ citation.href }}</a>
+  (last visited {{ citation.retrieved|date:"F j, Y" }}).
   </p>
 -->
 
   <h3 id="BibTeX_entry">BibTeX</h3>
 <pre> @misc{ wiki:xxx,
-   author = "{{ authors_bibtex }}",
-   title = "{{ title }} --- Densho Encyclopedia{,} ",
-   year = "{{ retrieved|date:"Y" }}",
-   url = "<a class="offsite" href="{{ href }}" rel="nofollow">{{ href }}</a>",
-   note = "[Online; accessed {{ retrieved|date:"j-M-Y" }}]"
+   author = "{{ citation.authors_bibtex }}",
+   title = "{{ citation.title }} --- Densho Encyclopedia{,} ",
+   year = "{{ citation.retrieved|date:"Y" }}",
+   url = "<a class="offsite" href="{{ citation.href }}" rel="nofollow">{{ citation.href }}</a>",
+   note = "[Online; accessed {{ citation.retrieved|date:"j-M-Y" }}]"
  }
 </pre>
   <p>When using the LaTeX package url (<code>\usepackage{url}</code> somewhere in the preamble) which tends to give much more nicely formatted web addresses, the following may be preferred:
   </p>
 <pre> @misc{ wiki:xxx,
-   author = "{{ authors_bibtex }}",
-   title = "{{ title }} --- Densho Encyclopedia ",
-   year = "{{ retrieved|date:"Y" }}",
-   url = "<b>\url{</b><a class="offsite" href="{{ href }}" rel="nofollow">{{ href }}</a><b>}</b>",
-   note = "[Online; accessed {{ retrieved|date:"j-F-Y" }}]"
+   author = "{{ citation.authors_bibtex }}",
+   title = "{{ citation.title }} --- Densho Encyclopedia ",
+   year = "{{ citation.retrieved|date:"Y" }}",
+   url = "<b>\url{</b><a class="offsite" href="{{ citation.href }}" rel="nofollow">{{ citation.href }}</a><b>}</b>",
+   note = "[Online; accessed {{ citation.retrieved|date:"j-F-Y" }}]"
  }
 </pre>
 

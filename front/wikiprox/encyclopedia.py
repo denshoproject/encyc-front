@@ -1,5 +1,7 @@
 from datetime import datetime
 import json
+import logging
+logger = logging.getLogger(__name__)
 from operator import itemgetter
 from urlparse import urlparse
 
@@ -10,10 +12,10 @@ from django.conf import settings
 from django.core.cache import cache
 
 from wikiprox import make_cache_key
+from wikiprox import mediawiki
 
 
 NON_ARTICLE_PAGES = ['about', 'categories', 'contact', 'contents', 'search',]
-TS_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
 
 
 def api_login_round1(username, password):
@@ -42,6 +44,8 @@ def api_login_round2(username, password, result):
     payload = {'lgname':username, 'lgpassword':password, 'lgtoken':result['token'],}
     cookies = {'%s_session' % result['cookieprefix']: result['sessionid'], 'domain':domain,}
     r = requests.post(url, data=payload, cookies=cookies)
+    if 'WrongPass' in r.text:
+        raise Exception('Bad MediaWiki API credentials')
     soup = BeautifulSoup(r.text)
     login = soup.find('login')
     result = {
@@ -87,7 +91,7 @@ def all_pages():
     if cached:
         pages = json.loads(cached)
         for page in pages:
-            page['timestamp'] = datetime.strptime(page['timestamp'], TS_FORMAT)
+            page['timestamp'] = datetime.strptime(page['timestamp'], mediawiki.TS_FORMAT)
     else:
         cookies = api_login()
         # all articles
@@ -315,7 +319,7 @@ def published_pages():
     if cached:
         pages = json.loads(cached)
         for page in pages:
-            page['timestamp'] = datetime.strptime(page['timestamp'], TS_FORMAT)
+            page['timestamp'] = datetime.strptime(page['timestamp'], mediawiki.TS_FORMAT_ZONED)
     else:
         pids = []  # published_article_ids
         for page in category_members('Published', namespace_id=namespaces_reversed()['Default']):

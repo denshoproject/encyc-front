@@ -1,5 +1,7 @@
 *.pyc
 *~
-settings.py
+front/settings.py
 pip-log.txt
+build
+env
 media

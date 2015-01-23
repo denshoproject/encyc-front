@@ -1,7 +1,7 @@
 {% extends "wikiprox/base.html" %}
 
 
-{% block title %}{{ title }}{% endblock %}
+{% block title %}{{ page.title }}{% endblock %}
 
 
 {% block contents %}
@@ -15,7 +15,7 @@
 &nbsp;|&nbsp; <a href="/search/">Search</a>
 </p>
 
-<h1 id="firstHeading" class="firstHeading">{{ title }}</h1>
+<h1 id="firstHeading" class="firstHeading">{{ page.title }}</h1>
 
 <div id="share">
 
@@ -26,7 +26,7 @@
 
 </div><!-- #share -->
 
-{{ bodycontent|safe }}
+{{ page.body|safe }}
 
 </div><!-- .span8 -->
 {% endblock contents %}
@@ -39,7 +39,7 @@
   <div class="block author-articles">
     <dl>
       <dt>By this author</dt>
-{% for article in author_articles %}
+{% for article in page.author_articles %}
         <dd>- <a href="/{{ article }}/">{{ article }}</a></dd>
 {% endfor %}
       </dl>

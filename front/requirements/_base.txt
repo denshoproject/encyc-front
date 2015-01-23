@@ -2,10 +2,16 @@
 # Install using pip: http://pip.openplans.org/
 # File format: http://pip.openplans.org/requirement-format.html
 
+# Non-Python dependencies
+# sudo apt-get install redis-server python2.7 supervisor
+
+
 Django==1.4
+django-redis==3.7.1
 gunicorn==0.14.3
 pykml==0.1.0
 python-memcached==1.48
+redis==2.10.3
 staticgenerator==1.4.1
 
 # wikiprox

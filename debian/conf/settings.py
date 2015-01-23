@@ -60,7 +60,7 @@ CACHE_MIDDLEWARE_ALIAS = 'default'
 CACHE_MIDDLEWARE_SECONDS = 60 * 15
 CACHE_MIDDLEWARE_KEY_PREFIX = 'front'
 # low-level caching
-CACHE_TIMEOUT = 60 * 1
+CACHE_TIMEOUT = 60 * 5
 
 STATIC_ROOT = '/usr/local/src/encyc-front/front/static/'
 STATIC_URL = 'http://encyclopedia.densho.org/front/static/'

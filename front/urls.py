@@ -31,6 +31,12 @@ urlpatterns = patterns(
     url(r'^search/$', direct_to_template, {'template': 'search.html'}),
     url(r'^terminology/$', direct_to_template, {'template': 'terminology.html'}),
     #
+    url(r'^es/articles/(?P<url_title>[\w\W]+)/$', 'wikiprox.views_es.article', name='wikiprox-es-article'),
+    url(r'^es/authors/(?P<url_title>[\w\W]+)/$', 'wikiprox.views_es.author', name='wikiprox-es-author'),
+    url(r'^es/authors/$', 'wikiprox.views_es.authors', name='wikiprox-es-authors'),
+    url(r'^es/categories/$', 'wikiprox.views_es.categories', name='wikiprox-es-categories'),
+    url(r'^es/contents/$', 'wikiprox.views_es.contents', name='wikiprox-es-contents'),
+    #
     url(r'^timeline/$', 'events.views.events', name='events-events'),
     #
     url(r'^locations-(?P<category>[\w]+).kml$', 'locations.views.locations_kml', name='locations-kml-category'),

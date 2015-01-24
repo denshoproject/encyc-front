@@ -34,9 +34,11 @@ class Wiki(object):
     """
     
     @staticmethod
-    def authors():
+    def authors(columnize=True):
         authors = [page['title'] for page in encyclopedia.published_authors()]
-        return _columnizer(authors, 4)
+        if columnize:
+            return _columnizer(authors, 4)
+        return authors
 
     @staticmethod
     def articles_by_category():

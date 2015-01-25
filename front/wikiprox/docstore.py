@@ -12,25 +12,28 @@ docstore.delete_index(HOSTS, INDEX)
 
 docstore.create_index(HOSTS, INDEX)
 
-doc_type = 'authors'
-authors = models.Wiki.authors(columnize=False)
-for title in authors:
-    print(title)
-    page = models.Page(title)
-    docstore.post(HOSTS, INDEX, doc_type, title, page.__dict__)
-
-doc_type = 'articles'
-contents = models.Wiki.contents()
+contents = models.Proxy().contents()
 titles = []
 import random
-while len(titles) < 10:
+NUM_ARTICLES = 100
+while len(titles) < NUM_ARTICLES:
     page = random.choice(contents)
     if not page['title'] in titles:
         titles.append(page['title'])
 
 for title in titles:
-    page = models.Page(title)
-    docstore.post(HOSTS, INDEX, doc_type, title, page.__dict__)
+    page = models.Proxy().page(title)
+    page_sources = [source['encyclopedia_id'] for source in page.sources]
+    for source in page.sources:
+        docstore.post(HOSTS, INDEX, 'sources', source['encyclopedia_id'], source)
+    page.sources = page_sources
+    docstore.post(HOSTS, INDEX, 'articles', title, page.__dict__)
+
+authors = models.Proxy().authors(columnize=False)
+for title in authors:
+    print(title)
+    page = models.Proxy().page(title)
+    docstore.post(HOSTS, INDEX, 'authors', title, page.__dict__)
 
 ------------------------------------------------------------------------
 """
@@ -136,6 +139,20 @@ def get(hosts, index, model, document_id, fields=None):
         return es.get(index=index, doc_type=model, id=document_id)
     return None
 
+def mget(hosts, index, model, document_ids, fields=None):
+    """
+    @param hosts: list of dicts containing host information.
+    @param index:
+    @param model:
+    @param document_ids: list
+    @param fields:
+    """
+    es = _get_connection(hosts)
+    body = {'ids': document_ids}
+    if fields is not None:
+        return es.mget(index=index, doc_type=model, body=body, fields=fields)
+    return es.mget(index=index, doc_type=model, body=body)
+    
 def _clean_dict(data):
     """Remove null or empty fields; ElasticSearch chokes on them.
     
@@ -214,47 +231,3 @@ def search(hosts, index, model='', query='', term={}, filters={}, sort=[], field
             fields=fields,
         )
     return results
-
-class Page(object):
-    pass
-
-def articles(hosts, index):
-    results = search(
-        hosts, index, model='articles',
-        term={}, filters={}, sort=[],
-        fields=['title', 'published'],
-        first=0, size=MAX_SIZE)
-    data = []
-    for hit in results['hits']['hits']:
-        data.append(hit['fields']['title'][0])
-    return data
-
-def contents(hosts, index):
-    titles = articles(hosts, index)
-    data = [
-        {'title': title, 'first_letter': title[0]}
-        for title in titles
-    ]
-    return data
-
-def article(hosts, index, title):
-    results = get(hosts, index, 'articles', title)
-    page = Page()
-    for key,val in results['_source'].iteritems():
-        setattr(page, key, val)
-    return page
-
-def authors(hosts, index):
-    results = search(
-        hosts, index, model='authors',
-        term={}, filters={}, sort=[],
-        fields=['title', 'public'],
-        first=0, size=MAX_SIZE)
-    data = []
-    for hit in results['hits']['hits']:
-        data.append(hit['fields']['title'][0])
-    return data
-
-def author(hosts, index, title):
-    results = get(hosts, index, 'authors', title)
-    return results['_source']

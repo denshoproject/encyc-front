@@ -27,6 +27,33 @@ def index(request, template_name='index.html'):
         context_instance=RequestContext(request)
     )
 
+def authors(request, template_name='wikiprox/authors.html'):
+    return render_to_response(
+        template_name,
+        {
+            'authors': models.Wiki.authors(),
+        },
+        context_instance=RequestContext(request)
+    )
+
+def categories(request, template_name='wikiprox/categories.html'):
+    return render_to_response(
+        template_name,
+        {
+            'articles_by_category': models.Wiki.articles_by_category(),
+        },
+        context_instance=RequestContext(request)
+    )
+
+def contents(request, template_name='wikiprox/contents.html'):
+    return render_to_response(
+        template_name,
+        {
+            'articles': models.Wiki.contents(),
+        },
+        context_instance=RequestContext(request)
+    )
+
 @require_http_methods(['GET',])
 def page(request, url_title='index', printed=False, template_name='wikiprox/page.html'):
     """
@@ -46,6 +73,21 @@ def page(request, url_title='index', printed=False, template_name='wikiprox/page
         template_name,
         {
             'page': page,
+        },
+        context_instance=RequestContext(request)
+    )
+
+@require_http_methods(['GET',])
+def source(request, encyclopedia_id, template_name='wikiprox/source.html'):
+    source = models.Source(encyclopedia_id)
+    if not source:
+        raise Http404
+    return render_to_response(
+        template_name,
+        {
+            'source': source,
+            'SOURCES_BASE': settings.SOURCES_BASE,
+            'rtmp_streamer': settings.RTMP_STREAMER,
         },
         context_instance=RequestContext(request)
     )
@@ -94,48 +136,6 @@ def media(request, filename, template_name='wikiprox/mediafile.html'):
         {
             'media_url': settings.TANSU_MEDIA_URL,
             'mediafile': mediafile,
-        },
-        context_instance=RequestContext(request)
-    )
-
-@require_http_methods(['GET',])
-def source(request, encyclopedia_id, template_name='wikiprox/source.html'):
-    source = models.Source(encyclopedia_id)
-    if not source:
-        raise Http404
-    return render_to_response(
-        template_name,
-        {
-            'source': source,
-            'SOURCES_BASE': settings.SOURCES_BASE,
-            'rtmp_streamer': settings.RTMP_STREAMER,
-        },
-        context_instance=RequestContext(request)
-    )
-
-def authors(request, template_name='wikiprox/authors.html'):
-    return render_to_response(
-        template_name,
-        {
-            'authors': models.Wiki.authors(),
-        },
-        context_instance=RequestContext(request)
-    )
-
-def categories(request, template_name='wikiprox/categories.html'):
-    return render_to_response(
-        template_name,
-        {
-            'articles_by_category': models.Wiki.articles_by_category(),
-        },
-        context_instance=RequestContext(request)
-    )
-
-def contents(request, template_name='wikiprox/contents.html'):
-    return render_to_response(
-        template_name,
-        {
-            'articles': models.Wiki.contents(),
         },
         context_instance=RequestContext(request)
     )

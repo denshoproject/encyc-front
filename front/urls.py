@@ -14,6 +14,7 @@ sitemaps = {
 urlpatterns = patterns(
     '',
     #url(r'^admin/', include(admin.site.urls)),
+    url(r'^api/0.1/urls-titles/$', 'wikiprox.views.api_contents', name='wikiprox-api-contents'),
     url(r'^crossdomain\.xml$', direct_to_template, {'template': 'crossdomain.xml'}),
     url(r'^qr/$', direct_to_template, {'template': 'qr.html'}, name='qr'),
     url(r'^robots\.txt$', direct_to_template, {'template': 'robots.txt'}),

@@ -173,6 +173,14 @@ class Proxy(object):
             articles_by_category.append( (category,titles) )
         return articles_by_category
     
+    def api_contents(self):
+        articles = {}
+        for page in encyclopedia.articles_a_z():
+            title = page['title']
+            url = reverse('wikiprox-page', args=([title]))
+            articles[url] = title
+        return articles
+    
     def contents(self):
         articles = [
             {'first_letter':page['sortkey'][0].upper(), 'title':page['title']}

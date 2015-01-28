@@ -47,6 +47,9 @@ class Author(object):
     def __str__(self):
         return self.title
 
+    def absolute_url(self):
+        return reverse('wikiprox-author', args=([self.title]))
+
 
 class Page(object):
     """Represents a MediaWiki page.
@@ -77,6 +80,9 @@ class Page(object):
     
     def __str__(self):
         return self.url_title
+    
+    def absolute_url(self):
+        return reverse('wikiprox-page', args=([self.title]))
 
 
 class Source(object):

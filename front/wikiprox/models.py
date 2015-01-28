@@ -306,14 +306,19 @@ class Elasticsearch(object):
             fields=['title', 'title_sort', 'categories',],
         )
         pages = []
+        bad = []
         for hit in results['hits']['hits']:
-            if hit['fields'].get('categories', None):
-                page = Page()
-                page.url_title = hit['fields']['title'][0]
-                page.title = hit['fields']['title'][0]
-                page.title_sort = hit['fields']['title_sort'][0]
-                page.categories = hit['fields']['categories']
-                pages.append(page)
+            # Don't crash if hit is empty
+            if hit.get('fields', None):
+                if hit['fields'].get('categories', None):
+                    page = Page()
+                    page.url_title = hit['fields']['title'][0]
+                    page.title = hit['fields']['title'][0]
+                    page.title_sort = hit['fields']['title_sort'][0]
+                    page.categories = hit['fields']['categories']
+                    pages.append(page)
+            else:
+                bad.append(hit)
         articles = sorted(pages, key=lambda page: page.title_sort)
         categories = {}
         for page in articles:
@@ -332,13 +337,18 @@ class Elasticsearch(object):
             fields=['title', 'title_sort',],
         )
         pages = []
+        bad = []
         for hit in results['hits']['hits']:
-            page = Page()
-            page.url_title = hit['fields']['title'][0]
-            page.title = hit['fields']['title'][0]
-            page.title_sort = hit['fields']['title_sort'][0]
-            page.first_letter = page.title_sort[0]
-            pages.append(page)
+            # Don't crash if hit is empty
+            if hit.get('fields', None):
+                page = Page()
+                page.url_title = hit['fields']['title'][0]
+                page.title = hit['fields']['title'][0]
+                page.title_sort = hit['fields']['title_sort'][0]
+                page.first_letter = page.title_sort[0]
+                pages.append(page)
+            else:
+                bad.append(hit)
         return sorted(pages, key=lambda page: page.title_sort)
 
     def authors(self, columnize=True):

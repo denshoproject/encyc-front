@@ -392,3 +392,34 @@ class Elasticsearch(object):
 
     def citation(self, page):
         return Citation(page)
+    
+    def index_articles(self, start=0, num=1000000):
+        print('Getting article titles')
+        titles = [page['title'] for page in Proxy().contents()]
+        posted = 0
+        could_not_post = []
+        for n,title in enumerate(titles):
+            if (posted < num) and (n > start):
+                print('%s/%s %s' % (n, len(titles), title))
+                page = Proxy().page(title)
+                if (page.published or settings.WIKIPROX_SHOW_UNPUBLISHED):
+                    page_sources = [source['encyclopedia_id'] for source in page.sources]
+                    for source in page.sources:
+                        print('     %s' % source['encyclopedia_id'])
+                        docstore.post(HOSTS, INDEX, 'sources', source['encyclopedia_id'], source)
+                    page.sources = page_sources
+                    docstore.post(HOSTS, INDEX, 'articles', title, page.__dict__)
+                    posted = posted + 1
+                    print('posted %s' % posted)
+                else:
+                    could_not_post.append(page)
+        if could_not_post:
+            print('Could not post these: %s' % could_not_post)
+    
+    def index_authors(self):
+        print('Getting authors')
+        titles = Proxy().authors(columnize=False)
+        for n,title in enumerate(titles):
+            print('%s/%s %s' % (n, len(titles), title))
+            page = Proxy().page(title)
+            docstore.post(HOSTS, INDEX, 'authors', title, page.__dict__)

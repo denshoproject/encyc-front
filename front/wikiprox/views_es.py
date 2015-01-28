@@ -65,8 +65,7 @@ def article(request, url_title='index', printed=False, template_name='wikiprox/p
     page = Backend().page(url_title)
     if not page:
         raise Http404
-    sources = [source.__dict__ for source in page.sources]
-    page.sources = sources
+    page.sources = [Backend().source(encyc_id).__dict__ for encyc_id in page.sources]
     if (not page.published) and (not settings.WIKIPROX_SHOW_UNPUBLISHED):
         template_name = 'wikiprox/unpublished.html'
     elif page.is_author:

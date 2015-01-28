@@ -150,6 +150,18 @@ def get(hosts, index, model, document_id, fields=None):
         return es.get(index=index, doc_type=model, id=document_id)
     return None
 
+def delete(hosts, index, model, document_id):
+    """
+    @param hosts: list of dicts containing host information.
+    @param index:
+    @param model:
+    @param document_id:
+    """
+    es = _get_connection(hosts)
+    if exists(hosts, index, model, document_id):
+        return es.delete(index=index, doc_type=model, id=document_id)
+    return None
+
 def mget(hosts, index, model, document_ids, fields=None):
     """
     @param hosts: list of dicts containing host information.

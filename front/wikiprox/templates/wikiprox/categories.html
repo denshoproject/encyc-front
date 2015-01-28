@@ -25,7 +25,7 @@
 <dt><h2>{{ category.0 }}</h2></dt>
 <dd>
 {% for article in category.1 %}
-<a href="/{{ article }}/">{{ article }}</a>{% if not forloop.last %},&nbsp;&nbsp;{% endif %}
+<a href="{{ article.absolute_url }}">{{ article.title }}</a>{% if not forloop.last %},&nbsp;&nbsp;{% endif %}
 {% endfor %}
 </dd>
 {% endfor %}

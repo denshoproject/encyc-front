@@ -61,7 +61,7 @@
     <dl><strong>
       <dt>Category</dt>
 {% for category in page.categories %}
-      <dd><a href="/categories/#{{ category }}">{{ category }}</a></dd>
+      <dd><a href="{% url wikiprox-categories %}#{{ category }}">{{ category }}</a></dd>
 {% endfor %}
     </strong></dl>
     <dl><strong>
@@ -73,7 +73,7 @@
     </strong></dl>
     <dl>
 {% if page.prev_page %}
-      <dt><a href="/{{ page.prev_page }}/">&laquo;&nbsp;Previous Article</a></dt>
+      <dt><a href="{% url wikiprox-page page.prev_page %}">&laquo;&nbsp;Previous Article</a></dt>
       <dd>{{ page.prev_page }}</dd>
 {% else %}
       <dt>&raquo; Previous Article</dt>
@@ -82,7 +82,7 @@
     </dl>
     <dl>
 {% if page.next_page %}
-      <dt><a href="/{{ page.next_page }}/">&raquo;&nbsp;Next Article</a></dt>
+      <dt><a href="{% url wikiprox-page page.next_page %}">&raquo;&nbsp;Next Article</a></dt>
       <dd>{{ page.next_page }}</dd>
 {% else %}
       <dt>&raquo; Next Article</dt>
@@ -120,7 +120,7 @@
   <strong>
   Category:
 {% for category in page.categories %}
-    <a href="/categories/#{{ category }}">{{ category }}</a>
+    <a href="{% url wikiprox-categories %}#{{ category }}">{{ category }}</a>
 {% endfor %}
   <br />
   Table of Contents:
@@ -129,13 +129,13 @@
   <br/>
 <table border="0">
 {% if page.prev_page %}<tr>
-    <td><a href="/{{ page.prev_page }}/">&laquo;&nbsp;Previous:</a></td>
+    <td><a href="{% url wikiprox-page page.prev_page %}">&laquo;&nbsp;Previous:</a></td>
     <td>
 {{ page.prev_page|truncatechars:40 }}
     </td>
   </tr>{% endif %}
 {% if page.next_page %}<tr>
-    <td><a href="/{{ page.next_page }}/">&raquo;&nbsp;Next:</a></td>
+    <td><a href="{% url wikiprox-page page.next_page %}">&raquo;&nbsp;Next:</a></td>
     <td>
 {{ page.next_page|truncatechars:40 }}
     </td>

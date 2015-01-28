@@ -367,6 +367,8 @@ class Elasticsearch(object):
 
     def page(self, url_title):
         results = docstore.get(HOSTS, INDEX, 'articles', url_title)
+        if not results:
+            return None
         page = Page()
         for key,val in results['_source'].iteritems():
             setattr(page, key, val)

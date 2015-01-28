@@ -361,14 +361,19 @@ class Elasticsearch(object):
         results = docstore.search(
             HOSTS, INDEX, model='authors',
             first=0, size=docstore.MAX_SIZE,
-            fields=['title', 'title_sort', 'public'],
+            fields=['url_title', 'title', 'title_sort', 'public'],
         )
         authors = []
         for hit in results['hits']['hits']:
-            author = Author()
-            author.title = hit['fields']['title'][0]
-            author.title_sort = hit['fields']['title_sort'][0]
-            authors.append(author)
+            url_title = hit['fields']['url_title'][0]
+            title = hit['fields']['title'][0]
+            title_sort = hit['fields']['title_sort'][0]
+            if title and title_sort:
+                author = Author()
+                author.url_title = url_title
+                author.title = title
+                author.title_sort = title_sort
+                authors.append(author)
         authors = sorted(authors, key=lambda a: a.title_sort)
         if columnize:
             return _columnizer(authors, 4)

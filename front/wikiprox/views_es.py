@@ -4,7 +4,7 @@ import requests
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.template import RequestContext
 from django.views.decorators.http import require_http_methods
@@ -50,10 +50,12 @@ def authors(request, template_name='wikiprox/authors.html'):
     )
 
 def author(request, url_title, template_name='wikiprox/author.html'):
+    author = Backend().author(url_title)
+    author.articles = [Backend().page(title) for title in author.author_articles]
     return render_to_response(
         template_name,
         {
-            'page': Backend().author(url_title),
+            'author': author,
         },
         context_instance=RequestContext(request)
     )
@@ -62,8 +64,17 @@ def author(request, url_title, template_name='wikiprox/author.html'):
 def article(request, url_title='index', printed=False, template_name='wikiprox/page.html'):
     """
     """
+    alt_title = url_title.replace('_', ' ')
     page = Backend().page(url_title)
     if not page:
+        page = Backend().page(alt_title)
+    if not page:
+        # might be an author
+        author_titles = [author.title for author in Backend().authors(columnize=False)]
+        if url_title in author_titles:
+            return HttpResponseRedirect(reverse('wikiprox-author', args=[url_title]))
+        elif alt_title in author_titles:
+            return HttpResponseRedirect(reverse('wikiprox-author', args=[alt_title]))
         raise Http404
     page.sources = [Backend().source(encyc_id).__dict__ for encyc_id in page.sources]
     if (not page.published) and (not settings.WIKIPROX_SHOW_UNPUBLISHED):

@@ -379,8 +379,21 @@ def find_author_info(text):
                 authors['display'].append(a.contents[0])
     for citation in soup.find_all('div', id='citationAuthor'):
         if hasattr(citation,'contents') and citation.contents:
+            names = []
             for n in citation.contents[0].split(';'):
-                surname,givenname = n.strip().split(',')
-                name = [surname.strip(), givenname.strip()]
+                if 'and' in n:
+                    for name in n.split('and'):
+                        names.append(name.strip())
+                else:
+                    names.append(n)
+            for n in names:
+                try:
+                    surname,givenname = n.strip().split(',')
+                    name = [surname.strip(), givenname.strip()]
+                except:
+                    name = [n,]
+                    print n
+                    print('mediawiki.find_author_info')
+                    print('ValueError: too many values to unpack')
                 authors['parsed'].append(name)
     return authors

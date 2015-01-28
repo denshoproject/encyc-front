@@ -8,32 +8,43 @@ INDEX = 'encyc-dev'
 from wikiprox import docstore
 from wikiprox import models
 
-docstore.delete_index(HOSTS, INDEX)
+#docstore.delete_index(HOSTS, INDEX)
+#docstore.create_index(HOSTS, INDEX)
 
-docstore.create_index(HOSTS, INDEX)
+def index_articles(hosts, index, start=0):
+    print('Getting article titles')
+    contents = models.Proxy().contents()
+    
+    #import random
+    #NUM_ARTICLES = 20
+    #newcontents = []
+    #while len(newcontents) < NUM_ARTICLES:
+    #    newcontents.append(random.choice(contents))
+    #contents = newcontents
+    
+    titles = [page['title'] for page in contents]
+    for n,title in enumerate(titles):
+        if n > start:
+            print('%s/%s %s' % (n, len(titles), title))
+            page = models.Proxy().page(title)
+            page_sources = [source['encyclopedia_id'] for source in page.sources]
+            for source in page.sources:
+                print('     %s' % source['encyclopedia_id'])
+                docstore.post(hosts, index, 'sources', source['encyclopedia_id'], source)
+            
+            page.sources = page_sources
+            docstore.post(hosts, index, 'articles', title, page.__dict__)
 
-contents = models.Proxy().contents()
-titles = []
-import random
-NUM_ARTICLES = 100
-while len(titles) < NUM_ARTICLES:
-    page = random.choice(contents)
-    if not page['title'] in titles:
-        titles.append(page['title'])
+def index_authors(hosts, index):
+    print('Getting authors')
+    titles = models.Proxy().authors(columnize=False)
+    for n,title in enumerate(titles):
+        print('%s/%s %s' % (n, len(titles), title))
+        page = models.Proxy().page(title)
+        docstore.post(HOSTS, INDEX, 'authors', title, page.__dict__)
 
-for title in titles:
-    page = models.Proxy().page(title)
-    page_sources = [source['encyclopedia_id'] for source in page.sources]
-    for source in page.sources:
-        docstore.post(HOSTS, INDEX, 'sources', source['encyclopedia_id'], source)
-    page.sources = page_sources
-    docstore.post(HOSTS, INDEX, 'articles', title, page.__dict__)
-
-authors = models.Proxy().authors(columnize=False)
-for title in authors:
-    print(title)
-    page = models.Proxy().page(title)
-    docstore.post(HOSTS, INDEX, 'authors', title, page.__dict__)
+index_articles(HOSTS, INDEX)
+index_authors(HOSTS, INDEX)
 
 ------------------------------------------------------------------------
 """

@@ -116,6 +116,8 @@ DANGO_HTPASSWD_PWD  = 'TODO'
 
 GOOGLE_CUSTOM_SEARCH_PASSWORD='TODO'
 
+DDR_TOPICS_BASE = 'http://ddr.densho.org/browse/topics'
+
 # ----------------------------------------------------------------------
 
 #STATICFILES_FINDERS = (

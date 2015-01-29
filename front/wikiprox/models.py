@@ -83,6 +83,13 @@ class Page(object):
     
     def absolute_url(self):
         return reverse('wikiprox-page', args=([self.title]))
+    
+    def topics(self):
+        terms = Elasticsearch().topics_by_url().get(self.absolute_url(), [])
+        for term in terms:
+            term['ddr_topic_url'] = '%s/%s/' % (
+                settings.DDR_TOPICS_BASE, term['id'])
+        return terms
 
 
 class Source(object):
@@ -403,7 +410,30 @@ class Elasticsearch(object):
         #    sources.append(source)
         #page.sources = sources
         return page
+    
+    def topics(self):
+        terms = []
+        results = docstore.get(HOSTS, INDEX, 'vocab', 'topics')
+        if results['_source']['terms']:
+            for term in results['_source']['terms']:
+                t = {
+                    'id': term['id'],
+                    'title': term['title'],
+                    '_title': term['_title'],
+                    'encyc_urls': term['encyc_urls'],
+                }
+                terms.append(t)
+        return terms
 
+    def topics_by_url(self):
+        terms = {}
+        for term in self.topics():
+            for url in term['encyc_urls']:
+                if not terms.get(url, None):
+                    terms[url] = []
+                terms[url].append(term)
+        return terms
+    
     def source(self, encyclopedia_id):
         results = docstore.get(HOSTS, INDEX, 'sources', encyclopedia_id)
         source = Source()
@@ -444,3 +474,8 @@ class Elasticsearch(object):
             print('%s/%s %s' % (n, len(titles), title))
             page = Proxy().page(title)
             docstore.post(HOSTS, INDEX, 'authors', title, page.__dict__)
+
+    def index_topics(self, path):
+        with open(path, 'r') as f:
+            topics = json.loads(f.read())
+        docstore.post(HOSTS, INDEX, 'vocab', 'topics', topics)

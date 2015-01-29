@@ -49,6 +49,19 @@
 
 </div><!-- #share -->
 
+
+{% if page.topics %}
+<div style="border:5px dashed orange; margin-top:10px; margin-bottom:10px;">
+  <h3>DDR Topics</h3>
+  <ul>
+  {% for term in page.topics %}
+    <li><a href="{{ term.ddr_topic_url }}">{{ term.title }}</a></li>
+  {% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+
 {{ page.body|safe }}
 
 </div><!-- #article .span8 -->

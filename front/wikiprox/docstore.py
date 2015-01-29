@@ -16,6 +16,10 @@ models.Elasticsearch().index_authors()
 
 IMPORTANT: To get links with DDR, make sure you upload vocab topics to this ES database.
 
+path = '/var/www/media/ddr/ddr/vocab/topics.json'
+from wikiprox import models
+models.Elasticsearch().index_topics(path)
+
 ------------------------------------------------------------------------
 """
 

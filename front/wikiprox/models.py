@@ -359,7 +359,7 @@ class Elasticsearch(object):
         results = docstore.search(
             HOSTS, INDEX, model='articles',
             first=0, size=docstore.MAX_SIZE,
-            fields=['title', 'title_sort',],
+            fields=['title', 'title_sort', 'lastmod',],
         )
         pages = []
         bad = []
@@ -371,6 +371,8 @@ class Elasticsearch(object):
                 page.title = hit['fields']['title'][0]
                 page.title_sort = hit['fields']['title_sort'][0]
                 page.first_letter = page.title_sort[0]
+                lastmod = hit['fields']['lastmod'][0]
+                page.lastmod = datetime.strptime(lastmod, mediawiki.TS_FORMAT)
                 pages.append(page)
             else:
                 bad.append(hit)
@@ -383,18 +385,20 @@ class Elasticsearch(object):
         results = docstore.search(
             HOSTS, INDEX, model='authors',
             first=0, size=docstore.MAX_SIZE,
-            fields=['url_title', 'title', 'title_sort', 'public'],
+            fields=['url_title', 'title', 'title_sort', 'lastmod'],
         )
         authors = []
         for hit in results['hits']['hits']:
             url_title = hit['fields']['url_title'][0]
             title = hit['fields']['title'][0]
             title_sort = hit['fields']['title_sort'][0]
+            lastmod = hit['fields']['lastmod'][0]
             if title and title_sort:
                 author = Author()
                 author.url_title = url_title
                 author.title = title
                 author.title_sort = title_sort
+                author.lastmod = datetime.strptime(lastmod, mediawiki.TS_FORMAT)
                 authors.append(author)
         authors = sorted(authors, key=lambda a: a.title_sort)
         if num_columns:

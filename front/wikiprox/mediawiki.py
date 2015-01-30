@@ -392,8 +392,8 @@ def find_author_info(text):
                     name = [surname.strip(), givenname.strip()]
                 except:
                     name = [n,]
-                    print n
-                    print('mediawiki.find_author_info')
-                    print('ValueError: too many values to unpack')
+                    logging.error(n)
+                    logging.error('mediawiki.find_author_info')
+                    logging.error('ValueError: too many values to unpack')
                 authors['parsed'].append(name)
     return authors

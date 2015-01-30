@@ -197,11 +197,23 @@ class Proxy(object):
         ]
         return articles
 
-    def authors(self, columnize=False):
-        authors = [page['title'] for page in encyclopedia.published_authors()]
+    def authors(self, cached_ok=True, columnize=False):
+        authors = [page['title'] for page in encyclopedia.published_authors(cached_ok=cached_ok)]
         if columnize:
             return _columnizer(authors, 4)
         return authors
+
+    def articles_lastmod(self):
+        """List of titles and timestamps for all published pages.
+        """
+        pages = [
+            {
+                'title': p['title'],
+                'lastmod': datetime.strptime(p['timestamp'], mediawiki.TS_FORMAT_ZONED)
+            }
+            for p in encyclopedia.published_pages(cached_ok=False)
+        ]
+        return pages
 
     def page(self, url_title, request=None):
         """

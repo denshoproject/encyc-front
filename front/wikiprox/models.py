@@ -197,7 +197,7 @@ class Proxy(object):
         ]
         return articles
 
-    def authors(self, columnize=True):
+    def authors(self, columnize=False):
         authors = [page['title'] for page in encyclopedia.published_authors()]
         if columnize:
             return _columnizer(authors, 4)
@@ -364,7 +364,10 @@ class Elasticsearch(object):
                 bad.append(hit)
         return sorted(pages, key=lambda page: page.title_sort)
 
-    def authors(self, columnize=True):
+    def authors(self, num_columns=0):
+        """
+        @param num_columns: int If non-zero, break up list into columns
+        """
         results = docstore.search(
             HOSTS, INDEX, model='authors',
             first=0, size=docstore.MAX_SIZE,
@@ -382,8 +385,8 @@ class Elasticsearch(object):
                 author.title_sort = title_sort
                 authors.append(author)
         authors = sorted(authors, key=lambda a: a.title_sort)
-        if columnize:
-            return _columnizer(authors, 4)
+        if num_columns:
+            return _columnizer(authors, num_columns)
         return authors
 
     def author(self, url_title):

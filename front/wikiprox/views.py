@@ -42,7 +42,7 @@ def authors(request, template_name='wikiprox/authors.html'):
     return render_to_response(
         template_name,
         {
-            'authors': Backend().authors(),
+            'authors': Backend().authors(num_columns=4),
         },
         context_instance=RequestContext(request)
     )

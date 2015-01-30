@@ -44,7 +44,7 @@ def authors(request, template_name='wikiprox/authors.html'):
     return render_to_response(
         template_name,
         {
-            'authors': Backend().authors(),
+            'authors': Backend().authors(num_columns=4),
         },
         context_instance=RequestContext(request)
     )
@@ -70,7 +70,7 @@ def article(request, url_title='index', printed=False, template_name='wikiprox/p
         page = Backend().page(alt_title)
     if not page:
         # might be an author
-        author_titles = [author.title for author in Backend().authors(columnize=False)]
+        author_titles = [author.title for author in Backend().authors()]
         if url_title in author_titles:
             return HttpResponseRedirect(reverse('wikiprox-author', args=[url_title]))
         elif alt_title in author_titles:

@@ -15,9 +15,6 @@ from wikiprox import encyclopedia
 from wikiprox import mediawiki
 from wikiprox import sources
 
-HOSTS = [{'host':'192.168.56.101', 'port':9200}]
-INDEX = 'encyc-dev'
-
 
 def _columnizer(things, cols):
     columns = []
@@ -298,7 +295,7 @@ class Contents:
     
     def __init__(self):
         results = docstore.search(
-            HOSTS, INDEX, model='articles',
+            settings.DOCSTORE_HOSTS, settings.DOCSTORE_INDEX, model='articles',
             first=0, size=docstore.MAX_SIZE,
             fields=['title', 'title_sort',],
         )
@@ -326,7 +323,7 @@ class Elasticsearch(object):
 
     def categories(self):
         results = docstore.search(
-            HOSTS, INDEX, model='articles',
+            settings.DOCSTORE_HOSTS, settings.DOCSTORE_INDEX, model='articles',
             first=0, size=docstore.MAX_SIZE,
             fields=['title', 'title_sort', 'categories',],
         )
@@ -357,7 +354,7 @@ class Elasticsearch(object):
     
     def articles(self):
         results = docstore.search(
-            HOSTS, INDEX, model='articles',
+            settings.DOCSTORE_HOSTS, settings.DOCSTORE_INDEX, model='articles',
             first=0, size=docstore.MAX_SIZE,
             fields=['title', 'title_sort', 'lastmod',],
         )
@@ -383,7 +380,7 @@ class Elasticsearch(object):
         @param num_columns: int If non-zero, break up list into columns
         """
         results = docstore.search(
-            HOSTS, INDEX, model='authors',
+            settings.DOCSTORE_HOSTS, settings.DOCSTORE_INDEX, model='authors',
             first=0, size=docstore.MAX_SIZE,
             fields=['url_title', 'title', 'title_sort', 'lastmod'],
         )
@@ -406,14 +403,20 @@ class Elasticsearch(object):
         return authors
 
     def author(self, url_title):
-        results = docstore.get(HOSTS, INDEX, 'authors', url_title)
+        results = docstore.get(
+            settings.DOCSTORE_HOSTS, settings.DOCSTORE_INDEX, 'authors',
+            url_title
+        )
         author = Author()
         for key,val in results['_source'].iteritems():
             setattr(author, key, val)
         return author
 
     def page(self, url_title):
-        results = docstore.get(HOSTS, INDEX, 'articles', url_title)
+        results = docstore.get(
+            settings.DOCSTORE_HOSTS, settings.DOCSTORE_INDEX, 'articles',
+            url_title
+        )
         if not results:
             return None
         page = Page()
@@ -421,7 +424,10 @@ class Elasticsearch(object):
             setattr(page, key, val)
         # sources
         #sources = []
-        #results = docstore.mget(HOSTS, INDEX, 'sources', page.sources)
+        #results = docstore.mget(
+        #    settings.DOCSTORE_HOSTS, settings.DOCSTORE_INDEX, 'sources',
+        #    page.sources
+        #)
         #for doc in results['docs']:
         #    source = Source()
         #    for key,val in doc['_source'].iteritems():
@@ -432,7 +438,10 @@ class Elasticsearch(object):
     
     def topics(self):
         terms = []
-        results = docstore.get(HOSTS, INDEX, 'vocab', 'topics')
+        results = docstore.get(
+            settings.DOCSTORE_HOSTS, settings.DOCSTORE_INDEX, 'vocab',
+            'topics'
+        )
         if results['_source']['terms']:
             for term in results['_source']['terms']:
                 t = {
@@ -454,7 +463,10 @@ class Elasticsearch(object):
         return terms
     
     def source(self, encyclopedia_id):
-        results = docstore.get(HOSTS, INDEX, 'sources', encyclopedia_id)
+        results = docstore.get(
+            settings.DOCSTORE_HOSTS, settings.DOCSTORE_INDEX, 'sources',
+            encyclopedia_id
+        )
         source = Source()
         for key,val in results['_source'].iteritems():
             setattr(source, key, val)
@@ -480,9 +492,15 @@ class Elasticsearch(object):
                     page_sources = [source['encyclopedia_id'] for source in page.sources]
                     for source in page.sources:
                         logging.debug('     %s' % source['encyclopedia_id'])
-                        docstore.post(HOSTS, INDEX, 'sources', source['encyclopedia_id'], source)
+                        docstore.post(
+                            settings.DOCSTORE_HOSTS, settings.DOCSTORE_INDEX, 'sources',
+                            source['encyclopedia_id'], source
+                        )
                     page.sources = page_sources
-                    docstore.post(HOSTS, INDEX, 'articles', title, page.__dict__)
+                    docstore.post(
+                        settings.DOCSTORE_HOSTS, settings.DOCSTORE_INDEX, 'articles',
+                        title, page.__dict__
+                    )
                     posted = posted + 1
                     logging.debug('posted %s' % posted)
                 else:
@@ -498,19 +516,28 @@ class Elasticsearch(object):
         for n,title in enumerate(titles):
             logging.debug('%s/%s %s' % (n, len(titles), title))
             page = Proxy().page(title)
-            docstore.post(HOSTS, INDEX, 'authors', title, page.__dict__)
+            docstore.post(
+                settings.DOCSTORE_HOSTS, settings.DOCSTORE_INDEX, 'authors',
+                title, page.__dict__
+            )
     
     def delete_articles(self, titles):
         results = []
         for title in titles:
-            r = docstore.delete(HOSTS, INDEX, 'articles', title)
+            r = docstore.delete(
+                settings.DOCSTORE_HOSTS, settings.DOCSTORE_INDEX, 'articles',
+                title
+            )
             results.append(r)
         return results
     
     def delete_authors(self, titles):
         results = []
         for title in titles:
-            r = docstore.delete(HOSTS, INDEX, 'authors', title)
+            r = docstore.delete(
+                settings.DOCSTORE_HOSTS, settings.DOCSTORE_INDEX, 'authors',
+                title
+            )
             results.append(r)
         return results
 
@@ -521,7 +548,10 @@ class Elasticsearch(object):
         """
         with open(path, 'r') as f:
             topics = json.loads(f.read())
-        docstore.post(HOSTS, INDEX, 'vocab', 'topics', topics)
+        docstore.post(
+            settings.DOCSTORE_HOSTS, settings.DOCSTORE_INDEX, 'vocab',
+            'topics', topics
+        )
     
     def articles_to_update(self, mw_authors, mw_articles, es_authors, es_articles):
         """Returns titles of articles to update and delete

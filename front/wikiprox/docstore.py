@@ -5,14 +5,12 @@ example walkthrough:
 HOSTS = [{'host':'192.168.56.101', 'port':9200}]
 INDEX = 'encyc-dev'
 
-from wikiprox import docstore
-from wikiprox import models
-
+#from wikiprox import docstore
 #docstore.delete_index(HOSTS, INDEX)
 #docstore.create_index(HOSTS, INDEX)
 
-models.Elasticsearch().index_articles(start=X, num=Y)
-models.Elasticsearch().index_authors()
+from wikiprox import models
+models.Elasticsearch().update_all()
 
 IMPORTANT: To get links with DDR, make sure you upload vocab topics to this ES database.
 

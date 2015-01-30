@@ -463,38 +463,148 @@ class Elasticsearch(object):
     def citation(self, page):
         return Citation(page)
     
-    def index_articles(self, start=0, num=1000000):
-        print('Getting article titles')
-        titles = [page['title'] for page in Proxy().contents()]
+    def index_articles(self, titles=[], start=0, num=1000000):
+        """
+        @param titles: list of url_titles to retrieve.
+        @param start: int Index of list at which to start.
+        @param num: int Number of articles to index, beginning at start.
+        @returns: (int num posted, list Articles that could not be posted)
+        """
         posted = 0
         could_not_post = []
         for n,title in enumerate(titles):
             if (posted < num) and (n > start):
-                print('%s/%s %s' % (n, len(titles), title))
+                logging.debug('%s/%s %s' % (n, len(titles), title))
                 page = Proxy().page(title)
                 if (page.published or settings.WIKIPROX_SHOW_UNPUBLISHED):
                     page_sources = [source['encyclopedia_id'] for source in page.sources]
                     for source in page.sources:
-                        print('     %s' % source['encyclopedia_id'])
+                        logging.debug('     %s' % source['encyclopedia_id'])
                         docstore.post(HOSTS, INDEX, 'sources', source['encyclopedia_id'], source)
                     page.sources = page_sources
                     docstore.post(HOSTS, INDEX, 'articles', title, page.__dict__)
                     posted = posted + 1
-                    print('posted %s' % posted)
+                    logging.debug('posted %s' % posted)
                 else:
                     could_not_post.append(page)
         if could_not_post:
-            print('Could not post these: %s' % could_not_post)
-    
-    def index_authors(self):
-        print('Getting authors')
-        titles = Proxy().authors(columnize=False)
+            logging.debug('Could not post these: %s' % could_not_post)
+        return posted,could_not_post
+        
+    def index_authors(self, titles=[]):
+        """
+        @param titles: list of url_titles to retrieve.
+        """
         for n,title in enumerate(titles):
-            print('%s/%s %s' % (n, len(titles), title))
+            logging.debug('%s/%s %s' % (n, len(titles), title))
             page = Proxy().page(title)
             docstore.post(HOSTS, INDEX, 'authors', title, page.__dict__)
+    
+    def delete_articles(self, titles):
+        results = []
+        for title in titles:
+            r = docstore.delete(HOSTS, INDEX, 'articles', title)
+            results.append(r)
+        return results
+    
+    def delete_authors(self, titles):
+        results = []
+        for title in titles:
+            r = docstore.delete(HOSTS, INDEX, 'authors', title)
+            results.append(r)
+        return results
 
     def index_topics(self, path):
+        """Upload topics.json; used for Encyc->DDR links on article pages.
+        
+        @param path: Absolute path to the topics.json file.
+        """
         with open(path, 'r') as f:
             topics = json.loads(f.read())
         docstore.post(HOSTS, INDEX, 'vocab', 'topics', topics)
+    
+    def articles_to_update(self, mw_authors, mw_articles, es_authors, es_articles):
+        """Returns titles of articles to update and delete
+        
+        >>> mw_authors = Proxy().authors(cached_ok=False)
+        >>> mw_articles = Proxy().articles_lastmod()
+        >>> es_authors = Elasticsearch().authors()
+        >>> es_articles = Elasticsearch().articles()
+        >>> results = Elasticsearch().articles_to_update(mw_authors, mw_articles, es_authors, es_articles)
+        >>> Elasticsearch().index_articles(titles=results['update'])
+        >>> Elasticsearch().delete_articles(titles=results['delete'])
+        
+        @param mw_authors: list Output of wikiprox.models.Proxy.authors_lastmod()
+        @param mw_articles: list Output of wikiprox.models.Proxy.articles_lastmod()
+        @param es_authors: list Output of wikiprox.models.Elasticsearch.authors()
+        @param es_articles: list Output of wikiprox.models.Elasticsearch.articles()
+        @returns: dict {'update':..., 'delete':...}
+        """
+        # filter out the authors
+        mw_lastmods = [
+            a for a in mw_articles
+            if a['title'] not in mw_authors
+        ]
+        es_pages = [a for a in es_articles if a.title not in es_authors]
+        
+        mw_titles = [a['title'] for a in mw_lastmods]
+        es_titles = [a.title for a in es_pages]
+        
+        new = [mwtitle for mwtitle in mw_titles if not mwtitle in es_titles]
+        deleted = [estitle for estitle in es_titles if not estitle in mw_titles]
+        
+        mw = {}  # so we don't loop on every es_article
+        for a in mw:
+            mw[a['title']] = a['lastmod']
+        updated = [
+            a for a in es_articles
+            if (a.title in mw.keys()) and (mw[a.title] > a.lastmod)
+        ]
+        return {
+            'update': new + updated,
+            'delete': deleted,
+        }
+    
+    def authors_to_update(self, mw_authors, es_authors):
+        """Returns titles of authors to add or delete
+        
+        Does not track updates because it's easy just to update them all.
+        
+        >>> mw_authors = Proxy().authors(cached_ok=False)
+        >>> es_authors = Elasticsearch().authors()
+        >>> results = Elasticsearch().articles_to_update(mw_authors, es_authors)
+        >>> Elasticsearch().index_authors(titles=results['update'])
+        >>> Elasticsearch().delete_authors(titles=results['delete'])
+        
+        @param mw_authors: list Output of wikiprox.models.Proxy.authors_lastmod()
+        @param es_authors: list Output of wikiprox.models.Elasticsearch.authors()
+        @returns: dict {'new':..., 'delete':...}
+        """
+        es_author_titles = [a.title for a in es_authors]
+        new = [title for title in mw_authors if title not in es_author_titles]
+        delete = [title for title in es_author_titles if title not in mw_authors]
+        return {
+            'new': new,
+            'delete': delete,
+        }
+
+    def update_all(self):
+        """Check with Proxy source and update authors and articles.
+        
+        IMPORTANT: Will lock if unable to connect to MediaWiki server!
+        """
+        # authors
+        mw_authors = Proxy().authors(cached_ok=False)
+        es_authors = self.authors()
+        results = self.authors_to_update(mw_authors, es_authors)
+        self.index_authors(titles=results['new'])
+        self.delete_authors(titles=results['delete'])
+        # articles
+        # authors need to be refreshed
+        mw_authors = Proxy().authors(cached_ok=False)
+        mw_articles = Proxy().articles_lastmod()
+        es_authors = self.authors()
+        es_articles = self.articles()
+        results = self.articles_to_update(mw_authors, mw_articles, es_authors, es_articles)
+        self.delete_articles(titles=results['delete'])
+        self.index_articles(titles=results['update'])

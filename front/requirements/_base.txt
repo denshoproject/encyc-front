@@ -8,6 +8,7 @@
 
 Django==1.4
 django-redis==3.7.1
+elasticsearch==1.2.0
 gunicorn==0.14.3
 pykml==0.1.0
 python-memcached==1.48

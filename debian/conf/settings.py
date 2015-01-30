@@ -116,6 +116,14 @@ DANGO_HTPASSWD_PWD  = 'TODO'
 
 GOOGLE_CUSTOM_SEARCH_PASSWORD='TODO'
 
+DDR_TOPICS_BASE = 'http://ddr.densho.org/browse/topics'
+
+DOCSTORE_HOSTS = [{
+    'host':'127.0.0.1',
+    'port':9200
+}]
+DOCSTORE_INDEX = 'encyc-production'
+
 # ----------------------------------------------------------------------
 
 #STATICFILES_FINDERS = (

@@ -4,19 +4,13 @@ import requests
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.template import RequestContext
 from django.views.decorators.http import require_http_methods
 
-from wikiprox.models import Proxy as Backend
+from wikiprox.models import Elasticsearch as Backend
 
-
-def api_contents(request, template_name='wikiprox/api-contents.html'):
-    return HttpResponse(
-        json.dumps(Backend().api_contents()),
-        content_type="application/json"
-    )
 
 @require_http_methods(['GET',])
 def index(request, template_name='index.html'):
@@ -27,10 +21,12 @@ def index(request, template_name='index.html'):
     )
 
 def categories(request, template_name='wikiprox/categories.html'):
+    categories = Backend().categories()
+    articles_by_category = [(key,val) for key,val in categories.iteritems()]
     return render_to_response(
         template_name,
         {
-            'articles_by_category': Backend().articles_by_category(),
+            'articles_by_category': articles_by_category,
         },
         context_instance=RequestContext(request)
     )
@@ -53,11 +49,34 @@ def authors(request, template_name='wikiprox/authors.html'):
         context_instance=RequestContext(request)
     )
 
+def author(request, url_title, template_name='wikiprox/author.html'):
+    author = Backend().author(url_title)
+    author.articles = [Backend().page(title) for title in author.author_articles]
+    return render_to_response(
+        template_name,
+        {
+            'author': author,
+        },
+        context_instance=RequestContext(request)
+    )
+
 @require_http_methods(['GET',])
-def page(request, url_title='index', printed=False, template_name='wikiprox/page.html'):
+def article(request, url_title='index', printed=False, template_name='wikiprox/page.html'):
+    """
+    """
+    alt_title = url_title.replace('_', ' ')
     page = Backend().page(url_title)
-    if page.error:
+    if not page:
+        page = Backend().page(alt_title)
+    if not page:
+        # might be an author
+        author_titles = [author.title for author in Backend().authors()]
+        if url_title in author_titles:
+            return HttpResponseRedirect(reverse('wikiprox-author', args=[url_title]))
+        elif alt_title in author_titles:
+            return HttpResponseRedirect(reverse('wikiprox-author', args=[alt_title]))
         raise Http404
+    page.sources = [Backend().source(encyc_id).__dict__ for encyc_id in page.sources]
     if (not page.published) and (not settings.WIKIPROX_SHOW_UNPUBLISHED):
         template_name = 'wikiprox/unpublished.html'
     elif page.is_author:

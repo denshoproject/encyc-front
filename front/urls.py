@@ -25,9 +25,6 @@ urlpatterns = patterns(
     url(r'^about/editorsmessage/embed/$', direct_to_template, {'template': 'editorsmessage-lightbox.html'}, name='editorsmessageembed'),
     url(r'^about/editorsmessage/$', direct_to_template, {'template': 'editorsmessage.html'}, name='editorsmessage'),
     url(r'^about/$', direct_to_template, {'template': 'about.html'}, name='about'),
-    url(r'^authors/$', 'wikiprox.views.authors', name='wikiprox-authors'),
-    url(r'^categories/$', 'wikiprox.views.categories', name='wikiprox-categories'),
-    url(r'^contents/$', 'wikiprox.views.contents', name='wikiprox-contents'),
     url(r'^history/$', direct_to_template, {'template': 'history.html'}),
     url(r'^search/$', direct_to_template, {'template': 'search.html'}),
     url(r'^terminology/$', direct_to_template, {'template': 'terminology.html'}),
@@ -39,15 +36,18 @@ urlpatterns = patterns(
     url(r'^map/(?P<category>[\w]+)/$', 'locations.views.locations', name='locations-category'),
     url(r'^map/$', 'locations.views.locations', name='locations-index'),
     #
-    url(r"^sources/(?P<encyclopedia_id>[\w .:_-]+)/$", 'wikiprox.views.source', name='wikiprox-source'),
-    #
     # temp cite functionality patch 2013-03-26 gf
     url(r'^citehelp/$', direct_to_template, {'template': 'citehelp.html'}, name='citehelp'),
     #
-    url(r"^cite/source/(?P<encyclopedia_id>[\w .:_-]+)/$", 'wikiprox.views.source_cite', name='wikiprox-source-cite'),
-    url(r"^cite/page/(?P<url_title>[\w\W]+)/$", 'wikiprox.views.page_cite', name='wikiprox-page-cite'),
+    url(r'^authors/$', 'wikiprox.views_es.authors', name='wikiprox-authors'),
+    url(r'^categories/$', 'wikiprox.views_es.categories', name='wikiprox-categories'),
+    url(r'^contents/$', 'wikiprox.views_es.contents', name='wikiprox-contents'),
+    url(r"^authors/(?P<url_title>[\w\W]+)/$", 'wikiprox.views_es.author', name='wikiprox-author'),
+    url(r"^cite/source/(?P<encyclopedia_id>[\w .:_-]+)/$", 'wikiprox.views_es.source_cite', name='wikiprox-source-cite'),
+    url(r"^sources/(?P<encyclopedia_id>[\w .:_-]+)/$", 'wikiprox.views_es.source', name='wikiprox-source'),
+    url(r"^cite/page/(?P<url_title>[\w\W]+)/$", 'wikiprox.views_es.page_cite', name='wikiprox-page-cite'),
+    url(r"^print/(?P<url_title>[\w\W]+)/$", 'wikiprox.views_es.article', {'printed':True}, name='wikiprox-page-print'),
+    url(r"^(?P<url_title>[\w\W]+)/$", 'wikiprox.views_es.article', name='wikiprox-page'),
     #
-    url(r"^print/(?P<url_title>[\w\W]+)/$", 'wikiprox.views.page', {'printed':True}, name='wikiprox-page-print'),
-    url(r"^(?P<url_title>[\w\W]+)/$", 'wikiprox.views.page', name='wikiprox-page'),
     url(r"^$", 'wikiprox.views.index', name='wikiprox-index'),
 )

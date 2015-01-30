@@ -26,7 +26,7 @@
 <dt><h2>{{ letter.grouper }}</h2></dt>
 <dd>
 {% for article in letter.list %}
-<a href="/{{ article.title }}/">{{ article.title }}</a>&nbsp;&nbsp;
+<a href="{{ article.absolute_url }}">{{ article.title }}</a>&nbsp;&nbsp;
 {% endfor %}
 </dd>
 {% endfor %}

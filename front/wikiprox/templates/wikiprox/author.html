@@ -15,7 +15,7 @@
 &nbsp;|&nbsp; <a href="/search/">Search</a>
 </p>
 
-<h1 id="firstHeading" class="firstHeading">{{ page.title }}</h1>
+<h1 id="firstHeading" class="firstHeading">{{ author.title }}</h1>
 
 <div id="share">
 
@@ -26,7 +26,7 @@
 
 </div><!-- #share -->
 
-{{ page.body|safe }}
+{{ author.body|safe }}
 
 </div><!-- .span8 -->
 {% endblock contents %}
@@ -35,12 +35,12 @@
 {% block sidebar_right %}
 <div id="sidebar-right" class="span4">
 
-{% if author_articles %}
+{% if author.articles %}
   <div class="block author-articles">
     <dl>
       <dt>By this author</dt>
-{% for article in page.author_articles %}
-        <dd>- <a href="/{{ article }}/">{{ article }}</a></dd>
+{% for article in author.articles %}
+        <dd>- <a href="{{ article.absolute_url }}">{{ article.title }}</a></dd>
 {% endfor %}
       </dl>
   </div><!-- .block .author-articles -->

@@ -91,7 +91,7 @@ def all_pages():
     if cached:
         pages = json.loads(cached)
         for page in pages:
-            page['timestamp'] = datetime.strptime(page['timestamp'], mediawiki.TS_FORMAT)
+            page['timestamp'] = datetime.strptime(page['timestamp'], mediawiki.TS_FORMAT_ZONED)
     else:
         cookies = api_login()
         # all articles
@@ -310,13 +310,14 @@ def page_categories(title, whitelist=[]):
         cache.set(cache_key, json.dumps(categories), settings.CACHE_TIMEOUT)
     return categories
 
-def published_pages():
+def published_pages(cached_ok=True):
     """Returns a list of *published* articles (pages), with timestamp of latest revision.
+    @param cached_ok: boolean Whether cached results are OK.
     """
     pages = []
     cache_key = make_cache_key('wikiprox:encyclopedia:published_pages')
     cached = cache.get(cache_key)
-    if cached:
+    if cached and cached_ok:
         pages = json.loads(cached)
         for page in pages:
             page['timestamp'] = datetime.strptime(page['timestamp'], mediawiki.TS_FORMAT_ZONED)
@@ -331,12 +332,13 @@ def published_pages():
         cache.set(cache_key, json.dumps(pages), settings.CACHE_TIMEOUT)
     return pages
 
-def published_authors():
+def published_authors(cached_ok=True):
     """Returns a list of *published* authors (pages), with timestamp of latest revision.
+    @param cached_ok: boolean Whether cached results are OK.
     """
     cache_key = make_cache_key('wikiprox:encyclopedia:published_authors')
     cached = cache.get(cache_key)
-    if cached:
+    if cached and cached_ok:
         published_authors = json.loads(cached)
     else:
         published_authors = []

@@ -41,7 +41,7 @@ bios and a list of entries they have contributed to the encyclopedia.</p>
 {% for column in authors %}
   <div class="span3">
 {% for author in column %}
-    <a href="/{{ author }}/">{{ author }}</a><br/>
+    <a href="{{ author.absolute_url }}">{{ author }}</a><br/>
 {% endfor %}
   </div>
 {% endfor %}
@@ -54,7 +54,7 @@ bios and a list of entries they have contributed to the encyclopedia.</p>
 <dt><h2>{{ letter.grouper }}</h2></dt>
 <dd>
 {% for authors in letter.list %}
-<a href="/{{ authors.title }}/">{{ authors.title }}</a>&nbsp;&nbsp;
+    <a href="{{ author.absolute_url }}">{{ author }}</a><br/>
 {% endfor %}
 </dd>
 {% endfor %}

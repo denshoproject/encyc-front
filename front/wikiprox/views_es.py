@@ -35,7 +35,7 @@ def contents(request, template_name='wikiprox/contents.html'):
     return render_to_response(
         template_name,
         {
-            'articles': Backend().contents(),
+            'articles': Backend().articles(),
         },
         context_instance=RequestContext(request)
     )

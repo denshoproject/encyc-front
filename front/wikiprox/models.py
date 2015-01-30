@@ -190,7 +190,7 @@ class Proxy(object):
             articles_by_category.append( (category,titles) )
         return articles_by_category
     
-    def contents(self):
+    def articles(self):
         articles = [
             {'first_letter':page['sortkey'][0].upper(), 'title':page['title']}
             for page in encyclopedia.articles_a_z()
@@ -343,7 +343,7 @@ class Elasticsearch(object):
                     categories[category].append(page)
         return categories
     
-    def contents(self):
+    def articles(self):
         results = docstore.search(
             HOSTS, INDEX, model='articles',
             first=0, size=docstore.MAX_SIZE,

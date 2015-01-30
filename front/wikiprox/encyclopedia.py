@@ -91,7 +91,7 @@ def all_pages():
     if cached:
         pages = json.loads(cached)
         for page in pages:
-            page['timestamp'] = datetime.strptime(page['timestamp'], mediawiki.TS_FORMAT)
+            page['timestamp'] = datetime.strptime(page['timestamp'], mediawiki.TS_FORMAT_ZONED)
     else:
         cookies = api_login()
         # all articles

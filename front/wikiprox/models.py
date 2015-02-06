@@ -539,16 +539,22 @@ class Elasticsearch(object):
             results.append(r)
         return results
 
-    def index_topics(self, path):
+    def index_topics(self, json_text=None, url=settings.DDR_TOPICS_SRC_URL):
         """Upload topics.json; used for Encyc->DDR links on article pages.
         
-        @param path: Absolute path to the topics.json file.
+        url = 'http://partner.densho.org/vocab/api/0.2/topics.json'
+        models.Elasticsearch().index_topics(url)
+        
+        @param json_text: unicode Raw topics.json file text.
+        @param url: URL of topics.json
         """
-        with open(path, 'r') as f:
-            topics = json.loads(f.read())
+        if url and not json_text:
+            r = requests.get(url)
+            if r.status_code == 200:
+                json_text = r.text
         docstore.post(
             settings.DOCSTORE_HOSTS, settings.DOCSTORE_INDEX, 'vocab',
-            'topics', topics
+            'topics', json.loads(json_text),
         )
     
     def articles_to_update(self, mw_authors, mw_articles, es_authors, es_articles):

@@ -116,6 +116,7 @@ DANGO_HTPASSWD_PWD  = 'TODO'
 
 GOOGLE_CUSTOM_SEARCH_PASSWORD='TODO'
 
+DDR_TOPICS_SRC_URL = 'http://partner.densho.org/vocab/api/0.2/topics.json'
 DDR_TOPICS_BASE = 'http://ddr.densho.org/browse/topics'
 
 DOCSTORE_HOSTS = [{

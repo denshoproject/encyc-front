@@ -2,7 +2,7 @@
 Add this to `/etc/crontab`:
 
     SHELL=/bin/bash
-    MIN *     * * *   ddr     cd /usr/local/src/encyc-front/front && /usr/local/src/encyc-front/front/env/bin/python /usr/local/src/encyc-front/front/manage.py encycupdate
+    MIN *     * * *   encyc     cd /usr/local/src/encyc-front/front && /usr/local/src/env/front/bin/python manage.py encycupdate
 
 """
 

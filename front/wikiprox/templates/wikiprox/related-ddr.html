@@ -1,0 +1,96 @@
+{% extends "wikiprox/base.html" %}
+
+
+
+{% block title %}{{ page.title|safe }} | Related Content{% endblock %}
+
+
+
+{% block contents %}
+<!-- wikiprox/source.html -->
+<!-- <div class="row"> -->
+  <div class="span12">
+
+<p>
+<a href="/{{ page.title|safe }}/">&laquo; Back to article {{ page.title|safe }}</a>
+</p>
+
+
+<h1 id="firstHeading" class="firstHeading">
+From the Densho Digital Repository
+</h1>
+
+<p>
+Related topics and primary source items from the <a href="http://ddr.densho.org/" target="_blank">Densho Digital Repository</a>.
+</p>
+
+{% if page.related_ddr %}
+<ul>
+{% for term in page.related_ddr %}
+  <li><a href="#{{ term.id }}">{{ term.title|safe }}</a></li>
+{% endfor %}
+</ul>
+{% endif %}
+
+  </div><!-- .span12 -->
+</div><!-- .row -->
+
+
+{% for term in page.related_ddr %}
+<a name="{{ term.id }}"></a>
+<div class="row">
+  <div class="span12">
+    <h2>{{ term.title|safe }}</h2>
+  </div><!-- .span12 -->
+</div><!-- .row -->
+
+{% for document in term.documents %}
+<div class="row">
+  <div class="span3">
+    <img class="img-responsive img-polaroid" src="{{ document.img_src }}">
+  </div>
+  <div class="span9">
+    <h4>{{ document.title|safe }}</h4>
+    {{ document.description|safe|truncatewords_html:50 }}
+    <br/>
+    <a class="more" href="{{ document.url }}">View in DDR &raquo;</a>
+  </div>
+</div>
+{% endfor %}
+<div class="row">
+  <div class="span3">
+    &nbsp;
+  </div>
+  <div class="span9">
+    <p>
+    <a class="more" href="#">See more items for "{{ term.title|safe }}" in the DDR &raquo;</a>
+    </p>
+  </div>
+</div><!-- .row -->
+{% empty %}
+<div class="row">
+  <div class="span12">
+
+    <p>
+    No related items in the DDR.
+    </p>
+
+</div>
+</div><!-- .row -->
+{% endfor %}
+
+
+<div class="row">
+  <div class="span12">
+
+{% if page.related_ddr %}
+<p>
+<a href="/{{ page.title }}/">&laquo; Back to article {{ page.title }}</a>
+</p>
+{% endif %}
+
+  </div><!-- .span12 -->
+<!-- </div> .row -->
+
+
+{% endblock contents %}

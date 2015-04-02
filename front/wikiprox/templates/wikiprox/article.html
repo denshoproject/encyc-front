@@ -50,18 +50,6 @@
 </div><!-- #share -->
 
 
-{% if page.topics %}
-<div style="border:5px dashed orange; margin-top:10px; margin-bottom:10px;">
-  <h3>DDR Topics</h3>
-  <ul>
-  {% for term in page.topics %}
-    <li><a href="{{ term.ddr_topic_url }}">{{ term.title }}</a></li>
-  {% endfor %}
-  </ul>
-</div>
-{% endif %}
-
-
 {{ page.body|safe }}
 
 </div><!-- #article .span8 -->
@@ -172,6 +160,19 @@
 
   <div class="toplink visible-phone"><a href="#top"><i class="icon-chevron-up"></i> Top</a></div>
 
+
+{% if page.topics %}
+<div style="border:5px dashed orange; margin-top:10px; margin-bottom:10px;">
+  <h3>DDR Topics</h3>
+  <ul>
+  {% for term in page.topics %}
+    <li><a href="{{ term.ddr_topic_url }}">{{ term.title }}</a></li>
+  {% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+
   <div class="block">
     <p>
     <strong>
@@ -194,6 +195,31 @@
   </div><!-- .block .primarysources -->
 
   <div class="toplink visible-phone"><a href="#top"><i class="icon-chevron-up"></i> Top</a></div>
+
+
+{% if page.related_ddr %}
+  <div class="block">
+    <p>
+    <strong>From the Densho Digital Repository</strong>
+    </p>
+    <p>
+{% for document in page.related_ddr %}
+    <a class="image lightview"
+      href="{{ document.img_src }}"
+      data-lightview-caption="{{ document.title }} ({{ document.id }})">
+    <img class="img-polaroid"
+      src="{{ document.img_src }}"
+      large="{{ document.img_src }}"
+      more=""
+      title="{{ document.title|safe }}"
+      alt="{{ document.title|safe }}" />
+    </a>
+{% endfor %}
+    <a href="/ddr/{{ page.title }}/" class="more">See more »</a>
+    </p>
+</div>
+{% endif %}
+
 
   <div class="block">
     <p>

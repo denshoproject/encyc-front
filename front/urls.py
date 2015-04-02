@@ -46,6 +46,7 @@ urlpatterns = patterns(
     url(r"^cite/source/(?P<encyclopedia_id>[\w .:_-]+)/$", 'wikiprox.views_es.source_cite', name='wikiprox-source-cite'),
     url(r"^sources/(?P<encyclopedia_id>[\w .:_-]+)/$", 'wikiprox.views_es.source', name='wikiprox-source'),
     url(r"^cite/page/(?P<url_title>[\w\W]+)/$", 'wikiprox.views_es.page_cite', name='wikiprox-page-cite'),
+    url(r"^ddr/(?P<url_title>[\w\W]+)/$", 'wikiprox.views_es.related_ddr', name='wikiprox-related-ddr'),
     url(r"^print/(?P<url_title>[\w\W]+)/$", 'wikiprox.views_es.article', {'printed':True}, name='wikiprox-page-print'),
     url(r"^(?P<url_title>[\w\W]+)/$", 'wikiprox.views_es.article', name='wikiprox-page'),
     #

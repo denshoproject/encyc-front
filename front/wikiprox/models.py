@@ -10,6 +10,7 @@ from django.core.urlresolvers import reverse
 from django.db import models
 
 from wikiprox import citations
+from wikiprox import ddr
 from wikiprox import docstore
 from wikiprox import encyclopedia
 from wikiprox import mediawiki
@@ -459,6 +460,15 @@ class Elasticsearch(object):
                     terms[url] = []
                 terms[url].append(term)
         return terms
+
+    def related_ddr(self, term_ids, balanced=False):
+        return ddr.related_by_topic(
+            hosts=settings.DDRPUBLIC_DOCSTORE_HOSTS,
+            index=settings.DDRPUBLIC_DOCSTORE_INDEX,
+            term_ids=term_ids,
+            size=5,
+            balanced=balanced
+        )
     
     def source(self, encyclopedia_id):
         results = docstore.get(

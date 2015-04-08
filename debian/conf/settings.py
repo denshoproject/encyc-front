@@ -125,13 +125,7 @@ DOCSTORE_HOSTS = [{
 }]
 DOCSTORE_INDEX = 'encyc-production'
 
-DDRPUBLIC_DOCSTORE_HOSTS = [{
-    'host':'192.168.0.31',
-    'port':9200
-}]
-DDRPUBLIC_DOCSTORE_INDEX = 'production'
-DDRPUBLIC_DOCUMENT_URL = 'http://ddr.densho.org'
-DDRPUBLIC_MEDIA_URL = 'http://ddr.densho.org/media'
+DDRPUBLIC_API = 'http://ddr.densho.org/api/0.1'
 
 # ----------------------------------------------------------------------
 

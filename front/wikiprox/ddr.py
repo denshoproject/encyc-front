@@ -13,7 +13,7 @@ def _term_documents(term_id, size):
     @param size: int Maximum number of results to return.
     @returns: list of dicts
     """
-    url = 'http://192.168.56.120/api/0.1/facet/topics/%s/objects/' % term_id
+    url = '%s/facet/topics/%s/objects/' % (settings.DDRPUBLIC_API, term_id)
     r = requests.get(url)
     if (r.status_code == 200) and ('json' in r.headers['content-type']):
         documents = r.json['results']

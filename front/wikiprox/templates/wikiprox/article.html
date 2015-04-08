@@ -205,11 +205,11 @@
     <p>
 {% for document in page.related_ddr %}
     <a class="image lightview"
-      href="{{ document.signature_url }}"
+      href="{{ document.img_url }}"
       data-lightview-caption="{{ document.title }} ({{ document.id }})">
     <img class="img-polaroid"
-      src="{{ document.signature_url }}"
-      large="{{ document.signature_url }}"
+      src="{{ document.img_url }}"
+      large="{{ document.img_url }}"
       more=""
       title="{{ document.title|safe }}"
       alt="{{ document.title|safe }}" />

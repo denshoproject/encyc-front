@@ -27,7 +27,9 @@ Related topics and primary source items from the <a href="http://ddr.densho.org/
 {% if page.related_ddr %}
 <ul>
 {% for term in page.related_ddr %}
+{% if term.documents %}
   <li><a href="#{{ term.id }}">{{ term.title|safe }}</a></li>
+{% endif %}
 {% endfor %}
 </ul>
 {% endif %}
@@ -37,6 +39,7 @@ Related topics and primary source items from the <a href="http://ddr.densho.org/
 
 
 {% for term in page.related_ddr %}
+{% if term.documents %}
 <a name="{{ term.id }}"></a>
 <div class="row">
   <div class="span12">
@@ -67,16 +70,7 @@ Related topics and primary source items from the <a href="http://ddr.densho.org/
     </p>
   </div>
 </div><!-- .row -->
-{% empty %}
-<div class="row">
-  <div class="span12">
-
-    <p>
-    No related items in the DDR.
-    </p>
-
-</div>
-</div><!-- .row -->
+{% endif %}{# term.documents #}
 {% endfor %}
 
 

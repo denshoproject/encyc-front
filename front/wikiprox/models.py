@@ -462,9 +462,10 @@ class Elasticsearch(object):
         return terms
 
     def related_ddr(self, term_ids, balanced=False):
+        """Get objects for terms from DDR.
+        Ironic: this uses DDR's REST UI rather than ES.
+        """
         return ddr.related_by_topic(
-            hosts=settings.DDRPUBLIC_DOCSTORE_HOSTS,
-            index=settings.DDRPUBLIC_DOCSTORE_INDEX,
             term_ids=term_ids,
             size=5,
             balanced=balanced

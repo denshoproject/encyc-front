@@ -47,13 +47,13 @@ Related topics and primary source items from the <a href="http://ddr.densho.org/
 {% for document in term.documents %}
 <div class="row">
   <div class="span3">
-    <img class="img-responsive img-polaroid" src="{{ document.img_src }}">
+    <a href="{{ document.absolute_url }}"><img class="img-responsive img-polaroid" src="{{ document.signature_url }}"></a>
   </div>
   <div class="span9">
     <h4>{{ document.title|safe }}</h4>
     {{ document.description|safe|truncatewords_html:50 }}
     <br/>
-    <a class="more" href="{{ document.url }}">View in DDR &raquo;</a>
+    <a class="more" href="{{ document.absolute_url }}">View in DDR &raquo;</a>
   </div>
 </div>
 {% endfor %}

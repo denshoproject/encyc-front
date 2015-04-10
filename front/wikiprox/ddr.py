@@ -16,7 +16,10 @@ def _term_documents(term_id, size):
     url = '%s/facet/topics/%s/objects/' % (settings.DDRPUBLIC_API, term_id)
     r = requests.get(url)
     if (r.status_code == 200) and ('json' in r.headers['content-type']):
-        documents = r.json['results']
+        if isinstance(r.json, dict):
+            documents = r.json['results']
+        elif isinstance(r.json, list):
+            documents = r.json
     else:
         documents = []
     return documents

@@ -32,9 +32,9 @@
 <h1 id="firstHeading" class="firstHeading">{{ page.title }}</h1>
 
 <div id="share">
-  <a href="{% url wikiprox-page-print page.title %}"><i class="icon-print"></i> Print</a>
+  <a href="{% url "wikiprox-page-print" page.title %}"><i class="icon-print"></i> Print</a>
   &nbsp;
-  <a href="{% url wikiprox-page-cite page.title %}"
+  <a href="{% url "wikiprox-page-cite" page.title %}"
      class="lightview"
      data-lightview-type="iframe"
      data-lightview-group="cite-header"
@@ -62,19 +62,19 @@
     <dl><strong>
       <dt>Category</dt>
 {% for category in page.categories %}
-      <dd><a href="{% url wikiprox-categories %}#{{ category }}">{{ category }}</a></dd>
+      <dd><a href="{% url "wikiprox-categories" %}#{{ category }}">{{ category }}</a></dd>
 {% endfor %}
     </strong></dl>
     <dl><strong>
       <dt>Table of Contents</dt>
       <dd>
-        <a href="{% url wikiprox-contents %}">A-Z</a><br/>
-        <a href="{% url wikiprox-categories %}">By Category</a><br/>
+        <a href="{% url "wikiprox-contents" %}">A-Z</a><br/>
+        <a href="{% url "wikiprox-categories" %}">By Category</a><br/>
       </dd>
     </strong></dl>
     <dl>
 {% if page.prev_page %}
-      <dt><a href="{% url wikiprox-page page.prev_page %}">&laquo;&nbsp;Previous Article</a></dt>
+      <dt><a href="{% url "wikiprox-page" page.prev_page %}">&laquo;&nbsp;Previous Article</a></dt>
       <dd>{{ page.prev_page }}</dd>
 {% else %}
       <dt>&raquo; Previous Article</dt>
@@ -83,7 +83,7 @@
     </dl>
     <dl>
 {% if page.next_page %}
-      <dt><a href="{% url wikiprox-page page.next_page %}">&raquo;&nbsp;Next Article</a></dt>
+      <dt><a href="{% url "wikiprox-page" page.next_page %}">&raquo;&nbsp;Next Article</a></dt>
       <dd>{{ page.next_page }}</dd>
 {% else %}
       <dt>&raquo; Next Article</dt>
@@ -91,8 +91,8 @@
 {% endif %}
     </dl>
     <p>
-    <a href="{% url wikiprox-page-print page.title %}"><i class="icon-print"></i> Printer-friendly</a><br/>
-  <a href="{% url wikiprox-page-cite page.title %}"
+    <a href="{% url "wikiprox-page-print" page.title %}"><i class="icon-print"></i> Printer-friendly</a><br/>
+  <a href="{% url "wikiprox-page-cite" page.title %}"
      class="lightview"
      data-lightview-type="iframe"
      data-lightview-options="width: 1000, height: '100%'">
@@ -121,22 +121,22 @@
   <strong>
   Category:
 {% for category in page.categories %}
-    <a href="{% url wikiprox-categories %}#{{ category }}">{{ category }}</a>
+    <a href="{% url "wikiprox-categories" %}#{{ category }}">{{ category }}</a>
 {% endfor %}
   <br />
   Table of Contents:
-  <a href="{% url wikiprox-contents %}">A-Z</a>
-  | <a href="{% url wikiprox-categories %}">By Category</a>
+  <a href="{% url "wikiprox-contents" %}">A-Z</a>
+  | <a href="{% url "wikiprox-categories" %}">By Category</a>
   <br/>
 <table border="0">
 {% if page.prev_page %}<tr>
-    <td><a href="{% url wikiprox-page page.prev_page %}">&laquo;&nbsp;Previous:</a></td>
+    <td><a href="{% url "wikiprox-page" page.prev_page %}">&laquo;&nbsp;Previous:</a></td>
     <td>
 {{ page.prev_page|truncatechars:40 }}
     </td>
   </tr>{% endif %}
 {% if page.next_page %}<tr>
-    <td><a href="{% url wikiprox-page page.next_page %}">&raquo;&nbsp;Next:</a></td>
+    <td><a href="{% url "wikiprox-page" page.next_page %}">&raquo;&nbsp;Next:</a></td>
     <td>
 {{ page.next_page|truncatechars:40 }}
     </td>

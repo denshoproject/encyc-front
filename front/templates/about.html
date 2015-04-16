@@ -21,13 +21,13 @@
           if (Modernizr.mq('screen and (min-width: 768px)')) {
               $('a#editorsmessagelink').each(function() {
                   $(this).addClass('lightview');
-                  $(this).attr({ href: '{% url editorsmessageembed %}' });
+                  $(this).attr({ href: '{% url "editorsmessageembed" %}' });
               });
           }
           else {
               $('a#editorsmessagelink').each(function() {
                   $(this).removeClass('lightview');
-                  $(this).attr({ href: '{% url editorsmessage %}' });
+                  $(this).attr({ href: '{% url "editorsmessage" %}' });
               });
           }
       }
@@ -91,7 +91,7 @@
 
 <p class="well" style="text-align:center;">
 <a id="editorsmessagelink"
-   href="{% url editorsmessage %}"
+   href="{% url "editorsmessage" %}"
    class=""
    data-lightview-type="iframe"
    data-lightview-group="editorsmessage"

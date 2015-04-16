@@ -1,3 +1,5 @@
+import requests
+
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, Http404
@@ -9,9 +11,15 @@ from events import backend as ev
 
 
 def events(request, template_name='events/events.html'):
-    events = ev.events()
+    try:
+        events = ev.events()
+        timeout = False
+    except requests.exceptions.Timeout:
+        events = []
+        timeout = True
     return render_to_response(
         template_name,
-        {'events': events,},
+        {'events': events,
+         'timeout': timeout,},
         context_instance=RequestContext(request)
     )

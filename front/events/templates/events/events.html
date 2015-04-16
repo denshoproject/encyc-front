@@ -19,6 +19,12 @@
 
 <h1 id="firstHeading" class="firstHeading">Timeline</h1>
 
+{% if timeout %}
+<div class="alert alert-danger">
+Could not get timeline data: HTTP request timed out.
+</div>
+{% endif %}
+
 <dl id="events">
 {% for event in events %}
   <dt>

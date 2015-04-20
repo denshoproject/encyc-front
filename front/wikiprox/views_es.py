@@ -84,7 +84,7 @@ def article(request, url_title='index', printed=False, template_name='wikiprox/p
     
     topic_term_ids = [term['id'] for term in page.topics()]
     try:
-        related_ddr = Backend().related_ddr(
+        page.related_ddr = Backend().related_ddr(
             topic_term_ids,
             balanced=True
         )

@@ -83,10 +83,15 @@ def article(request, url_title='index', printed=False, template_name='wikiprox/p
     ]
     
     topic_term_ids = [term['id'] for term in page.topics()]
-    related_ddr = Backend().related_ddr(
-        topic_term_ids,
-        balanced=True
-    )
+    try:
+        related_ddr = Backend().related_ddr(
+            topic_term_ids,
+            balanced=True
+        )
+        page.related_ddr_timeout = False
+    except requests.exceptions.ConnectionError as error:
+        page.related_ddr = []
+        page.related_ddr_error = error
     
     if (not page.published) and (not settings.WIKIPROX_SHOW_UNPUBLISHED):
         template_name = 'wikiprox/unpublished.html'

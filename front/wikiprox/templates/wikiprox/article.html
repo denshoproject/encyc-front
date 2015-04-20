@@ -219,6 +219,16 @@
     </p>
 </div>
 {% endif %}
+{% if page.related_ddr_error %}
+<div class="block" style="border:2px solid #cb6664; background-color:#F2DEDE; color:#A94442; padding:5px;">
+    <p>
+    <strong>
+    Could not get data from the DDR:<br/>
+    </strong>
+    {{ page.related_ddr_error }}
+    </p>
+</div>
+{% endif %}
 
 
   <div class="block">

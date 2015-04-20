@@ -74,6 +74,12 @@
       #text #legend, #text .location {
           padding-top: 10px;
       }
+      #error {
+          border: 2px solid #cb6664;
+          background-color: #F2DEDE;
+          color: #A94442;
+          padding:5px;
+      }
       #text .location {
           overflow-y: auto;
       }
@@ -179,6 +185,12 @@
 
   <div id="text">
 
+{% if timeout %}
+    <div id="error" style="display:block;">
+      Could not get location data: HTTP request timed out.
+    </div>
+{% endif %}
+
     <div id="legend" style="display:block;">
       <h2>
       <a id="legendflip" href="#">
@@ -205,7 +217,7 @@
 {% for location in locations %}
     <div id="{{ location.uid }}" class="location" style="display:none;">
       <h2 class="title">
-      <a href="{% url wikiprox-page location.location_uri %}">{{ location.title }}</a>
+      <a href="{% url "wikiprox-page" location.location_uri %}">{{ location.title }}</a>
       </h2>
       <p class="type">
       <b>Location</b>: {{ location.location_name }}<br/>
@@ -215,7 +227,7 @@
       {{ location.description }}
       </p>
       <p class="more">
-      <a href="{% url wikiprox-page location.location_uri %}">More info &raquo;</a>
+      <a href="{% url "wikiprox-page" location.location_uri %}">More info &raquo;</a>
       </p>
     </div>
 {% endfor %}

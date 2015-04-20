@@ -14,7 +14,7 @@ from wikiprox import make_cache_key
 
 
 def locations():
-    """Returns list of locations.
+    """Returns list of locations and a status message.
     """
     locations = []
     cache_key = make_cache_key('wikiprox:locations:locations')
@@ -23,9 +23,11 @@ def locations():
         locations = json.loads(cached)
     else:
         url = '%s/locations/' % settings.TANSU_API
-        r = requests.get(url, params={'limit':'1000'},
-                         headers={'content-type':'application/json'})
-        if r.status_code == 200:
+        r = requests.get(
+            url, params={'limit':'1000'},
+            headers={'content-type':'application/json'},
+            timeout=3)
+        if (r.status_code == 200) and ('json' in r.headers['content-type']):
             response = json.loads(r.text)
             for location in response['objects']:
                 locations.append(location)

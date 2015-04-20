@@ -125,6 +125,8 @@ DOCSTORE_HOSTS = [{
 }]
 DOCSTORE_INDEX = 'encyc-production'
 
+DDRPUBLIC_API = 'http://ddr.densho.org/api/0.1'
+
 # ----------------------------------------------------------------------
 
 #STATICFILES_FINDERS = (

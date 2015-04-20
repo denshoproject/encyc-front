@@ -10,6 +10,7 @@ from django.template import RequestContext
 from django.views.decorators.http import require_http_methods
 
 from wikiprox.models import Elasticsearch as Backend
+from wikiprox import ddr
 
 
 @require_http_methods(['GET',])
@@ -76,7 +77,22 @@ def article(request, url_title='index', printed=False, template_name='wikiprox/p
         elif alt_title in author_titles:
             return HttpResponseRedirect(reverse('wikiprox-author', args=[alt_title]))
         raise Http404
-    page.sources = [Backend().source(encyc_id).__dict__ for encyc_id in page.sources]
+    
+    page.sources = [
+        Backend().source(encyc_id).__dict__ for encyc_id in page.sources
+    ]
+    
+    topic_term_ids = [term['id'] for term in page.topics()]
+    try:
+        related_ddr = Backend().related_ddr(
+            topic_term_ids,
+            balanced=True
+        )
+        page.related_ddr_timeout = False
+    except requests.exceptions.ConnectionError as error:
+        page.related_ddr = []
+        page.related_ddr_error = error
+    
     if (not page.published) and (not settings.WIKIPROX_SHOW_UNPUBLISHED):
         template_name = 'wikiprox/unpublished.html'
     elif page.is_author:
@@ -136,6 +152,31 @@ def source_cite(request, encyclopedia_id, template_name='wikiprox/cite.html'):
         template_name,
         {
             'citation': citation,
+        },
+        context_instance=RequestContext(request)
+    )
+
+@require_http_methods(['GET',])
+def related_ddr(request, url_title='index', template_name='wikiprox/related-ddr.html'):
+    """
+    """
+    alt_title = url_title.replace('_', ' ')
+    page = Backend().page(url_title)
+    if not page:
+        page = Backend().page(alt_title)
+    
+    related = Backend().related_ddr(
+        [term['id'] for term in page.topics()]
+    )
+    page.related_ddr = []
+    for term in page.topics():
+        term['documents'] = related[term['id']]
+        page.related_ddr.append(term)
+    
+    return render_to_response(
+        template_name,
+        {
+            'page': page,
         },
         context_instance=RequestContext(request)
     )

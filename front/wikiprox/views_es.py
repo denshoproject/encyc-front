@@ -77,13 +77,17 @@ def article(request, url_title='index', printed=False, template_name='wikiprox/p
         elif alt_title in author_titles:
             return HttpResponseRedirect(reverse('wikiprox-author', args=[alt_title]))
         raise Http404
+    
     page.sources = [
         Backend().source(encyc_id).__dict__ for encyc_id in page.sources
     ]
-    page.related_ddr = Backend().related_ddr(
-        [term['id'] for term in page.topics()],
+    
+    topic_term_ids = [term['id'] for term in page.topics()]
+    related_ddr = Backend().related_ddr(
+        topic_term_ids,
         balanced=True
     )
+    
     if (not page.published) and (not settings.WIKIPROX_SHOW_UNPUBLISHED):
         template_name = 'wikiprox/unpublished.html'
     elif page.is_author:

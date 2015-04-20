@@ -1,9 +1,13 @@
 """front.ddr -- Links to the DDR REST API
 """
+import json
 
 import requests
 
 from django.conf import settings
+from django.core.cache import cache
+
+from wikiprox import make_cache_key
 
 
 def _term_documents(term_id, size):
@@ -13,16 +17,24 @@ def _term_documents(term_id, size):
     @param size: int Maximum number of results to return.
     @returns: list of dicts
     """
-    url = '%s/facet/topics/%s/objects/' % (settings.DDRPUBLIC_API, term_id)
-    r = requests.get(url)
-    if (r.status_code == 200) and ('json' in r.headers['content-type']):
-        if isinstance(r.json, dict):
-            documents = r.json['results']
-        elif isinstance(r.json, list):
-            documents = r.json
+    cache_key = make_cache_key('wikiprox:ddr:termdocs:%s:%s' % (term_id,size))
+    cached = cache.get(cache_key)
+    if cached:
+        objects = json.loads(cached)
     else:
-        documents = []
-    return documents
+        url = '%s/facet/topics/%s/objects/' % (settings.DDRPUBLIC_API, term_id)
+        r = requests.get(
+            url,
+            headers={'content-type':'application/json'},
+            timeout=3)
+        if ('json' in r.headers['content-type']):
+            data = json.loads(r.text)
+            if isinstance(data, dict):
+                objects = data['results']
+            elif isinstance(data, list):
+                objects = data
+        cache.set(cache_key, json.dumps(objects), settings.CACHE_TIMEOUT)
+    return objects
 
 def _balance(results, size):
     """cycle through term IDs taking one at a time until we have enough

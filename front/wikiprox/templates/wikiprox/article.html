@@ -1,4 +1,5 @@
 {% extends "wikiprox/base.html" %}
+{% load thumbnail %}
 {% load wikiprox_tags %}
 
 
@@ -204,16 +205,18 @@
     </p>
     <p>
 {% for document in page.related_ddr %}
+{% thumbnail document.img_url "400x400" as img %}
     <a class="image lightview"
-      href="{{ document.img_url }}"
+      href="{{ img }}"
       data-lightview-caption="{{ document.title }} ({{ document.id }})">
     <img class="img-polaroid"
-      src="{{ document.img_url }}"
-      large="{{ document.img_url }}"
+      src="{{ img }}"
+      large="{{ img }}"
       more=""
       title="{{ document.title|safe }}"
       alt="{{ document.title|safe }}" />
     </a>
+{% endthumbnail %}
 {% endfor %}
     <a href="/ddr/{{ page.title }}/" class="more">See more »</a>
     </p>

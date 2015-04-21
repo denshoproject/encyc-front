@@ -13,6 +13,7 @@ elasticsearch==1.4.0               # Apache   y
 gunicorn==19.3.0                   # MIT      y
 pykml==0.1.0                       # BSD      ???
 redis==2.10.3                      # MIT      y
+sorl-thumbnail==12.2               # BSD      y
 
 # wikiprox
 beautifulsoup4==4.3.2              # MIT      y

@@ -1,4 +1,5 @@
 {% extends "wikiprox/base.html" %}
+{% load thumbnail %}
 
 
 
@@ -48,9 +49,10 @@ Related topics and primary source items from the <a href="http://ddr.densho.org/
 </div><!-- .row -->
 
 {% for document in term.documents %}
+{% thumbnail document.img_url "400x400" as img %}
 <div class="row">
   <div class="span3">
-    <a href="{{ document.absolute_url }}"><img class="img-responsive img-polaroid" src="{{ document.img_url }}"></a>
+    <a href="{{ document.absolute_url }}"><img class="img-responsive img-polaroid" src="{{ img }}"></a>
   </div>
   <div class="span9">
     <h4>{{ document.title|safe }}</h4>
@@ -59,6 +61,7 @@ Related topics and primary source items from the <a href="http://ddr.densho.org/
     <a class="more" href="{{ document.absolute_url }}">View in DDR &raquo;</a>
   </div>
 </div>
+{% endthumbnail %}
 {% endfor %}
 <div class="row">
   <div class="span3">

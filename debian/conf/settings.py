@@ -85,6 +85,8 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     #'django.contrib.staticfiles',
     #
+    'sorl.thumbnail',
+    #
     'events',
     'locations',
     'wikiprox',

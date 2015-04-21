@@ -72,6 +72,7 @@ MEDIA_URL = 'http://encyclopedia.densho.org/front/media/'
 
 TEMPLATE_DIRS = (
     '/usr/local/src/encyc-front/front/templates/',
+    '/usr/local/src/encyc-front/front/wikiprox/templates/',
 )
 
 INSTALLED_APPS = (

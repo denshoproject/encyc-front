@@ -44,6 +44,9 @@ class Author(object):
     def __str__(self):
         return self.title
 
+    def api_url(self):
+        return reverse('wikiprox-api-author', args=([self.title]))
+
     def absolute_url(self):
         return reverse('wikiprox-author', args=([self.title]))
 
@@ -77,6 +80,9 @@ class Page(object):
     
     def __str__(self):
         return self.url_title
+    
+    def api_url(self):
+        return reverse('wikiprox-api-page', args=([self.title]))
     
     def absolute_url(self):
         return reverse('wikiprox-page', args=([self.title]))
@@ -126,6 +132,12 @@ class Source(object):
     
     def __str__(self):
         return self.encyclopedia_id
+    
+    def api_url(self):
+        return reverse('wikiprox-api-source', args=([self.encyclopedia_id]))
+    
+    def absolute_url(self):
+        return reverse('wikiprox-source', args=([self.encyclopedia_id]))
 
 
 class Citation(object):

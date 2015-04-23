@@ -22,7 +22,8 @@ def _term_documents(term_id, size):
     if cached:
         objects = json.loads(cached)
     else:
-        url = '%s/facet/topics/%s/objects/' % (settings.DDRPUBLIC_API, term_id)
+        url = '%s/facet/topics/%s/objects/?%s=1' % (
+            settings.DDRPUBLIC_API, term_id, settings.DDRPUBLIC_LOCAL_MEDIA_MARKER)
         r = requests.get(
             url,
             headers={'content-type':'application/json'},

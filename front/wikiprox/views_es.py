@@ -78,9 +78,15 @@ def article(request, url_title='index', printed=False, template_name='wikiprox/p
             return HttpResponseRedirect(reverse('wikiprox-author', args=[alt_title]))
         raise Http404
     
+    source_ids = page.sources
     page.sources = [
-        Backend().source(encyc_id).__dict__ for encyc_id in page.sources
+        Backend().source(source_id).__dict__ for source_id in source_ids
     ]
+    # sorl.thumbnail-friendly URL
+    for source in page.sources:
+        source['img_url'] = source['display'].replace(
+            settings.TANSU_MEDIA_URL,
+            settings.TANSU_MEDIA_URL_LOCAL)
     
     topic_term_ids = [term['id'] for term in page.topics()]
     try:

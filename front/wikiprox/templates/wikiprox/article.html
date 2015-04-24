@@ -206,12 +206,12 @@
     <p>
 {% for document in page.related_ddr %}
 {% thumbnail document.img_url "400x400" as img %}
-    <a class="image lightview"
-      href="{{ img }}"
+<a class="image lightview"
+      href="{{ THUMBNAIL_URL }}{{ img }}"
       data-lightview-caption="{{ document.title }} ({{ document.id }})">
     <img class="img-polaroid"
-      src="{{ img }}"
-      large="{{ img }}"
+      src="{{ THUMBNAIL_URL }}{{ img }}"
+      large="{{ THUMBNAIL_URL }}{{ img }}"
       more=""
       title="{{ document.title|safe }}"
       alt="{{ document.title|safe }}" />

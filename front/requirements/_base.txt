@@ -3,7 +3,7 @@
 # File format: http://pip.openplans.org/requirement-format.html
 
 # Non-Python dependencies
-# sudo apt-get install redis-server python2.7 supervisor
+# sudo apt-get install imagemagick libjpeg8-dev python2.7 redis-server supervisor
 
 
 Django==1.8                        # MIT      y

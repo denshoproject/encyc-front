@@ -105,6 +105,7 @@ def article(request, url_title='index', printed=False, template_name='wikiprox/p
         template_name,
         {
             'page': page,
+            'THUMBNAIL_URL': settings.THUMBNAIL_URL,
         },
         context_instance=RequestContext(request)
     )
@@ -177,6 +178,7 @@ def related_ddr(request, url_title='index', template_name='wikiprox/related-ddr.
         template_name,
         {
             'page': page,
+            'THUMBNAIL_URL': settings.THUMBNAIL_URL,
         },
         context_instance=RequestContext(request)
     )

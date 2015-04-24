@@ -66,7 +66,7 @@ STATIC_ROOT = '/usr/local/src/encyc-front/front/static/'
 STATIC_URL = 'http://encyclopedia.densho.org/front/static/'
 #STATIC_URL = 'http://localhost:8000/static/'
 
-MEDIA_ROOT = '/usr/local/src/encyc-front/front/media/'
+MEDIA_ROOT = '/var/www/front/media/'
 MEDIA_URL = 'http://encyclopedia.densho.org/front/media/'
 #MEDIA_URL = 'http://localhost:8000/media/'
 
@@ -131,6 +131,16 @@ DOCSTORE_INDEX = 'encyc-production'
 
 DDRPUBLIC_API = 'http://ddr.densho.org/api/0.1'
 DDRPUBLIC_LOCAL_MEDIA_MARKER = 'internal'
+
+# sorl-thumbnail
+THUMBNAIL_KVSTORE = 'sorl.thumbnail.kvstores.cached_db_kvstore.KVStore'
+THUMBNAIL_ENGINE = 'sorl.thumbnail.engines.convert_engine.Engine'
+THUMBNAIL_CONVERT = 'convert'
+THUMBNAIL_IDENTIFY = 'identify'
+THUMBNAIL_CACHE_TIMEOUT = 60*60*24*365*10  # 10 years
+THUMBNAIL_DUMMY = False
+THUMBNAIL_URL_TIMEOUT = 60  # 1min
+THUMBNAIL_URL = 'http://encyclopedia.densho.org/media/'
 
 # ----------------------------------------------------------------------
 

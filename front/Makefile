@@ -125,7 +125,7 @@ clean-front: clean-encyc-front
 install-encyc-front:
 	@echo ""
 	@echo "encyc-front --------------------------------------------------------------"
-	apt-get --assume-yes install imagemagick libxml2 libxslt1.1 libxslt1-dev python-dev python-virtualenv supervisor
+	apt-get --assume-yes install imagemagick libjpeg8-dev libxml2 libxslt1.1 libxslt1-dev python-dev python-virtualenv supervisor
 # 	test -d $(VIRTUALENV) || virtualenv $(VIRTUALENV)
 # 	source $(VIRTUALENV)/bin/activate
 	pip install -U --download-cache=$(PIP_CACHE_DIR) setuptools
@@ -137,7 +137,7 @@ install-encyc-front:
 	-mkdir /var/lib/encyc
 	chown -R encyc.root /var/lib/encyc
 	chmod -R 755 /var/lib/encyc
-	-mkdir -p /var/www/front
+	-mkdir -p /var/www/front/media
 	chown -R encyc.root /var/www/front
 	chmod -R 755 /var/www/front
 

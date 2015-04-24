@@ -1,18 +1,11 @@
 from django.conf import settings
-from django.core.urlresolvers import reverse
 
 from rest_framework import status
 from rest_framework.decorators import api_view
+from rest_framework.reverse import reverse
 from rest_framework.response import Response
 
 from wikiprox.models import Elasticsearch as Backend
-
-
-def http_host(request):
-    return 'http://%s' % request.META['HTTP_HOST']
-
-def makeurl(request, uri):
-    return '%s%s' % (http_host(request), uri)
 
 
 @api_view(['GET'])
@@ -22,7 +15,7 @@ def articles(request, format=None):
     data = [
         {
             'title': article.title,
-            'url': makeurl(request, article.api_url()),
+            'url': reverse('wikiprox-api-page', args=([article.url_title]), request=request),
         }
         for article in Backend().articles()
     ]
@@ -36,7 +29,7 @@ def article(request, url_title, format=None):
     if not page:
         return Response(status=status.HTTP_404_NOT_FOUND)
     sources = [
-        makeurl(request, reverse('wikiprox-api-source', args=([encyc_id])))
+        reverse('wikiprox-api-source', args=([encyc_id]), request=request)
         for encyc_id in page.sources
     ]
     topic_term_ids = [
@@ -44,17 +37,17 @@ def article(request, url_title, format=None):
         for term in page.topics()
     ]
     categories = [
-        makeurl(request, reverse('wikiprox-api-category', args=([category])))
+        reverse('wikiprox-api-category', args=([category]), request=request)
         for category in page.categories
     ]
     author_articles = [
-        makeurl(request, reverse('wikiprox-api-page', args=([title])))
+        reverse('wikiprox-api-page', args=([title]), request=request)
         for title in page.author_articles
     ]
     data = {
         'url_title': page.url_title,
-        'url': makeurl(request, page.api_url()),
-        'absolute_url': makeurl(request, page.api_url()),
+        'url': reverse('wikiprox-api-page', args=([page.url_title]), request=request),
+        'absolute_url': reverse('wikiprox-page', args=([page.url_title]), request=request),
         'lastmod': page.lastmod,
         'title_sort': page.title_sort,
         'title': page.title,
@@ -62,8 +55,8 @@ def article(request, url_title, format=None):
         'categories': categories,
         'author_articles': author_articles,
         'coordinates': page.coordinates,
-        'prev_page': makeurl(request, reverse('wikiprox-api-page', args=([page.prev_page]))),
-        'next_page': makeurl(request, reverse('wikiprox-api-page', args=([page.next_page]))),
+        'prev_page': reverse('wikiprox-api-page', args=([page.prev_page]), request=request),
+        'next_page': reverse('wikiprox-api-page', args=([page.next_page]), request=request),
         'sources': sources,
         'ddr_topic_terms': topic_term_ids,
     }
@@ -78,7 +71,7 @@ def authors(request, format=None):
         {
             'title': author.title,
             'title_sort': author.title_sort,
-            'url': makeurl(request, author.api_url()),
+            'url': reverse('wikiprox-api-author', args=([author.url_title]), request=request),
         }
         for author in sorted(
             Backend().authors(),
@@ -95,7 +88,7 @@ def author(request, url_title, format=None):
     articles = [
         {
             'title': article.title,
-            'url': makeurl(request, article.api_url()),
+            'url': reverse('wikiprox-api-page', args=([article.url_title]), request=request),
         }
         for article in [
             Backend().page(t) for t in author.author_articles
@@ -103,8 +96,8 @@ def author(request, url_title, format=None):
     ]
     data = {
         'url_title': author.url_title,
-        'url': makeurl(request, author.api_url()),
-        'absolute_url': makeurl(request, author.absolute_url()),
+        'url': reverse('wikiprox-api-author', args=([author.url_title]), request=request),
+        'absolute_url': reverse('wikiprox-author', args=([author.url_title]), request=request),
         'title': author.title,
         'title_sort': author.title_sort,
         'body': author.body,
@@ -148,8 +141,8 @@ def source(request, encyclopedia_id, format=None):
         'psms_id': source.psms_id,
         'densho_id': source.densho_id,
         'institution_id': source.institution_id,
-        'url': makeurl(request, source.api_url()),
-        'absolute_url': makeurl(request, source.absolute_url()),
+        'url': reverse('wikiprox-api-source', args=([source.encyclopedia_id]), request=request),
+        'absolute_url': reverse('wikiprox-source', args=([source.encyclopedia_id]), request=request),
         'streaming_url': source.streaming_url,
         'external_url': source.external_url,
         'original': source.original,

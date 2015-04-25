@@ -46,8 +46,11 @@ def _balance(results, size):
     @param results: dict of search results keyed to term IDs.
     @param size: int Maximum number of results to return.
     """
+    if not results:
+        return []
+    limit = min([size, len(results.keys())])
     round1 = []
-    while(len(round1) < size):
+    while(len(round1) < limit):
         for tid in results.iterkeys():
             doc = None
             if results[tid]:

@@ -39,8 +39,7 @@ def published_sources():
         r = requests.get(url, headers={'content-type':'application/json'})
         if r.status_code == 200:
             response = json.loads(r.text)
-            for source in response['objects']:
-                sources.append(source)
+            sources = [source for source in response['objects']]
         cache.set(cache_key, json.dumps(sources), settings.CACHE_TIMEOUT)
     return sources
 

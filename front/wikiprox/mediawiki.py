@@ -262,9 +262,7 @@ def find_primary_sources(api_url, images):
             eids.append(encyclopedia_id)
     # get sources via sources API
     if eids:
-        eid_args = []
-        for eid in eids:
-            eid_args.append('encyclopedia_id__in=%s' % eid)
+        eid_args = ['encyclopedia_id__in=%s' % eid for eid in eids]
         url = '%s/primarysource/?%s' % (api_url, '&'.join(eid_args))
         r = requests.get(url, headers={'content-type':'application/json'})
         if r.status_code == 200:
@@ -290,9 +288,7 @@ def remove_primary_sources(soup, sources):
     """
     # all the <a><img>s
     contexts = []
-    sources_keys = []
-    for s in sources:
-        sources_keys.append(s['encyclopedia_id'])
+    sources_keys = [s['encyclopedia_id'] for s in sources]
     for a in soup.find_all('a', attrs={'class':'image'}):
         encyclopedia_id = extract_encyclopedia_id(a.img['src'])
         href = None

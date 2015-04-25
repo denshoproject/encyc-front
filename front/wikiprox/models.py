@@ -445,14 +445,15 @@ class Elasticsearch(object):
             'topics'
         )
         if results['_source']['terms']:
-            for term in results['_source']['terms']:
-                t = {
+            terms = [
+                {
                     'id': term['id'],
                     'title': term['title'],
                     '_title': term['_title'],
                     'encyc_urls': term['encyc_urls'],
                 }
-                terms.append(t)
+                for term in results['_source']['terms']
+            ]
         return terms
 
     def topics_by_url(self):

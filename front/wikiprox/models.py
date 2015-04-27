@@ -259,6 +259,7 @@ class Proxy(object):
                 page.sources = sources.replace_source_urls(page.sources, request)
             page.is_article = encyclopedia.is_article(page.title)
             if page.is_article:
+                # TODO be better at removing non-public categories
                 page.categories = [
                     c['*'] for c in pagedata['parse']['categories']
                     if not c.has_key('hidden')]
@@ -347,11 +348,13 @@ class Elasticsearch(object):
         categories = {}
         for page in articles:
             for category in page.categories:
-                if category not in categories.keys():
-                    categories[category] = []
-                # pages already sorted so category lists will be sorted
-                if page not in categories[category]:
-                    categories[category].append(page)
+                # exclude internal editorial categories
+                if category not in settings.WIKIPROX_HIDDEN_CATEGORIES:
+                    if category not in categories.keys():
+                        categories[category] = []
+                    # pages already sorted so category lists will be sorted
+                    if page not in categories[category]:
+                        categories[category].append(page)
         return categories
     
     def articles(self):
@@ -424,6 +427,13 @@ class Elasticsearch(object):
         page = Page()
         for key,val in results['_source'].iteritems():
             setattr(page, key, val)
+        # remove page elements for internal editorial use only
+        categories = [
+            category
+            for category in page.categories
+            if category not in settings.WIKIPROX_HIDDEN_CATEGORIES
+        ]
+        page.categories = categories
         # sources
         #sources = []
         #results = docstore.mget(

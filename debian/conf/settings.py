@@ -105,6 +105,14 @@ WIKIPROX_MEDIAWIKI_API_PASSWORD = 'TODO'
 WIKIPROX_MEDIAWIKI_DEFAULT_PAGE = 'Encyclopedia'
 WIKIPROX_MEDIAWIKI_TITLE = ' - Densho Encyclopedia'
 WIKIPROX_SHOW_UNPUBLISHED = False
+WIKIPROX_HIDDEN_CATEGORIES = (
+    'Articles_Needing_Primary_Source_Video',
+    'CAL60',
+    'In_Camp',
+    'NeedMoreInfo',
+    'Status_2',
+    'Status_3',
+)
 #EDITORS_MEDIAWIKI_USER = 'denshowiki'
 #EDITORS_MEDIAWIKI_PASS = 'TODO'
 TANSU_API  = 'http://dango:8080/api/v1.0'

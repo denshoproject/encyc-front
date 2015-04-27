@@ -12,6 +12,10 @@ from django.views.decorators.http import require_http_methods
 from wikiprox.models import Elasticsearch as Backend
 from wikiprox import ddr
 
+if not settings.DEBUG:
+    from bs4 import BeautifulSoup
+    from wikiprox.mediawiki import remove_status_markers
+
 
 @require_http_methods(['GET',])
 def index(request, template_name='index.html'):
@@ -53,6 +57,11 @@ def authors(request, template_name='wikiprox/authors.html'):
 def author(request, url_title, template_name='wikiprox/author.html'):
     author = Backend().author(url_title)
     author.articles = [Backend().page(title) for title in author.author_articles]
+
+    # remove internal editorial markers
+    # TODO this should really be part of the Page model or the indexer.
+    if not settings.DEBUG:
+        author.body = unicode(remove_status_markers(BeautifulSoup(author.body)))
     return render_to_response(
         template_name,
         {
@@ -77,6 +86,11 @@ def article(request, url_title='index', printed=False, template_name='wikiprox/p
         elif alt_title in author_titles:
             return HttpResponseRedirect(reverse('wikiprox-author', args=[alt_title]))
         raise Http404
+
+    # remove internal editorial markers
+    # TODO this should really be part of the Page model or the indexer.
+    if not settings.DEBUG:
+        page.body = unicode(remove_status_markers(BeautifulSoup(page.body)))
     
     source_ids = page.sources
     page.sources = [

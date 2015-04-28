@@ -3,6 +3,7 @@ import json
 import logging
 logger = logging.getLogger(__name__)
 
+from elasticsearch_dsl import Search
 import requests
 
 from django.conf import settings
@@ -325,25 +326,24 @@ class Elasticsearch(object):
     """
 
     def categories(self):
-        results = docstore.search(
-            settings.DOCSTORE_HOSTS, settings.DOCSTORE_INDEX, model='articles',
-            first=0, size=docstore.MAX_SIZE,
-            fields=['title', 'title_sort', 'categories',],
-        )
+        s = Search(
+            using=docstore._get_connection(settings.DOCSTORE_HOSTS),
+            index=settings.DOCSTORE_INDEX,
+            doc_type='articles'
+        ).fields([
+            'title', 'title_sort', 'categories',
+        ])[0:docstore.MAX_SIZE]
+        if not settings.WIKIPROX_SHOW_UNPUBLISHED:
+            s = s.query('match', published=True)
+        response = s.execute()
         pages = []
-        bad = []
-        for hit in results['hits']['hits']:
-            # Don't crash if hit is empty
-            if hit.get('fields', None):
-                if hit['fields'].get('categories', None):
-                    page = Page()
-                    page.url_title = hit['fields']['title'][0]
-                    page.title = hit['fields']['title'][0]
-                    page.title_sort = hit['fields']['title_sort'][0]
-                    page.categories = hit['fields']['categories']
-                    pages.append(page)
-            else:
-                bad.append(hit)
+        for hit in response:
+            page = Page()
+            page.url_title = hit.title[0]
+            page.title = hit.title[0]
+            page.title_sort = hit.title_sort[0]
+            page.categories = hit.get('categories', [])
+            pages.append(page)
         articles = sorted(pages, key=lambda page: page.title_sort)
         categories = {}
         for page in articles:
@@ -358,43 +358,43 @@ class Elasticsearch(object):
         return categories
     
     def articles(self):
-        results = docstore.search(
-            settings.DOCSTORE_HOSTS, settings.DOCSTORE_INDEX, model='articles',
-            first=0, size=docstore.MAX_SIZE,
-            fields=['title', 'title_sort', 'lastmod',],
-        )
+        s = Search(
+            using=docstore._get_connection(settings.DOCSTORE_HOSTS),
+            index=settings.DOCSTORE_INDEX,
+            doc_type='articles'
+        ).fields([
+            'title', 'title_sort', 'lastmod',
+        ])[0:docstore.MAX_SIZE]
+        response = s.execute()
         pages = []
-        bad = []
-        for hit in results['hits']['hits']:
-            # Don't crash if hit is empty
-            if hit.get('fields', None):
-                page = Page()
-                page.url_title = hit['fields']['title'][0]
-                page.title = hit['fields']['title'][0]
-                page.title_sort = hit['fields']['title_sort'][0]
-                page.first_letter = page.title_sort[0]
-                lastmod = hit['fields']['lastmod'][0]
-                page.lastmod = datetime.strptime(lastmod, mediawiki.TS_FORMAT)
-                pages.append(page)
-            else:
-                bad.append(hit)
+        for hit in response:
+            page = Page()
+            page.url_title = hit.title[0]
+            page.title = hit.title[0]
+            page.title_sort = hit.title_sort[0]
+            page.first_letter = page.title_sort[0]
+            page.lastmod = datetime.strptime(hit.lastmod[0], mediawiki.TS_FORMAT)
+            pages.append(page)
         return sorted(pages, key=lambda page: page.title_sort)
 
     def authors(self, num_columns=0):
         """
         @param num_columns: int If non-zero, break up list into columns
         """
-        results = docstore.search(
-            settings.DOCSTORE_HOSTS, settings.DOCSTORE_INDEX, model='authors',
-            first=0, size=docstore.MAX_SIZE,
-            fields=['url_title', 'title', 'title_sort', 'lastmod'],
-        )
+        s = Search(
+            using=docstore._get_connection(settings.DOCSTORE_HOSTS),
+            index=settings.DOCSTORE_INDEX,
+            doc_type='authors'
+        ).fields([
+            'url_title', 'title', 'title_sort', 'lastmod'
+        ])[0:docstore.MAX_SIZE]
+        response = s.execute()
         authors = []
-        for hit in results['hits']['hits']:
-            url_title = hit['fields']['url_title'][0]
-            title = hit['fields']['title'][0]
-            title_sort = hit['fields']['title_sort'][0]
-            lastmod = hit['fields']['lastmod'][0]
+        for hit in response:
+            url_title = hit.url_title[0]
+            title = hit.title[0]
+            title_sort = hit.title_sort[0]
+            lastmod = hit.lastmod[0]
             if title and title_sort:
                 author = Author()
                 author.url_title = url_title

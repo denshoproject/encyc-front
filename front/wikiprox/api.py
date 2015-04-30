@@ -6,6 +6,8 @@ from rest_framework.reverse import reverse
 from rest_framework.response import Response
 
 from wikiprox.models import Elasticsearch as Backend
+from wikiprox.models import Page, Source, Author
+from wikiprox.models import MAX_SIZE, NotFoundError
 
 
 @api_view(['GET'])
@@ -17,7 +19,7 @@ def articles(request, format=None):
             'title': article.title,
             'url': reverse('wikiprox-api-page', args=([article.url_title]), request=request),
         }
-        for article in Backend().articles()
+        for article in Page.pages()
     ]
     return Response(data)
 
@@ -25,39 +27,41 @@ def articles(request, format=None):
 def article(request, url_title, format=None):
     """DOCUMENTATION GOES HERE.
     """
-    page = Backend().page(url_title)
-    if not page:
+    try:
+        page = Page.get(url_title)
+        page.scrub()
+    except NotFoundError:
         return Response(status=status.HTTP_404_NOT_FOUND)
+    categories = [
+        reverse('wikiprox-api-category', args=([category]), request=request)
+        for category in page.categories
+    ]
     sources = [
-        reverse('wikiprox-api-source', args=([encyc_id]), request=request)
-        for encyc_id in page.sources
+        reverse('wikiprox-api-source', args=([source_id]), request=request)
+        for source_id in page.source_ids
     ]
     topic_term_ids = [
         '%s/facet/topics/%s/objects/' % (settings.DDRPUBLIC_API, term['id'])
         for term in page.topics()
     ]
-    categories = [
-        reverse('wikiprox-api-category', args=([category]), request=request)
-        for category in page.categories
-    ]
-    author_articles = [
-        reverse('wikiprox-api-page', args=([title]), request=request)
-        for title in page.author_articles
+    authors = [
+        reverse('wikiprox-api-author', args=([author_titles]), request=request)
+        for author_titles in page.authors_data['display']
     ]
     data = {
         'url_title': page.url_title,
         'url': reverse('wikiprox-api-page', args=([page.url_title]), request=request),
         'absolute_url': reverse('wikiprox-page', args=([page.url_title]), request=request),
-        'lastmod': page.lastmod,
+        'modified': page.modified,
         'title_sort': page.title_sort,
+        'prev_page': reverse('wikiprox-api-page', args=([page.prev_page]), request=request),
+        'next_page': reverse('wikiprox-api-page', args=([page.next_page]), request=request),
         'title': page.title,
         'body': page.body,
         'categories': categories,
-        'author_articles': author_articles,
-        'coordinates': page.coordinates,
-        'prev_page': reverse('wikiprox-api-page', args=([page.prev_page]), request=request),
-        'next_page': reverse('wikiprox-api-page', args=([page.next_page]), request=request),
         'sources': sources,
+        'coordinates': page.coordinates,
+        'authors': authors,
         'ddr_topic_terms': topic_term_ids,
     }
     return Response(data)
@@ -73,10 +77,7 @@ def authors(request, format=None):
             'title_sort': author.title_sort,
             'url': reverse('wikiprox-api-author', args=([author.url_title]), request=request),
         }
-        for author in sorted(
-            Backend().authors(),
-            key=lambda a: a.title_sort.lower()
-        )
+        for author in Author.authors()
     ]
     return Response(data)
 
@@ -84,15 +85,16 @@ def authors(request, format=None):
 def author(request, url_title, format=None):
     """DOCUMENTATION GOES HERE.
     """
-    author = Backend().author(url_title)
+    try:
+        author = Author.get(url_title)
+    except NotFoundError:
+        return Response(status=status.HTTP_404_NOT_FOUND)
     articles = [
         {
             'title': article.title,
             'url': reverse('wikiprox-api-page', args=([article.url_title]), request=request),
         }
-        for article in [
-            Backend().page(t) for t in author.author_articles
-        ]
+        for article in author.articles()
     ]
     data = {
         'url_title': author.url_title,
@@ -101,7 +103,7 @@ def author(request, url_title, format=None):
         'title': author.title,
         'title_sort': author.title_sort,
         'body': author.body,
-        'lastmod': author.lastmod,
+        'modified': author.modified,
         'articles': articles,
     }
     return Response(data)
@@ -135,7 +137,10 @@ def sources(request, format=None):
 def source(request, encyclopedia_id, format=None):
     """DOCUMENTATION GOES HERE.
     """
-    source = Backend().source(encyclopedia_id)
+    try:
+        source = Source.get(encyclopedia_id)
+    except NotFoundError:
+        return Response(status=status.HTTP_404_NOT_FOUND)
     data = {
         'encyclopedia_id': source.encyclopedia_id,
         'psms_id': source.psms_id,
@@ -145,7 +150,7 @@ def source(request, encyclopedia_id, format=None):
         'absolute_url': reverse('wikiprox-source', args=([source.encyclopedia_id]), request=request),
         'streaming_url': source.streaming_url,
         'external_url': source.external_url,
-        'original': source.original,
+        'original_url': source.original_url,
         'original_size': source.original_size,
         'img_url': source.display,
         'img_size': source.display_size,
@@ -153,7 +158,6 @@ def source(request, encyclopedia_id, format=None):
         'thumbnail_sm': source.thumbnail_sm,
         'media_format': source.media_format,
         'aspect_ratio': source.aspect_ratio,
-        'title': source.title,
         'collection_name': source.collection_name,
         'headword': source.headword,
         'caption': source.caption,
@@ -164,6 +168,6 @@ def source(request, encyclopedia_id, format=None):
         'created': source.created,
         'modified': source.modified,
         'published': source.published,
-        'rtmp_streamer': source.rtmp_streamer,
+        'rtmp_streamer': settings.RTMP_STREAMER,
     }
     return Response(data)

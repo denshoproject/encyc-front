@@ -9,12 +9,10 @@ from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.template import RequestContext
 from django.views.decorators.http import require_http_methods
 
-from wikiprox.models import Elasticsearch as Backend
 from wikiprox import ddr
-
-if not settings.DEBUG:
-    from bs4 import BeautifulSoup
-    from wikiprox.mediawiki import remove_status_markers
+from wikiprox.models import Elasticsearch as Backend
+from wikiprox.models import Page, Source, Author, Citation
+from wikiprox.models import NotFoundError
 
 
 @require_http_methods(['GET',])
@@ -26,12 +24,10 @@ def index(request, template_name='index.html'):
     )
 
 def categories(request, template_name='wikiprox/categories.html'):
-    categories = Backend().categories()
-    articles_by_category = [(key,val) for key,val in categories.iteritems()]
     return render_to_response(
         template_name,
         {
-            'articles_by_category': articles_by_category,
+            'articles_by_category': Page.pages_by_category(),
         },
         context_instance=RequestContext(request)
     )
@@ -40,7 +36,7 @@ def contents(request, template_name='wikiprox/contents.html'):
     return render_to_response(
         template_name,
         {
-            'articles': Backend().articles(),
+            'articles': Page.pages(),
         },
         context_instance=RequestContext(request)
     )
@@ -49,19 +45,17 @@ def authors(request, template_name='wikiprox/authors.html'):
     return render_to_response(
         template_name,
         {
-            'authors': Backend().authors(num_columns=4),
+            'authors': Author.authors(num_columns=4),
         },
         context_instance=RequestContext(request)
     )
 
 def author(request, url_title, template_name='wikiprox/author.html'):
-    author = Backend().author(url_title)
-    author.articles = [Backend().page(title) for title in author.author_articles]
-
-    # remove internal editorial markers
-    # TODO this should really be part of the Page model or the indexer.
-    if not settings.DEBUG:
-        author.body = unicode(remove_status_markers(BeautifulSoup(author.body)))
+    try:
+        author = Author.get(url_title)
+        author.scrub()
+    except NotFoundError:
+        raise Http404
     return render_to_response(
         template_name,
         {
@@ -75,49 +69,29 @@ def article(request, url_title='index', printed=False, template_name='wikiprox/p
     """
     """
     alt_title = url_title.replace('_', ' ')
-    page = Backend().page(url_title)
+    try:
+        page = Page.get(url_title)
+        page.scrub()
+    except NotFoundError:
+        page = None
     if not page:
-        page = Backend().page(alt_title)
+        try:
+            page = Page.get(alt_title)
+            page.scrub()
+        except NotFoundError:
+            page = None
     if not page:
         # might be an author
-        author_titles = [author.title for author in Backend().authors()]
+        author_titles = [author.title for author in Author.authors()]
         if url_title in author_titles:
             return HttpResponseRedirect(reverse('wikiprox-author', args=[url_title]))
         elif alt_title in author_titles:
             return HttpResponseRedirect(reverse('wikiprox-author', args=[alt_title]))
         raise Http404
-
-    # remove internal editorial markers
-    # TODO this should really be part of the Page model or the indexer.
-    if not settings.DEBUG:
-        page.body = unicode(remove_status_markers(BeautifulSoup(page.body)))
-    
-    source_ids = page.sources
-    page.sources = [
-        Backend().source(source_id).__dict__ for source_id in source_ids
-    ]
-    # sorl.thumbnail-friendly URL
-    for source in page.sources:
-        source['img_url'] = source['display'].replace(
-            settings.TANSU_MEDIA_URL,
-            settings.TANSU_MEDIA_URL_LOCAL)
-    
-    topic_term_ids = [term['id'] for term in page.topics()]
-    try:
-        page.related_ddr = Backend().related_ddr(
-            topic_term_ids,
-            balanced=True
-        )
-        page.related_ddr_timeout = False
-    except requests.exceptions.ConnectionError as error:
-        page.related_ddr = []
-        page.related_ddr_error = error
     
     if (not page.published) and (not settings.WIKIPROX_SHOW_UNPUBLISHED):
         template_name = 'wikiprox/unpublished.html'
-    elif page.is_author:
-        template_name = 'wikiprox/author.html'
-    elif page.is_article and printed:
+    elif printed:
         template_name = 'wikiprox/article-print.html'
     else:
         template_name = 'wikiprox/article.html'
@@ -132,8 +106,9 @@ def article(request, url_title='index', printed=False, template_name='wikiprox/p
 
 @require_http_methods(['GET',])
 def source(request, encyclopedia_id, template_name='wikiprox/source.html'):
-    source = Backend().source(encyclopedia_id)
-    if not source:
+    try:
+        source = Source.get(encyclopedia_id)
+    except NotFoundError:
         raise Http404
     return render_to_response(
         template_name,
@@ -147,13 +122,13 @@ def source(request, encyclopedia_id, template_name='wikiprox/source.html'):
 
 @require_http_methods(['GET',])
 def page_cite(request, url_title, template_name='wikiprox/cite.html'):
-    page = Backend().page(url_title)
-    if page.error or page.is_author:
+    try:
+        page = Page.get(url_title)
+    except NotFoundError:
         raise Http404
     if (not page.published) and (not settings.WIKIPROX_SHOW_UNPUBLISHED):
         raise Http404
-    citation = Backend().citation(page)
-    citation.href = 'http://%s%s' % (request.META['HTTP_HOST'], citation.uri)
+    citation = Citation(page, request)
     return render_to_response(
         template_name,
         {
@@ -164,11 +139,11 @@ def page_cite(request, url_title, template_name='wikiprox/cite.html'):
 
 @require_http_methods(['GET',])
 def source_cite(request, encyclopedia_id, template_name='wikiprox/cite.html'):
-    source = Backend().source(encyclopedia_id)
-    if not source:
+    try:
+        source = Source.get(encyclopedia_id)
+    except NotFoundError:
         raise Http404
-    citation = Backend().citation(source)
-    citation.href = 'http://%s%s' % (request.META['HTTP_HOST'], citation.uri)
+    citation = Citation(source, request)
     return render_to_response(
         template_name,
         {
@@ -181,19 +156,15 @@ def source_cite(request, encyclopedia_id, template_name='wikiprox/cite.html'):
 def related_ddr(request, url_title='index', template_name='wikiprox/related-ddr.html'):
     """
     """
-    alt_title = url_title.replace('_', ' ')
-    page = Backend().page(url_title)
-    if not page:
-        page = Backend().page(alt_title)
-    
-    related = Backend().related_ddr(
-        [term['id'] for term in page.topics()]
-    )
+    try:
+        page = Page.get(url_title)
+    except NotFoundError:
+        raise Http404
+    related = Backend().related_ddr([term['id'] for term in page.topics()])
     page.related_ddr = []
     for term in page.topics():
         term['documents'] = related[term['id']]
         page.related_ddr.append(term)
-    
     return render_to_response(
         template_name,
         {

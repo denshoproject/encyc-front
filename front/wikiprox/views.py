@@ -9,7 +9,7 @@ from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.template import RequestContext
 from django.views.decorators.http import require_http_methods
 
-from wikiprox.models import Proxy as Backend
+from wikiprox.models.legacy import Proxy as Backend
 
 
 def api_contents(request, template_name='wikiprox/api-contents.html'):

@@ -16,10 +16,10 @@
         height: {% if source.aspect_ratio == 'hd' %}380{% else %}500{% endif %},
         image: "{{ source.thumbnail_lg }}",
         modes: [
-{% if source.original %}
+{% if source.original_url %}
             { type: "html5",
               config: {
-                file: "{{ source.original }}"
+                file: "{{ source.original_url }}"
               }
             },
 {% endif %}
@@ -31,12 +31,12 @@
                 streamer: "{{ rtmp_streamer }}",
                 file: "{{ source.streaming_url }}"
               }
-            }{% if source.streaming_url and source.original %},{% endif %}
+            }{% if source.streaming_url and source.original_url %},{% endif %}
 {% endif %}
-{% if source.original %}
+{% if source.original_url %}
             { type: "download",
               config: {
-                file: "{{ source.original }}",
+                file: "{{ source.original_url }}",
                 provider: 'video'
               }
             }
@@ -65,11 +65,11 @@ Primary Source &mdash; {{ source.encyclopedia_id }}
 <div id="media" class="{{ source.media_format }} {% if source.aspect_ratio %}{{ source.aspect_ratio }}{% endif %}">
 {% if source.media_format == 'image' %}
   <img src="{{ source.thumbnail_lg }}" />
-  {% if source.original %}<br/><a href="{{ source.original }}">Download full-size version ({{ source.original_size|filesizeformat }})</a>{% endif %}
+  {% if source.original_url %}<br/><a href="{{ source.original_url }}">Download full-size version ({{ source.original_size|filesizeformat }})</a>{% endif %}
 {% endif %}
 {% if source.media_format == 'document' %}
   <img src="{{ source.thumbnail_lg }}" />
-  {% if source.original %}<br/><a href="{{ source.original }}">Download full PDF ({{ source.original_size|filesizeformat }})</a>{% endif %}
+  {% if source.original_url %}<br/><a href="{{ source.original_url }}">Download full PDF ({{ source.original_size|filesizeformat }})</a>{% endif %}
 {% endif %}
 {% if source.media_format == 'video' %}
   <div id="videocontainer">Loading video player...</div>

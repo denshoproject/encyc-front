@@ -41,10 +41,9 @@ def reset():
     index = Index(settings.DOCSTORE_INDEX)
 
     logprint('debug', 'deleting old index')
-    index = Index('encyc-dev')
     index.delete()
     logprint('debug', 'creating new index')
-    index = Index('encyc-dev')
+    index = Index(settings.DOCSTORE_INDEX)
     index.create()
     
     logprint('debug', 'creating mappings')

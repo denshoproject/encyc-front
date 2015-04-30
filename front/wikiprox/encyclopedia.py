@@ -339,10 +339,10 @@ def published_authors(cached_ok=True):
     if cached and cached_ok:
         published_authors = json.loads(cached)
     else:
-        titles = [
-            page['title']
-            for page in published_pages()
-            if page['title'] not in titles
+        titles = []
+        [
+            titles.append(page['title'])
+            for page in published_pages() if page['title'] not in titles
         ]
         published_authors = [
             page

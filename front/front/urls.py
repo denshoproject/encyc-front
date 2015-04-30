@@ -13,7 +13,7 @@ sitemaps = {
 urlpatterns = patterns(
     '',
     #url(r'^admin/', include(admin.site.urls)),
-    url(r'^api/0.1/urls-titles/$', 'wikiprox.views.api_contents', name='wikiprox-api-contents'),
+    #url(r'^api/0.1/urls-titles/$', 'wikiprox.views.api_contents', name='wikiprox-api-contents'),
     url(r"^api/0.1/articles/(?P<url_title>[\w\W]+)/$", 'wikiprox.api.article', name='wikiprox-api-page'),
     url(r'^api/0.1/articles/$', 'wikiprox.api.articles', name='wikiprox-api-articles'),
     url(r"^api/0.1/authors/(?P<url_title>[\w\W]+)/$", 'wikiprox.api.author', name='wikiprox-api-author'),
@@ -51,16 +51,16 @@ urlpatterns = patterns(
     # temp cite functionality patch 2013-03-26 gf
     url(r'^citehelp/$', TemplateView.as_view(template_name='citehelp.html'), name='citehelp'),
     #
-    url(r'^authors/$', 'wikiprox.views_es.authors', name='wikiprox-authors'),
-    url(r'^categories/$', 'wikiprox.views_es.categories', name='wikiprox-categories'),
-    url(r'^contents/$', 'wikiprox.views_es.contents', name='wikiprox-contents'),
-    url(r"^authors/(?P<url_title>[\w\W]+)/$", 'wikiprox.views_es.author', name='wikiprox-author'),
-    url(r"^cite/source/(?P<encyclopedia_id>[\w .:_-]+)/$", 'wikiprox.views_es.source_cite', name='wikiprox-source-cite'),
-    url(r"^sources/(?P<encyclopedia_id>[\w .:_-]+)/$", 'wikiprox.views_es.source', name='wikiprox-source'),
-    url(r"^cite/page/(?P<url_title>[\w\W]+)/$", 'wikiprox.views_es.page_cite', name='wikiprox-page-cite'),
-    url(r"^ddr/(?P<url_title>[\w\W]+)/$", 'wikiprox.views_es.related_ddr', name='wikiprox-related-ddr'),
-    url(r"^print/(?P<url_title>[\w\W]+)/$", 'wikiprox.views_es.article', {'printed':True}, name='wikiprox-page-print'),
-    url(r"^(?P<url_title>[\w\W]+)/$", 'wikiprox.views_es.article', name='wikiprox-page'),
+    url(r'^authors/$', 'wikiprox.views.authors', name='wikiprox-authors'),
+    url(r'^categories/$', 'wikiprox.views.categories', name='wikiprox-categories'),
+    url(r'^contents/$', 'wikiprox.views.contents', name='wikiprox-contents'),
+    url(r"^authors/(?P<url_title>[\w\W]+)/$", 'wikiprox.views.author', name='wikiprox-author'),
+    url(r"^cite/source/(?P<encyclopedia_id>[\w .:_-]+)/$", 'wikiprox.views.source_cite', name='wikiprox-source-cite'),
+    url(r"^sources/(?P<encyclopedia_id>[\w .:_-]+)/$", 'wikiprox.views.source', name='wikiprox-source'),
+    url(r"^cite/page/(?P<url_title>[\w\W]+)/$", 'wikiprox.views.page_cite', name='wikiprox-page-cite'),
+    url(r"^ddr/(?P<url_title>[\w\W]+)/$", 'wikiprox.views.related_ddr', name='wikiprox-related-ddr'),
+    url(r"^print/(?P<url_title>[\w\W]+)/$", 'wikiprox.views.article', {'printed':True}, name='wikiprox-page-print'),
+    url(r"^(?P<url_title>[\w\W]+)/$", 'wikiprox.views.article', name='wikiprox-page'),
     #
     url(r"^$", 'wikiprox.views.index', name='wikiprox-index'),
 )

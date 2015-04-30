@@ -4,19 +4,16 @@ import requests
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.template import RequestContext
 from django.views.decorators.http import require_http_methods
 
-from wikiprox.models.legacy import Proxy as Backend
+from wikiprox import ddr
+from wikiprox.models import Elasticsearch as Backend
+from wikiprox.models import Page, Source, Author, Citation
+from wikiprox.models import NotFoundError
 
-
-def api_contents(request, template_name='wikiprox/api-contents.html'):
-    return HttpResponse(
-        json.dumps(Backend().api_contents()),
-        content_type="application/json"
-    )
 
 @require_http_methods(['GET',])
 def index(request, template_name='index.html'):
@@ -30,7 +27,7 @@ def categories(request, template_name='wikiprox/categories.html'):
     return render_to_response(
         template_name,
         {
-            'articles_by_category': Backend().articles_by_category(),
+            'articles_by_category': Page.pages_by_category(),
         },
         context_instance=RequestContext(request)
     )
@@ -39,7 +36,7 @@ def contents(request, template_name='wikiprox/contents.html'):
     return render_to_response(
         template_name,
         {
-            'articles': Backend().articles(),
+            'articles': Page.pages(),
         },
         context_instance=RequestContext(request)
     )
@@ -48,21 +45,53 @@ def authors(request, template_name='wikiprox/authors.html'):
     return render_to_response(
         template_name,
         {
-            'authors': Backend().authors(num_columns=4),
+            'authors': Author.authors(num_columns=4),
+        },
+        context_instance=RequestContext(request)
+    )
+
+def author(request, url_title, template_name='wikiprox/author.html'):
+    try:
+        author = Author.get(url_title)
+        author.scrub()
+    except NotFoundError:
+        raise Http404
+    return render_to_response(
+        template_name,
+        {
+            'author': author,
         },
         context_instance=RequestContext(request)
     )
 
 @require_http_methods(['GET',])
-def page(request, url_title='index', printed=False, template_name='wikiprox/page.html'):
-    page = Backend().page(url_title)
-    if page.error:
+def article(request, url_title='index', printed=False, template_name='wikiprox/page.html'):
+    """
+    """
+    alt_title = url_title.replace('_', ' ')
+    try:
+        page = Page.get(url_title)
+        page.scrub()
+    except NotFoundError:
+        page = None
+    if not page:
+        try:
+            page = Page.get(alt_title)
+            page.scrub()
+        except NotFoundError:
+            page = None
+    if not page:
+        # might be an author
+        author_titles = [author.title for author in Author.authors()]
+        if url_title in author_titles:
+            return HttpResponseRedirect(reverse('wikiprox-author', args=[url_title]))
+        elif alt_title in author_titles:
+            return HttpResponseRedirect(reverse('wikiprox-author', args=[alt_title]))
         raise Http404
+    
     if (not page.published) and (not settings.WIKIPROX_SHOW_UNPUBLISHED):
         template_name = 'wikiprox/unpublished.html'
-    elif page.is_author:
-        template_name = 'wikiprox/author.html'
-    elif page.is_article and printed:
+    elif printed:
         template_name = 'wikiprox/article-print.html'
     else:
         template_name = 'wikiprox/article.html'
@@ -70,14 +99,16 @@ def page(request, url_title='index', printed=False, template_name='wikiprox/page
         template_name,
         {
             'page': page,
+            'THUMBNAIL_URL': settings.THUMBNAIL_URL,
         },
         context_instance=RequestContext(request)
     )
 
 @require_http_methods(['GET',])
 def source(request, encyclopedia_id, template_name='wikiprox/source.html'):
-    source = Backend().source(encyclopedia_id)
-    if not source:
+    try:
+        source = Source.get(encyclopedia_id)
+    except NotFoundError:
         raise Http404
     return render_to_response(
         template_name,
@@ -91,13 +122,13 @@ def source(request, encyclopedia_id, template_name='wikiprox/source.html'):
 
 @require_http_methods(['GET',])
 def page_cite(request, url_title, template_name='wikiprox/cite.html'):
-    page = Backend().page(url_title)
-    if page.error or page.is_author:
+    try:
+        page = Page.get(url_title)
+    except NotFoundError:
         raise Http404
     if (not page.published) and (not settings.WIKIPROX_SHOW_UNPUBLISHED):
         raise Http404
-    citation = Backend().citation(page)
-    citation.href = 'http://%s%s' % (request.META['HTTP_HOST'], citation.uri)
+    citation = Citation(page, request)
     return render_to_response(
         template_name,
         {
@@ -108,15 +139,37 @@ def page_cite(request, url_title, template_name='wikiprox/cite.html'):
 
 @require_http_methods(['GET',])
 def source_cite(request, encyclopedia_id, template_name='wikiprox/cite.html'):
-    source = Backend().source(encyclopedia_id)
-    if not source:
+    try:
+        source = Source.get(encyclopedia_id)
+    except NotFoundError:
         raise Http404
-    citation = Backend().citation(source)
-    citation.href = 'http://%s%s' % (request.META['HTTP_HOST'], citation.uri)
+    citation = Citation(source, request)
     return render_to_response(
         template_name,
         {
             'citation': citation,
+        },
+        context_instance=RequestContext(request)
+    )
+
+@require_http_methods(['GET',])
+def related_ddr(request, url_title='index', template_name='wikiprox/related-ddr.html'):
+    """
+    """
+    try:
+        page = Page.get(url_title)
+    except NotFoundError:
+        raise Http404
+    related = Backend().related_ddr([term['id'] for term in page.topics()])
+    page.related_ddr = []
+    for term in page.topics():
+        term['documents'] = related[term['id']]
+        page.related_ddr.append(term)
+    return render_to_response(
+        template_name,
+        {
+            'page': page,
+            'THUMBNAIL_URL': settings.THUMBNAIL_URL,
         },
         context_instance=RequestContext(request)
     )

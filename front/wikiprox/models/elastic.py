@@ -355,7 +355,7 @@ class Page(DocType):
         return objects
     
     def topics(self):
-        terms = Elasticsearch().topics_by_url().get(self.absolute_url(), [])
+        terms = Elasticsearch.topics_by_url().get(self.absolute_url(), [])
         for term in terms:
             term['ddr_topic_url'] = '%s/%s/' % (
                 settings.DDR_TOPICS_BASE, term['id'])
@@ -529,13 +529,13 @@ class Citation(object):
         self.retrieved = datetime.now()
 
 
-
 class Elasticsearch(object):
     """Interface to Elasticsearch backend
     NOTE: not a Django model object!
     """
-    
-    def topics(self):
+
+    @staticmethod
+    def topics():
         terms = []
         results = docstore.get(
             settings.DOCSTORE_HOSTS, settings.DOCSTORE_INDEX, 'vocab',
@@ -553,13 +553,14 @@ class Elasticsearch(object):
             ]
         return terms
 
-    def topics_by_url(self):
+    @staticmethod
+    def topics_by_url():
         KEY = 'encyc-front:topics_by_url'
         TIMEOUT = 60*5
         data = cache.get(KEY)
         if not data:
             data = {}
-            for term in Elasticsearch().topics():
+            for term in Elasticsearch.topics():
                 for url in term['encyc_urls']:
                     if not data.get(url, None):
                         data[url] = []
@@ -567,7 +568,8 @@ class Elasticsearch(object):
             cache.set(KEY, data, TIMEOUT)
         return data
     
-    def index_articles(self, titles=[], start=0, num=1000000):
+    @staticmethod
+    def index_articles(titles=[], start=0, num=1000000):
         """
         @param titles: list of url_titles to retrieve.
         @param start: int Index of list at which to start.
@@ -595,8 +597,9 @@ class Elasticsearch(object):
         if could_not_post:
             logging.debug('Could not post these: %s' % could_not_post)
         return posted,could_not_post
-        
-    def index_author(self, title):
+
+    @staticmethod
+    def index_author(title):
         """
         @param title: str
         """
@@ -606,11 +609,12 @@ class Elasticsearch(object):
             author = Author.from_mw(mwauthor)
             author.save()
 
-    def index_topics(self, json_text=None, url=settings.DDR_TOPICS_SRC_URL):
+    @staticmethod
+    def index_topics(json_text=None, url=settings.DDR_TOPICS_SRC_URL):
         """Upload topics.json; used for Encyc->DDR links on article pages.
         
         url = 'http://partner.densho.org/vocab/api/0.2/topics.json'
-        models.Elasticsearch().index_topics(url)
+        models.Elasticsearch.index_topics(url)
         
         @param json_text: unicode Raw topics.json file text.
         @param url: URL of topics.json
@@ -624,16 +628,17 @@ class Elasticsearch(object):
             'topics', json.loads(json_text),
         )
     
-    def articles_to_update(self, mw_authors, mw_articles, es_authors, es_articles):
+    @staticmethod
+    def articles_to_update(mw_authors, mw_articles, es_authors, es_articles):
         """Returns titles of articles to update and delete
         
         >>> mw_authors = Proxy().authors(cached_ok=False)
         >>> mw_articles = Proxy().articles_lastmod()
-        >>> es_authors = Elasticsearch().authors()
-        >>> es_articles = Elasticsearch().articles()
-        >>> results = Elasticsearch().articles_to_update(mw_authors, mw_articles, es_authors, es_articles)
-        >>> Elasticsearch().index_articles(titles=results['update'])
-        >>> Elasticsearch().delete_articles(titles=results['delete'])
+        >>> es_authors = Elasticsearch.authors()
+        >>> es_articles = Elasticsearch.articles()
+        >>> results = Elasticsearch.articles_to_update(mw_authors, mw_articles, es_authors, es_articles)
+        >>> Elasticsearch.index_articles(titles=results['update'])
+        >>> Elasticsearch.delete_articles(titles=results['delete'])
         
         @param mw_authors: list Output of wikiprox.models.Proxy.authors_lastmod()
         @param mw_articles: list Output of wikiprox.models.Proxy.articles_lastmod()
@@ -663,16 +668,17 @@ class Elasticsearch(object):
         ]
         return (new + updated, deleted)
     
-    def authors_to_update(self, mw_authors, es_authors):
+    @staticmethod
+    def authors_to_update(mw_authors, es_authors):
         """Returns titles of authors to add or delete
         
         Does not track updates because it's easy just to update them all.
         
         >>> mw_authors = Proxy().authors(cached_ok=False)
-        >>> es_authors = Elasticsearch().authors()
-        >>> results = Elasticsearch().articles_to_update(mw_authors, es_authors)
-        >>> Elasticsearch().index_authors(titles=results['update'])
-        >>> Elasticsearch().delete_authors(titles=results['delete'])
+        >>> es_authors = Elasticsearch.authors()
+        >>> results = Elasticsearch.articles_to_update(mw_authors, es_authors)
+        >>> Elasticsearch.index_authors(titles=results['update'])
+        >>> Elasticsearch.delete_authors(titles=results['delete'])
         
         @param mw_authors: list Output of wikiprox.models.Proxy.authors_lastmod()
         @param es_authors: list Output of wikiprox.models.Elasticsearch.authors()
@@ -683,7 +689,8 @@ class Elasticsearch(object):
         delete = [title for title in es_author_titles if title not in mw_authors]
         return new,delete
 
-    def update_all(self):
+    @staticmethod
+    def update_all():
         """Check with Proxy source and update authors and articles.
         
         IMPORTANT: Will lock if unable to connect to MediaWiki server!

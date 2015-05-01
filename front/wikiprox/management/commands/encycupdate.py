@@ -70,7 +70,7 @@ def authors(report=False, dryrun=False):
     logprint('debug', 'getting es_authors...')
     es_authors = Author.authors()
     logprint('debug', 'determining new,delete...')
-    authors_new,authors_delete = Elasticsearch().authors_to_update(mw_authors, es_authors)
+    authors_new,authors_delete = Elasticsearch.authors_to_update(mw_authors, es_authors)
     logprint('debug', 'mediawiki authors: %s' % len(mw_authors))
     logprint('debug', 'elasticsearch authors: %s' % len(es_authors))
     logprint('debug', 'authors to add: %s' % len(authors_new))
@@ -115,7 +115,7 @@ def articles(report=False, dryrun=False):
     es_authors = Author.authors()
     es_articles = Page.pages()
     logprint('debug', 'determining new,delete...')
-    articles_update,articles_delete = Elasticsearch().articles_to_update(
+    articles_update,articles_delete = Elasticsearch.articles_to_update(
         mw_authors, mw_articles, es_authors, es_articles)
     logprint('debug', 'mediawiki articles: %s' % len(mw_articles))
     logprint('debug', 'elasticsearch articles: %s' % len(es_articles))

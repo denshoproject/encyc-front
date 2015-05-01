@@ -23,6 +23,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 #from DDR import docstore
 #from wikiprox import encyclopedia
+from wikiprox import docstore
 from wikiprox.models.legacy import Proxy
 from wikiprox.models import Elasticsearch
 from wikiprox.models import Author, Page, Source
@@ -157,6 +158,13 @@ def articles(report=False, dryrun=False):
         logprint('debug', 'Could not post these: %s' % could_not_post)
     logprint('debug', 'DONE')
 
+def topics(report=False, dryrun=False):
+    index = set_hosts_index()
+
+    logprint('debug', 'indexing topics...')
+    Elasticsearch.index_topics()
+    logprint('debug', 'DONE')
+
 
 class Command(BaseCommand):
     help = 'Updates authors and articles.'
@@ -186,10 +194,14 @@ class Command(BaseCommand):
             '--articles', action='store_const', const=1,
             help='index articles.'
         )
+        parser.add_argument(
+            '--topics', action='store_const', const=1,
+            help='index encyc<->DDR topics.'
+        )
     
     def handle(self, *args, **options):
-        
-        if not (options['reset'] or options['authors'] or options['articles']):
+
+        if not (options['reset'] or options['authors'] or options['articles'] or options['topics']):
             print('Choose an action. Try "python manage.py encycupdate --help".')
             sys.exit(1)
         
@@ -205,6 +217,8 @@ class Command(BaseCommand):
                 authors(report=options['report'], dryrun=options['dryrun'])
             elif options['articles']:
                 articles(report=options['report'], dryrun=options['dryrun'])
+            elif options['topics']:
+                topics(report=options['report'], dryrun=options['dryrun'])
         
         except requests.exceptions.ConnectionError:
             logprint('error', 'ConnectionError: check connection to MediaWiki or Elasticsearch.')

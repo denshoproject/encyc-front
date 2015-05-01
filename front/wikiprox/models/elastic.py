@@ -41,6 +41,7 @@ from elasticsearch_dsl.connections import connections
 import requests
 
 from django.conf import settings
+from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.db import models
 
@@ -138,28 +139,33 @@ class Author(DocType):
         
         @returns: list
         """
-        s = Search(doc_type='authors')[0:MAX_SIZE]
-        s = s.sort('title_sort')
-        s = s.fields([
-            'url_title',
-            'title',
-            'title_sort',
-            'published',
-        ])
-        response = s.execute()
-        authors = [
-            Author(
-                url_title  = hitvalue(hit, 'url_title'),
-                title      = hitvalue(hit, 'title'),
-                title_sort = hitvalue(hit, 'title_sort'),
-                published  = hitvalue(hit, 'published'),
-            )
-            for hit in response
-            if hitvalue(hit, 'published')
-        ]
+        KEY = 'encyc-front:authors'
+        TIMEOUT = 60*5
+        data = cache.get(KEY)
+        if not data:
+            s = Search(doc_type='authors')[0:MAX_SIZE]
+            s = s.sort('title_sort')
+            s = s.fields([
+                'url_title',
+                'title',
+                'title_sort',
+                'published',
+            ])
+            response = s.execute()
+            data = [
+                Author(
+                    url_title  = hitvalue(hit, 'url_title'),
+                    title      = hitvalue(hit, 'title'),
+                    title_sort = hitvalue(hit, 'title_sort'),
+                    published  = hitvalue(hit, 'published'),
+                )
+                for hit in response
+                if hitvalue(hit, 'published')
+            ]
+            cache.set(KEY, data, TIMEOUT)
         if num_columns:
-            return _columnizer(authors, num_columns)
-        return authors
+            return _columnizer(data, num_columns)
+        return data
 
     def scrub(self):
         """Removes internal editorial markers.
@@ -259,28 +265,33 @@ class Page(DocType):
         
         @returns: list
         """
-        s = Search(doc_type='articles')[0:MAX_SIZE]
-        s = s.sort('title_sort')
-        s = s.fields([
-            'url_title',
-            'title',
-            'title_sort',
-            'published',
-            'categories',
-        ])
-        response = s.execute()
-        pages = [
-            Page(
-                url_title  = hitvalue(hit, 'url_title'),
-                title      = hitvalue(hit, 'title'),
-                title_sort = hitvalue(hit, 'title_sort'),
-                published  = hitvalue(hit, 'published'),
-                categories = hit.get('categories',[]),
-               )
-            for hit in response
-            if hitvalue(hit, 'published')
-        ]
-        return pages
+        KEY = 'encyc-front:pages'
+        TIMEOUT = 60*5
+        data = cache.get(KEY)
+        if not data:
+            s = Search(doc_type='articles')[0:MAX_SIZE]
+            s = s.sort('title_sort')
+            s = s.fields([
+                'url_title',
+                'title',
+                'title_sort',
+                'published',
+                'categories',
+            ])
+            response = s.execute()
+            data = [
+                Page(
+                    url_title  = hitvalue(hit, 'url_title'),
+                    title      = hitvalue(hit, 'title'),
+                    title_sort = hitvalue(hit, 'title_sort'),
+                    published  = hitvalue(hit, 'published'),
+                    categories = hit.get('categories',[]),
+                   )
+                for hit in response
+                if hitvalue(hit, 'published')
+            ]
+            cache.set(KEY, data, TIMEOUT)
+        return data
     
     @staticmethod
     def pages_by_category():
@@ -288,22 +299,27 @@ class Page(DocType):
         
         @returns: list
         """
-        categories = {}
-        for page in Page.pages():
-            for category in page.categories:
-                # exclude internal editorial categories
-                if category not in settings.WIKIPROX_HIDDEN_CATEGORIES:
-                    if category not in categories.keys():
-                        categories[category] = []
-                    # pages already sorted so category lists will be sorted
-                    if page not in categories[category]:
-                        categories[category].append(page)
-        category_pages = [
-            (key,categories[key])
-            for key in sorted(categories.keys())
-        ]
-        return category_pages
-    
+        KEY = 'encyc-front:pages_by_category'
+        TIMEOUT = 60*5
+        data = cache.get(KEY)
+        if not data:
+            categories = {}
+            for page in Page.pages():
+                for category in page.categories:
+                    # exclude internal editorial categories
+                    if category not in settings.WIKIPROX_HIDDEN_CATEGORIES:
+                        if category not in categories.keys():
+                            categories[category] = []
+                        # pages already sorted so category lists will be sorted
+                        if page not in categories[category]:
+                            categories[category].append(page)
+            data = [
+                (key,categories[key])
+                for key in sorted(categories.keys())
+            ]
+            cache.set(KEY, data, TIMEOUT)
+        return data
+
     def related_ddr(self, term_ids, balanced=False):
         """Get objects for terms from DDR.
         Ironic: this uses DDR's REST UI rather than ES.
@@ -547,13 +563,18 @@ class Elasticsearch(object):
         return terms
 
     def topics_by_url(self):
-        terms = {}
-        for term in self.topics():
-            for url in term['encyc_urls']:
-                if not terms.get(url, None):
-                    terms[url] = []
-                terms[url].append(term)
-        return terms
+        KEY = 'encyc-front:topics_by_url'
+        TIMEOUT = 60*5
+        data = cache.get(KEY)
+        if not data:
+            data = {}
+            for term in Elasticsearch().topics():
+                for url in term['encyc_urls']:
+                    if not data.get(url, None):
+                        data[url] = []
+                    data[url].append(term)
+            cache.set(KEY, data, TIMEOUT)
+        return data
     
     def index_articles(self, titles=[], start=0, num=1000000):
         """

@@ -320,24 +320,15 @@ class Page(DocType):
             cache.set(KEY, data, TIMEOUT)
         return data
 
-    def related_ddr(self, term_ids, balanced=False):
+    def related_ddr(self, size=5):
         """Get objects for terms from DDR.
         Ironic: this uses DDR's REST UI rather than ES.
         """
-        if self._related_ddr:
-            return self._related_ddr
-        
-        topic_term_ids = [term['id'] for term in self.topics()]
-        try:
-            self._related_ddr = Backend().related_ddr(
-                topic_term_ids,
-                balanced=True
-            )
-            self.related_ddr_timeout = False
-        except requests.exceptions.ConnectionError as error:
-            self._related_ddr = []
-            self.related_ddr_error = error
-        
+        self._related_ddr = ddr.related_by_topic(
+            term_ids=[term['id'] for term in self.topics()],
+            size=size,
+            balanced=True
+        )
         return self._related_ddr
 
     def scrub(self):

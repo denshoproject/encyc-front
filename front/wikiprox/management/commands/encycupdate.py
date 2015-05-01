@@ -34,11 +34,15 @@ def logprint(level, msg):
     elif level == 'info': logging.info(msg)
     elif level == 'error': logging.error(msg)
 
-def reset():
+def set_hosts_index():
     logprint('debug', 'hosts: %s' % settings.DOCSTORE_HOSTS)
     connections.create_connection(hosts=settings.DOCSTORE_HOSTS)
     logprint('debug', 'index: %s' % settings.DOCSTORE_INDEX)
     index = Index(settings.DOCSTORE_INDEX)
+    return index
+    
+def reset():
+    index = set_hosts_index()
 
     logprint('debug', 'deleting old index')
     index.delete()
@@ -58,29 +62,29 @@ def reset():
 
     logprint('debug', 'DONE')
 
-def authors():
-    logprint('debug', 'hosts: %s' % settings.DOCSTORE_HOSTS)
-    connections.create_connection(hosts=settings.DOCSTORE_HOSTS)
-    logprint('debug', 'index: %s' % settings.DOCSTORE_INDEX)
-    index = Index(settings.DOCSTORE_INDEX)
+def authors(report=False, dryrun=False):
+    index = set_hosts_index()
 
     logprint('debug', 'getting mw_authors...')
     mw_authors = Proxy().authors(cached_ok=False)
-    logprint('debug', '%s' % len(mw_authors))
     logprint('debug', 'getting es_authors...')
     es_authors = Author.authors()
-    logprint('debug', '%s' % len(es_authors))
     logprint('debug', 'determining new,delete...')
     authors_new,authors_delete = Elasticsearch().authors_to_update(mw_authors, es_authors)
-    logprint('debug', 'authors_new    %s' % len(authors_new))
-    logprint('debug', 'authors_delete %s' % len(authors_delete))
+    logprint('debug', 'mediawiki authors: %s' % len(mw_authors))
+    logprint('debug', 'elasticsearch authors: %s' % len(es_authors))
+    logprint('debug', 'authors to add: %s' % len(authors_new))
+    logprint('debug', 'authors to delete: %s' % len(authors_delete))
+    if report:
+        return
     
     logprint('debug', 'deleting...')
     for n,title in enumerate(authors_delete):
         logprint('debug', '------------------------------------------------------------------------')
         logprint('debug', '%s/%s %s' % (n, len(authors_delete), title))
         author = Author.get(url_title=title)
-        author.delete()
+        if not dryrun:
+            author.delete()
      
     logprint('debug', 'adding...')
     for n,title in enumerate(authors_new):
@@ -90,35 +94,36 @@ def authors():
         mwauthor = Proxy().page(title)
         logprint('debug', 'creating author')
         author = Author.from_mw(mwauthor)
-        logprint('debug', 'saving')
-        author.save()
-        try:
-            a = Author.get(title)
-        except NotFoundError:
-            logprint('error', 'ERROR: Author(%s) NOT SAVED!' % title)
-        logprint('debug', 'ok')
+        if not dryrun:
+            logprint('debug', 'saving')
+            author.save()
+            try:
+                a = Author.get(title)
+            except NotFoundError:
+                logprint('error', 'ERROR: Author(%s) NOT SAVED!' % title)
+    
+    logprint('debug', 'DONE')
 
-def articles():
-    logprint('debug', 'hosts: %s' % settings.DOCSTORE_HOSTS)
-    connections.create_connection(hosts=settings.DOCSTORE_HOSTS)
-    logprint('debug', 'index: %s' % settings.DOCSTORE_INDEX)
-    index = Index(settings.DOCSTORE_INDEX)
+def articles(report=False, dryrun=False):
+    index = set_hosts_index()
     
     # authors need to be refreshed
     logprint('debug', 'getting mw_authors,articles...')
     mw_authors = Proxy().authors(cached_ok=False)
     mw_articles = Proxy().articles_lastmod()
-    logprint('debug', '%s mediawiki articles' % len(mw_articles))
     logprint('debug', 'getting es_authors,articles...')
     es_authors = Author.authors()
     es_articles = Page.pages()
-    logprint('debug', '%s elasticsearch articles' % len(es_articles))
     logprint('debug', 'determining new,delete...')
     articles_update,articles_delete = Elasticsearch().articles_to_update(
         mw_authors, mw_articles, es_authors, es_articles)
-    logprint('debug', 'articles_update: %s' % len(articles_update))
-    logprint('debug', 'articles_delete: %s' % len(articles_delete))
-     
+    logprint('debug', 'mediawiki articles: %s' % len(mw_articles))
+    logprint('debug', 'elasticsearch articles: %s' % len(es_articles))
+    logprint('debug', 'articles to update: %s' % len(articles_update))
+    logprint('debug', 'articles to delete: %s' % len(articles_delete))
+    if report:
+        return
+    
     logprint('debug', 'adding articles...')
     posted = 0
     could_not_post = []
@@ -132,45 +137,77 @@ def articles():
             for mwsource in mwpage.sources:
                 logprint('debug', '- source %s' % mwsource['encyclopedia_id'])
                 source = Source.from_mw(mwsource)
-                source.save()
+                if not dryrun:
+                    source.save()
             logprint('debug', 'creating page')
             page = Page.from_mw(mwpage)
-            logprint('debug', 'saving')
-            page.save()
-            try:
-                p = Page.get(title)
-            except NotFoundError:
-                logprint('error', 'ERROR: Page(%s) NOT SAVED!' % title)
-            logprint('debug', 'ok')
+            if not dryrun:
+                logprint('debug', 'saving')
+                page.save()
+                try:
+                    p = Page.get(title)
+                except NotFoundError:
+                    logprint('error', 'ERROR: Page(%s) NOT SAVED!' % title)
         else:
-            could_not_post.append(page)
-            logprint('debug', 'not publishable')
+            logprint('debug', 'not publishable: %s' % mwpage)
+            could_not_post.append(mwpage)
+    
     if could_not_post:
         logprint('debug', '========================================================================')
         logprint('debug', 'Could not post these: %s' % could_not_post)
-        logging.debug('Could not post these: %s' % could_not_post)
+    logprint('debug', 'DONE')
 
 
 class Command(BaseCommand):
     help = 'Updates authors and articles.'
     
     def add_arguments(self, parser):
-        parser.add_argument('--reset', action='store_const', const=1, help='Create new index.')
-        parser.add_argument('--authors', action='store_const', const=1, help='Index authors.')
-        parser.add_argument('--articles', action='store_const', const=1, help='Index articles.')
+        parser.add_argument(
+            '-d', '--dryrun', action='store_const', const=1,
+            help="perform a trial run with no changes made"
+        )
+        parser.add_argument(
+            '-r', '--report', action='store_const', const=1,
+            help='report number of MediaWiki/Elasticsearch records and number to be indexed/updated.'
+        )
+        parser.add_argument(
+            '--reset', action='store_const', const=1,
+            help='create new index (requires --confirm).'
+        )
+        parser.add_argument(
+            '--confirm', action='store_const', const=1,
+            help='confirm that you really seriously want to reset.'
+        )
+        parser.add_argument(
+            '--authors', action='store_const', const=1,
+            help='index authors.'
+        )
+        parser.add_argument(
+            '--articles', action='store_const', const=1,
+            help='index articles.'
+        )
     
     def handle(self, *args, **options):
+        
         if not (options['reset'] or options['authors'] or options['articles']):
             print('Choose an action. Try "python manage.py encycupdate --help".')
             sys.exit(1)
+        
+        if options['reset'] and not options['confirm']:
+            print('*** Do you really want to reset?  All existing records will be deleted!')
+            print('*** If you want to proceed, add the --confirm argument.')
+            sys.exit(1)
+        
         try:
-            if options['reset']:
+            if options['reset'] and options['confirm']:
                 reset()
             elif options['authors']:
-                authors()
+                authors(report=options['report'], dryrun=options['dryrun'])
             elif options['articles']:
-                articles()
+                articles(report=options['report'], dryrun=options['dryrun'])
+        
         except requests.exceptions.ConnectionError:
             logprint('error', 'ConnectionError: check connection to MediaWiki or Elasticsearch.')
+        
         except requests.exceptions.ReadTimeout as e:
             logprint('error', 'ReadTimeout: %s' % e)

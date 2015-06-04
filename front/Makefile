@@ -3,8 +3,8 @@ SHELL = /bin/bash
 PACKAGE_SERVER=tank.densho.org
 
 PIP_CACHE_DIR=/usr/local/src/pip-cache
-
 VIRTUALENV=/usr/local/src/env/front
+INSTALLDIR=/usr/local/src/encyc-front
 
 ELASTICSEARCH=elasticsearch-1.0.1.deb
 # wget https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.0.1.deb
@@ -27,26 +27,49 @@ ASSETS=encyc-front-assets.tar.gz
 
 help:
 	@echo "encyc-front Install Helper"
+	@echo "See: make howto-install"
 
 help-all:
 	@echo "install - Do a fresh install"
 
 howto-install:
-	@echo "HOWTO INSTALL"
-	@echo "- Basic Debian netinstall"
-	@echo "- edit /etc/network/interfaces"
-	@echo "- reboot"
-	@echo "- apt-get install openssh fail2ban ufw"
-	@echo "- ufw allow 22/tcp"
-	@echo "- ufw allow 80/tcp"
-	@echo "- ufw enable"
-	@echo "- apt-get install make"
-	@echo "- adduser encyc"
-	@echo "- git clone https://github.com/densho/encyc-front.git /usr/local/src/encyc-front"
-	@echo "- cd /usr/local/src/encyc-front/front"
-	@echo "- make install"
-	@echo "- make syncdb"
-	@echo "- make restart"
+	@echo "Installation"
+	@echo "============"
+	@echo ""
+	@echo "Basic Debian server netinstall; see ddr-manual."
+	@echo "Install SSH keys for root."
+	@echo "(see https://help.github.com/articles/generating-ssh-keys/)::"
+	@echo ""
+	@echo "    # ssh-keygen -t rsa -b 4096 -C \"your_email@example.com\""
+	@echo "    # cat ~/.ssh/id_rsa.pub"
+	@echo "    Cut and paste public key into GitHub."
+	@echo "    # ssh -T git@github.com"
+	@echo ""
+	@echo "Prepare for install::"
+	@echo ""
+	@echo "    # apt-get install make"
+	@echo "    # adduser encyc"
+	@echo "    # git clone git@github.com:densho/encyc-front.git /usr/local/src/encyc-front"
+	@echo "    # cd /usr/local/src/encyc-front/front"
+	@echo ""
+	@echo "Switch to branch if not running master::"
+	@echo ""
+	@echo "    # git checkout -b develop origin/develop"
+	@echo ""
+	@echo "Install encyc-front::"
+	@echo ""
+	@echo "    # make install"
+	@echo "    # make syncdb"
+	@echo ""
+	@echo "Turn on DEBUG mode if not running in production::"
+	@echo ""
+	@echo "    # vi /usr/local/src/encyc-front/front/front/settings.py"
+	@echo "    DEBUG = True"
+	@echo ""
+	@echo "Restart::"
+	@echo ""
+	@echo "    # make restart"
+	@echo "    # make status"
 
 
 
@@ -84,7 +107,7 @@ git-config:
 install-misc-tools:
 	@echo ""
 	@echo "Installing miscellaneous tools -----------------------------------------"
-	apt-get --assume-yes install ack-grep byobu elinks htop mg multitail sshuttle
+	apt-get --assume-yes install ack-grep byobu elinks htop httpie iftop iotop mg multitail sshuttle
 
 
 install-daemons: install-nginx install-redis install-elasticsearch
@@ -106,10 +129,10 @@ install-elasticsearch:
 	apt-get --assume-yes install openjdk-7-jre
 	wget -nc -P /tmp/downloads http://$(PACKAGE_SERVER)/$(ELASTICSEARCH)
 	gdebi --non-interactive /tmp/downloads/$(ELASTICSEARCH)
-#	cp /usr/local/src/encyc-front/debian/conf/elasticsearch.yml /etc/elasticsearch/
-#	chown root.root /etc/elasticsearch/elasticsearch.yml
-#	chmod 644 /etc/elasticsearch/elasticsearch.yml
-# 	@echo "${bldgrn}search engine (re)start${txtrst}"
+	cp /usr/local/src/encyc-front/debian/conf/elasticsearch.yml /etc/elasticsearch/
+	chown root.root /etc/elasticsearch/elasticsearch.yml
+	chmod 644 /etc/elasticsearch/elasticsearch.yml
+	@echo "${bldgrn}search engine (re)start${txtrst}"
 	/etc/init.d/elasticsearch restart
 
 
@@ -125,10 +148,10 @@ clean-front: clean-encyc-front
 install-encyc-front:
 	@echo ""
 	@echo "encyc-front --------------------------------------------------------------"
-	apt-get --assume-yes install imagemagick libjpeg8-dev libxml2 libxslt1.1 libxslt1-dev python-dev python-virtualenv supervisor
-# 	test -d $(VIRTUALENV) || virtualenv $(VIRTUALENV)
-# 	source $(VIRTUALENV)/bin/activate
-	pip install -U --download-cache=$(PIP_CACHE_DIR) setuptools
+	apt-get --assume-yes install imagemagick libjpeg62-turbo-dev libxml2 libxslt1.1 libxslt1-dev python-dev python-pip python-virtualenv supervisor zlib1g-dev
+	test -d $(VIRTUALENV) || virtualenv $(VIRTUALENV)
+	source $(VIRTUALENV)/bin/activate
+	pip install -U --download-cache=$(PIP_CACHE_DIR) bpython setuptools
 	pip install -U --download-cache=$(PIP_CACHE_DIR) -r /usr/local/src/encyc-front/front/requirements/production.txt
 	-mkdir /var/log/encyc
 	chown -R encyc.root /var/log/encyc
@@ -142,6 +165,7 @@ install-encyc-front:
 	chmod -R 755 /var/www/front
 
 syncdb:
+	source $(VIRTUALENV)/bin/activate
 	cd /usr/local/src/encyc-front/front && python manage.py syncdb --noinput
 	chown -R encyc.root /var/lib/encyc
 	chmod -R 750 /var/lib/encyc
@@ -255,9 +279,9 @@ install-configs:
 	@echo ""
 	@echo "installing configs ----------------------------------------------------"
 # web app settings
-	cp /usr/local/src/encyc-front/debian/conf/settings.py /usr/local/src/encyc-front/front/
-	chown root.root /usr/local/src/encyc-front/front/settings.py
-	chmod 644 /usr/local/src/encyc-front/front/settings.py
+	cp /usr/local/src/encyc-front/debian/conf/settings.py /usr/local/src/encyc-front/front/front/
+	chown root.root /usr/local/src/encyc-front/front/front/settings.py
+	chmod 644 /usr/local/src/encyc-front/front/front/settings.py
 # nginx settings
 	cp /usr/local/src/encyc-front/debian/conf/front.conf /etc/nginx/sites-available
 	chown root.root /etc/nginx/sites-available/front.conf

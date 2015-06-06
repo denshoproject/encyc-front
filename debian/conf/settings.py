@@ -31,6 +31,13 @@ DEBUG = config.get('debug', 'debug')
 TEMPLATE_DEBUG = DEBUG
 THUMBNAIL_DEBUG = config.get('debug', 'thumbnail')
 
+# Hosts/domain names that are valid for this site; required if DEBUG is False
+# See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in config.get('security', 'allowed_hosts').strip().split(',')
+]
+
 STATIC_URL = config.get('media', 'static_url')
 MEDIA_URL = config.get('media', 'media_url')
 MEDIA_URL_LOCAL = config.get('media', 'media_url_local')

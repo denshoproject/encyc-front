@@ -8,19 +8,33 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.6/ref/settings/
 """
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+import ConfigParser
 import os
+
+# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+
+# User-configurable settings are located in the following files.
+# Files appearing *later* in the list override earlier files.
+CONFIG_FILES = [
+    '/etc/encyc/production.cfg',
+    '/etc/encyc/local.cfg'
+]
+config = ConfigParser.ConfigParser()
+configs_read = config.read(CONFIG_FILES)
+if not configs_read:
+    raise Exception('No config file!')
 
 # ----------------------------------------------------------------------
 
-DEBUG = False
+DEBUG = config.get('debug', 'debug')
 TEMPLATE_DEBUG = DEBUG
+THUMBNAIL_DEBUG = config.get('debug', 'thumbnail')
 
 STAGE = False
 
 SITE_ID = 1
-SECRET_KEY = 'TODO'
+SECRET_KEY = config.get('security', 'secret_key')
 
 ADMINS = (
     ('Geoff Froh', 'geoff.froh@densho.us'),
@@ -29,11 +43,11 @@ ADMINS = (
 MANAGERS = ADMINS
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'TODO'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'TODO'
-EMAIL_HOST_PASSWORD = 'TODO'
+EMAIL_HOST = config.get('email', 'host')
+EMAIL_PORT = config.get('email', 'port')
+EMAIL_USE_TLS = config.get('email', 'use_tls')
+EMAIL_HOST_USER = config.get('email', 'host_user')
+EMAIL_HOST_PASSWORD = config.get('email', 'host_password')
 EMAIL_SUBJECT_PREFIX = '[front] '
 SERVER_EMAIL = 'front@densho.org'
 
@@ -63,12 +77,10 @@ CACHE_MIDDLEWARE_KEY_PREFIX = 'front'
 CACHE_TIMEOUT = 60 * 5
 
 STATIC_ROOT = '/usr/local/src/encyc-front/front/static/'
-STATIC_URL = 'http://encyclopedia.densho.org/front/static/'
-#STATIC_URL = 'http://localhost:8000/static/'
-
+STATIC_URL = config.get('media', 'static_url')
 MEDIA_ROOT = '/var/www/front/media/'
-MEDIA_URL = 'http://encyclopedia.densho.org/front/media/'
-#MEDIA_URL = 'http://localhost:8000/media/'
+MEDIA_URL = config.get('media', 'media_url')
+MEDIA_URL_LOCAL = config.get('media', 'media_url_local')
 
 TEMPLATE_DIRS = (
     '/usr/local/src/encyc-front/front/templates/',
@@ -97,12 +109,10 @@ INSTALLED_APPS = (
 
 # wikiprox
 WIKIPROX_MEDIAWIKI_HTML = 'http://dango.densho.org:9066/mediawiki/index.php'
-#WIKIPROX_MEDIAWIKI_HTML = 'http://127.0.0.1:9000/mediawiki/index.php'
-WIKIPROX_MEDIAWIKI_API  = 'http://dango:9066/mediawiki/api.php'
-#WIKIPROX_MEDIAWIKI_API  = 'http://127.0.0.1:9000/mediawiki/api.php'
-WIKIPROX_MEDIAWIKI_API_USERNAME = 'frontbot'
-WIKIPROX_MEDIAWIKI_API_PASSWORD = 'TODO'
-WIKIPROX_MEDIAWIKI_API_TIMEOUT = 5
+WIKIPROX_MEDIAWIKI_API  = config.get('mediawiki', 'api_url')
+WIKIPROX_MEDIAWIKI_API_USERNAME = config.get('mediawiki', 'api_username')
+WIKIPROX_MEDIAWIKI_API_PASSWORD = config.get('mediawiki', 'api_password')
+WIKIPROX_MEDIAWIKI_API_TIMEOUT = config.get('mediawiki', 'api_timeout')
 WIKIPROX_MEDIAWIKI_DEFAULT_PAGE = 'Encyclopedia'
 WIKIPROX_MEDIAWIKI_TITLE = ' - Densho Encyclopedia'
 WIKIPROX_SHOW_UNPUBLISHED = False
@@ -114,33 +124,33 @@ WIKIPROX_HIDDEN_CATEGORIES = (
     'Status_2',
     'Status_3',
 )
-#EDITORS_MEDIAWIKI_USER = 'denshowiki'
-#EDITORS_MEDIAWIKI_PASS = 'TODO'
-TANSU_API  = 'http://dango:8080/api/v1.0'
-#TANSU_API  = 'http://127.0.0.1:8080/api/v1.0'
-TANSU_MEDIA_URL = 'http://encyclopedia.densho.org/psms/media/'
-TANSU_MEDIA_URL_LOCAL  = 'http://192.168.0.16/psms/media/'
-TANSU_MEDIA_URL_LOCAL_MARKER = 'internal'
-SOURCES_BASE = 'http://encyclopedia.densho.org/'
-#SOURCES_BASE = 'http://192.168.0.16/wiki/'
-RTMP_STREAMER = 'rtmp://streaming.densho.org/denshostream'
+TANSU_API  = config.get('sources', 'api_url')
+TANSU_MEDIA_URL = config.get('sources', 'media_url')
+TANSU_MEDIA_URL_LOCAL  = config.get('sources', 'media_url_local')
+TANSU_MEDIA_URL_LOCAL_MARKER = config.get('sources', 'media_url_local_marker')
+SOURCES_BASE = config.get('sources', 'base_url')
+RTMP_STREAMER = config.get('sources', 'rtmp_streamer')
 
 DANGO_HTPASSWD_USER = 'TODO'
 DANGO_HTPASSWD_PWD  = 'TODO'
 
-GOOGLE_CUSTOM_SEARCH_PASSWORD='TODO'
+GOOGLE_CUSTOM_SEARCH_PASSWORD = config.get('search', 'google_custom_search_password')
 
-DDR_TOPICS_SRC_URL = 'http://partner.densho.org/vocab/api/0.2/topics.json'
-DDR_TOPICS_BASE = 'http://ddr.densho.org/browse/topics'
+DDR_TOPICS_SRC_URL = config.get('ddr', 'topics_src_url')
+DDR_TOPICS_BASE = config.get('ddr', 'topics_base')
 
-DOCSTORE_HOSTS = [{
-    'host':'127.0.0.1',
-    'port':9200
-}]
-DOCSTORE_INDEX = 'encyc-production'
+DOCSTORE_HOSTS = []
+for node in config.get('elasticsearch', 'hosts').strip().split(','):
+    host,port = node.strip().split(':')
+    DOCSTORE_HOSTS.append(
+        {'host':host, 'port':port}
+    )
+DOCSTORE_INDEX = config.get('elasticsearch', 'index')
 
-DDRPUBLIC_API = 'http://ddr.densho.org/api/0.1'
-DDRPUBLIC_LOCAL_MEDIA_MARKER = 'internal'
+DDRPUBLIC_API = config.get('ddr', 'api_url')
+DDRPUBLIC_MEDIA_URL = config.get('ddr', 'media_url')
+DDRPUBLIC_MEDIA_URL_LOCAL = config.get('ddr', 'media_url_local')
+DDRPUBLIC_LOCAL_MEDIA_MARKER = config.get('ddr', 'media_url_local_marker')
 
 # sorl-thumbnail
 THUMBNAIL_KVSTORE = 'sorl.thumbnail.kvstores.cached_db_kvstore.KVStore'
@@ -150,7 +160,7 @@ THUMBNAIL_IDENTIFY = 'identify'
 THUMBNAIL_CACHE_TIMEOUT = 60*60*24*365*10  # 10 years
 THUMBNAIL_DUMMY = False
 THUMBNAIL_URL_TIMEOUT = 60  # 1min
-THUMBNAIL_URL = 'http://encyclopedia.densho.org/media/'
+THUMBNAIL_URL = config.get('ddr', 'media_url')
 
 # ----------------------------------------------------------------------
 

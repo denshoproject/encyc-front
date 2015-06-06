@@ -282,6 +282,12 @@ install-configs:
 	cp /usr/local/src/encyc-front/debian/conf/settings.py /usr/local/src/encyc-front/front/front/
 	chown root.root /usr/local/src/encyc-front/front/front/settings.py
 	chmod 644 /usr/local/src/encyc-front/front/front/settings.py
+	cp /usr/local/src/encyc-front/debian/conf/production.cfg /etc/encyc/
+	chown root.encyc /etc/encyc/production.cfg
+	chmod 640 /etc/encyc/production.cfg
+	touch /etc/encyc/local.cfg
+	chown root.encyc /etc/encyc/local.cfg
+	chmod 640 /etc/encyc/local.cfg
 # nginx settings
 	cp /usr/local/src/encyc-front/debian/conf/front.conf /etc/nginx/sites-available
 	chown root.root /etc/nginx/sites-available/front.conf

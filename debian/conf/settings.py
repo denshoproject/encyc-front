@@ -134,12 +134,12 @@ CACHE_MIDDLEWARE_KEY_PREFIX = 'front'
 # low-level caching
 CACHE_TIMEOUT = 60 * 5
 
-STATIC_ROOT = '/usr/local/src/encyc-front/front/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 MEDIA_ROOT = '/var/www/front/media/'
 
 TEMPLATE_DIRS = (
-    '/usr/local/src/encyc-front/front/templates/',
-    '/usr/local/src/encyc-front/front/wikiprox/templates/',
+    os.path.join(BASE_DIR, 'templates/'),
+    os.path.join(BASE_DIR, 'wikiprox/templates/'),
 )
 
 INSTALLED_APPS = (

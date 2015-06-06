@@ -31,6 +31,73 @@ DEBUG = config.get('debug', 'debug')
 TEMPLATE_DEBUG = DEBUG
 THUMBNAIL_DEBUG = config.get('debug', 'thumbnail')
 
+STATIC_URL = config.get('media', 'static_url')
+MEDIA_URL = config.get('media', 'media_url')
+MEDIA_URL_LOCAL = config.get('media', 'media_url_local')
+
+# elasticsearch
+DOCSTORE_HOSTS = []
+for node in config.get('elasticsearch', 'hosts').strip().split(','):
+    host,port = node.strip().split(':')
+    DOCSTORE_HOSTS.append(
+        {'host':host, 'port':port}
+    )
+DOCSTORE_INDEX = config.get('elasticsearch', 'index')
+
+# mediawiki
+WIKIPROX_MEDIAWIKI_HTML = 'http://dango.densho.org:9066/mediawiki/index.php'
+WIKIPROX_MEDIAWIKI_API  = config.get('mediawiki', 'api_url')
+WIKIPROX_MEDIAWIKI_API_USERNAME = config.get('mediawiki', 'api_username')
+WIKIPROX_MEDIAWIKI_API_PASSWORD = config.get('mediawiki', 'api_password')
+WIKIPROX_MEDIAWIKI_API_TIMEOUT = config.get('mediawiki', 'api_timeout')
+WIKIPROX_MEDIAWIKI_DEFAULT_PAGE = 'Encyclopedia'
+WIKIPROX_MEDIAWIKI_TITLE = ' - Densho Encyclopedia'
+WIKIPROX_SHOW_UNPUBLISHED = False
+WIKIPROX_HIDDEN_CATEGORIES = (
+    'Articles_Needing_Primary_Source_Video',
+    'CAL60',
+    'In_Camp',
+    'NeedMoreInfo',
+    'Status_2',
+    'Status_3',
+)
+
+# primary sources
+TANSU_API  = config.get('sources', 'api_url')
+TANSU_MEDIA_URL = config.get('sources', 'media_url')
+TANSU_MEDIA_URL_LOCAL  = config.get('sources', 'media_url_local')
+TANSU_MEDIA_URL_LOCAL_MARKER = config.get('sources', 'media_url_local_marker')
+SOURCES_BASE = config.get('sources', 'base_url')
+RTMP_STREAMER = config.get('sources', 'rtmp_streamer')
+
+# ddr
+DDR_TOPICS_SRC_URL = config.get('ddr', 'topics_src_url')
+DDR_TOPICS_BASE = config.get('ddr', 'topics_base')
+DDRPUBLIC_API = config.get('ddr', 'api_url')
+DDRPUBLIC_MEDIA_URL = config.get('ddr', 'media_url')
+DDRPUBLIC_MEDIA_URL_LOCAL = config.get('ddr', 'media_url_local')
+DDRPUBLIC_LOCAL_MEDIA_MARKER = config.get('ddr', 'media_url_local_marker')
+
+# sorl
+THUMBNAIL_URL = config.get('ddr', 'media_url')
+
+# search
+GOOGLE_CUSTOM_SEARCH_PASSWORD = config.get('search', 'google_custom_search_password')
+
+DANGO_HTPASSWD_USER = 'TODO'
+DANGO_HTPASSWD_PWD  = 'TODO'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = config.get('email', 'host')
+EMAIL_PORT = config.get('email', 'port')
+EMAIL_USE_TLS = config.get('email', 'use_tls')
+EMAIL_HOST_USER = config.get('email', 'host_user')
+EMAIL_HOST_PASSWORD = config.get('email', 'host_password')
+EMAIL_SUBJECT_PREFIX = '[front] '
+SERVER_EMAIL = 'front@densho.org'
+
+# ----------------------------------------------------------------------
+
 STAGE = False
 
 SITE_ID = 1
@@ -41,15 +108,6 @@ ADMINS = (
     ('geoffrey jost', 'geoffrey.jost@densho.us'),
 )
 MANAGERS = ADMINS
-
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = config.get('email', 'host')
-EMAIL_PORT = config.get('email', 'port')
-EMAIL_USE_TLS = config.get('email', 'use_tls')
-EMAIL_HOST_USER = config.get('email', 'host_user')
-EMAIL_HOST_PASSWORD = config.get('email', 'host_password')
-EMAIL_SUBJECT_PREFIX = '[front] '
-SERVER_EMAIL = 'front@densho.org'
 
 DATABASES = {
     'default': {
@@ -77,10 +135,7 @@ CACHE_MIDDLEWARE_KEY_PREFIX = 'front'
 CACHE_TIMEOUT = 60 * 5
 
 STATIC_ROOT = '/usr/local/src/encyc-front/front/static/'
-STATIC_URL = config.get('media', 'static_url')
 MEDIA_ROOT = '/var/www/front/media/'
-MEDIA_URL = config.get('media', 'media_url')
-MEDIA_URL_LOCAL = config.get('media', 'media_url_local')
 
 TEMPLATE_DIRS = (
     '/usr/local/src/encyc-front/front/templates/',
@@ -105,53 +160,6 @@ INSTALLED_APPS = (
     'wikiprox',
 )
 
-# ----------------------------------------------------------------------
-
-# wikiprox
-WIKIPROX_MEDIAWIKI_HTML = 'http://dango.densho.org:9066/mediawiki/index.php'
-WIKIPROX_MEDIAWIKI_API  = config.get('mediawiki', 'api_url')
-WIKIPROX_MEDIAWIKI_API_USERNAME = config.get('mediawiki', 'api_username')
-WIKIPROX_MEDIAWIKI_API_PASSWORD = config.get('mediawiki', 'api_password')
-WIKIPROX_MEDIAWIKI_API_TIMEOUT = config.get('mediawiki', 'api_timeout')
-WIKIPROX_MEDIAWIKI_DEFAULT_PAGE = 'Encyclopedia'
-WIKIPROX_MEDIAWIKI_TITLE = ' - Densho Encyclopedia'
-WIKIPROX_SHOW_UNPUBLISHED = False
-WIKIPROX_HIDDEN_CATEGORIES = (
-    'Articles_Needing_Primary_Source_Video',
-    'CAL60',
-    'In_Camp',
-    'NeedMoreInfo',
-    'Status_2',
-    'Status_3',
-)
-TANSU_API  = config.get('sources', 'api_url')
-TANSU_MEDIA_URL = config.get('sources', 'media_url')
-TANSU_MEDIA_URL_LOCAL  = config.get('sources', 'media_url_local')
-TANSU_MEDIA_URL_LOCAL_MARKER = config.get('sources', 'media_url_local_marker')
-SOURCES_BASE = config.get('sources', 'base_url')
-RTMP_STREAMER = config.get('sources', 'rtmp_streamer')
-
-DANGO_HTPASSWD_USER = 'TODO'
-DANGO_HTPASSWD_PWD  = 'TODO'
-
-GOOGLE_CUSTOM_SEARCH_PASSWORD = config.get('search', 'google_custom_search_password')
-
-DDR_TOPICS_SRC_URL = config.get('ddr', 'topics_src_url')
-DDR_TOPICS_BASE = config.get('ddr', 'topics_base')
-
-DOCSTORE_HOSTS = []
-for node in config.get('elasticsearch', 'hosts').strip().split(','):
-    host,port = node.strip().split(':')
-    DOCSTORE_HOSTS.append(
-        {'host':host, 'port':port}
-    )
-DOCSTORE_INDEX = config.get('elasticsearch', 'index')
-
-DDRPUBLIC_API = config.get('ddr', 'api_url')
-DDRPUBLIC_MEDIA_URL = config.get('ddr', 'media_url')
-DDRPUBLIC_MEDIA_URL_LOCAL = config.get('ddr', 'media_url_local')
-DDRPUBLIC_LOCAL_MEDIA_MARKER = config.get('ddr', 'media_url_local_marker')
-
 # sorl-thumbnail
 THUMBNAIL_KVSTORE = 'sorl.thumbnail.kvstores.cached_db_kvstore.KVStore'
 THUMBNAIL_ENGINE = 'sorl.thumbnail.engines.convert_engine.Engine'
@@ -160,9 +168,6 @@ THUMBNAIL_IDENTIFY = 'identify'
 THUMBNAIL_CACHE_TIMEOUT = 60*60*24*365*10  # 10 years
 THUMBNAIL_DUMMY = False
 THUMBNAIL_URL_TIMEOUT = 60  # 1min
-THUMBNAIL_URL = config.get('ddr', 'media_url')
-
-# ----------------------------------------------------------------------
 
 #STATICFILES_FINDERS = (
 #    'django.contrib.staticfiles.finders.FileSystemFinder',

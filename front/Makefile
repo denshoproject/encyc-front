@@ -331,10 +331,11 @@ restart-supervisor:
 
 
 status:
-	/etc/init.d/redis-server status
-	/etc/init.d/elasticsearch status
-	/etc/init.d/nginx status
-	supervisorctl status
+	@echo [`systemctl is-active nginx`] nginx
+	@echo [`systemctl is-active redis-server`] redis
+	@echo [`systemctl is-active elasticsearch`] elasticsearch
+	@echo [`systemctl is-active supervisor`] supervisor
+	@supervisorctl status
 
 git-status:
 	@echo "------------------------------------------------------------------------"

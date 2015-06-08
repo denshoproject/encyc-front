@@ -160,11 +160,6 @@ def related_ddr(request, url_title='index', template_name='wikiprox/related-ddr.
         page = Page.get(url_title)
     except NotFoundError:
         raise Http404
-    related = Backend().related_ddr([term['id'] for term in page.topics()])
-    page.related_ddr = []
-    for term in page.topics():
-        term['documents'] = related[term['id']]
-        page.related_ddr.append(term)
     return render_to_response(
         template_name,
         {

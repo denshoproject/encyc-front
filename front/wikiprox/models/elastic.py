@@ -320,17 +320,6 @@ class Page(DocType):
             cache.set(KEY, data, TIMEOUT)
         return data
 
-    def related_ddr(self, size=5):
-        """Get objects for terms from DDR.
-        Ironic: this uses DDR's REST UI rather than ES.
-        """
-        self._related_ddr = ddr.related_by_topic(
-            term_ids=[term['id'] for term in self.topics()],
-            size=size,
-            balanced=True
-        )
-        return self._related_ddr
-
     def scrub(self):
         """remove internal editorial markers.
         
@@ -355,12 +344,51 @@ class Page(DocType):
         return objects
     
     def topics(self):
-        terms = Elasticsearch.topics_by_url().get(self.absolute_url(), [])
-        for term in terms:
-            term['ddr_topic_url'] = '%s/%s/' % (
-                settings.DDR_TOPICS_BASE, term['id'])
+        """List of DDR topics associated with this page.
+        
+        @returns: list
+        """
+        if not hasattr(self, '_topics'):
+            # return list of dicts rather than an Elasticsearch results object
+            _topics = [
+                {key: val for key,val in t.iteritems()}
+                for t in Elasticsearch.topics_by_url().get(self.absolute_url(), [])
+            ]
+            for term in _topics:
+                term['ddr_topic_url'] = '%s/%s/' % (
+                    settings.DDR_TOPICS_BASE,
+                    term['id']
+                )
+                term.pop('encyc_urls')
+            self._topics = _topics
+        return self._topics
+    
+    def ddr_terms_objects(self, size=100):
+        """Get dict of DDR objects for article's DDR topic terms.
+        
+        Ironic: this uses DDR's REST UI rather than ES.
+        """
+        if not hasattr(self, '_related_terms_docs'):
+            terms = self.topics()
+            objects = ddr.related_by_topic(
+                term_ids=[term['id'] for term in terms],
+                size=size
+            )
+            for term in terms:
+                term['objects'] = objects[term['id']]
         return terms
-
+    
+    def ddr_objects(self, size=5):
+        """Get list of objects for terms from DDR.
+        
+        Ironic: this uses DDR's REST UI rather than ES.
+        """
+        objects = ddr.related_by_topic(
+            term_ids=[term['id'] for term in self.topics()],
+            size=size
+        )
+        return ddr._balance(objects, size)
+    
     @staticmethod
     def from_mw(mwpage):
         """Creates an Page object from a models.legacy.Page object.

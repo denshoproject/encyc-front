@@ -60,7 +60,7 @@ def _balance(results, size):
     round2 = [doc for doc in round1 if doc]
     return round2
 
-def related_by_topic(term_ids, size, balanced=False):
+def related_by_topic(term_ids, size):
     """Documents from DDR related to terms.
     
     @param term_ids: list of Topic term IDs.
@@ -70,6 +70,4 @@ def related_by_topic(term_ids, size, balanced=False):
         tid: _term_documents(tid, size)
         for tid in term_ids
     }
-    if balanced:
-        return _balance(term_results, size)
     return term_results

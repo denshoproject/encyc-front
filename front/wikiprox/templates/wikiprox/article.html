@@ -198,37 +198,27 @@
   <div class="toplink visible-phone"><a href="#top"><i class="icon-chevron-up"></i> Top</a></div>
 
 
-{% if page.related_ddr %}
+{% if page.ddr_objects %}
   <div class="block">
     <p>
     <strong>From the Densho Digital Repository</strong>
     </p>
     <p>
-{% for document in page.related_ddr %}
-{% thumbnail document.img_url "400x400" as img %}
+{% for object in page.ddr_objects %}
+{% thumbnail object.img_url "400x400" as img %}
 <a class="image lightview"
       href="{{ THUMBNAIL_URL }}{{ img }}"
-      data-lightview-caption="{{ document.title }} ({{ document.id }})">
+      data-lightview-caption="{{ object.title }} ({{ object.id }})">
     <img class="img-polaroid"
       src="{{ THUMBNAIL_URL }}{{ img }}"
       large="{{ THUMBNAIL_URL }}{{ img }}"
       more=""
-      title="{{ document.title|safe }}"
-      alt="{{ document.title|safe }}" />
+      title="{{ object.title|safe }}"
+      alt="{{ object.title|safe }}" />
     </a>
 {% endthumbnail %}
 {% endfor %}
     <a href="/ddr/{{ page.title }}/" class="more">See more »</a>
-    </p>
-</div>
-{% endif %}
-{% if page.related_ddr_error %}
-<div class="block" style="border:2px solid #cb6664; background-color:#F2DEDE; color:#A94442; padding:5px;">
-    <p>
-    <strong>
-    Could not get data from the DDR:<br/>
-    </strong>
-    {{ page.related_ddr_error }}
     </p>
 </div>
 {% endif %}

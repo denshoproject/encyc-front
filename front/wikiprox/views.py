@@ -154,16 +154,25 @@ def source_cite(request, encyclopedia_id, template_name='wikiprox/cite.html'):
 
 @require_http_methods(['GET',])
 def related_ddr(request, url_title='index', template_name='wikiprox/related-ddr.html'):
-    """
+    """List of topic terms and DDR objects relating to page
     """
     try:
         page = Page.get(url_title)
     except NotFoundError:
         raise Http404
+    # Don't show <ul> list of topics (with links) at top
+    # unless there are more than one
+    page_topics = [
+        term
+        for term in page.ddr_terms_objects()
+        if term['objects']
+    ]
+    show_topics_ul = len(page_topics) - 1
     return render_to_response(
         template_name,
         {
             'page': page,
+            'show_topics_ul': show_topics_ul,
             'THUMBNAIL_URL': settings.THUMBNAIL_URL,
         },
         context_instance=RequestContext(request)

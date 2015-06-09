@@ -25,10 +25,10 @@ From the Densho Digital Repository
 Related topics and primary source items from the <a href="http://ddr.densho.org/" target="_blank">Densho Digital Repository</a>.
 </p>
 
-{% if page.related_ddr %}
+{% if show_topics_ul %}
 <ul>
-{% for term in page.related_ddr %}
-{% if term.documents %}
+{% for term in page.ddr_terms_objects %}
+{% if term.objects %}
   <li><a href="#{{ term.id }}">{{ term.title|safe }}</a></li>
 {% endif %}
 {% endfor %}
@@ -39,8 +39,8 @@ Related topics and primary source items from the <a href="http://ddr.densho.org/
 </div><!-- .row -->
 
 
-{% for term in page.related_ddr %}
-{% if term.documents %}
+{% for term in page.ddr_terms_objects %}
+{% if term.objects %}
 <a name="{{ term.id }}"></a>
 <div class="row">
   <div class="span12">
@@ -48,17 +48,17 @@ Related topics and primary source items from the <a href="http://ddr.densho.org/
   </div><!-- .span12 -->
 </div><!-- .row -->
 
-{% for document in term.documents %}
-{% thumbnail document.img_url "400x400" as img %}
+{% for object in term.objects %}
+{% thumbnail object.img_url "400x400" as img %}
 <div class="row">
   <div class="span3">
-    <a href="{{ document.absolute_url }}"><img class="img-responsive img-polaroid" src="{{ THUMBNAIL_URL }}{{ img }}"></a>
+    <a href="{{ object.absolute_url }}"><img class="img-responsive img-polaroid" src="{{ THUMBNAIL_URL }}{{ img }}"></a>
   </div>
   <div class="span9">
-    <h4>{{ document.title|safe }}</h4>
-    {{ document.description|safe|truncatewords_html:50 }}
+    <h4>{{ object.title|safe }}</h4>
+    {{ object.description|safe|truncatewords_html:50 }}
     <br/>
-    <a class="more" href="{{ document.absolute_url }}">View in DDR &raquo;</a>
+    <a class="more" href="{{ object.absolute_url }}">View in DDR &raquo;</a>
   </div>
 </div>
 {% endthumbnail %}
@@ -73,8 +73,8 @@ Related topics and primary source items from the <a href="http://ddr.densho.org/
     </p>
   </div>
 </div><!-- .row -->
-{% endif %}{# term.documents #}
-{% endfor %}
+{% endif %}{# term.objects #}
+{% endfor %}{# page.ddr_terms_objects #}
 
 
 <div class="row">

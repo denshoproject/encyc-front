@@ -152,7 +152,9 @@
 {% block sidebar_right %}
 <div id="sidebar-right" class="span3 visible-phone">
 
-  <a name="primary-sources"></a>
+
+{% if page.sources %}
+<a name="primary-sources"></a>
   <div class="block primarysources">
 {% for source in page.sources %}
 {% primarysource source %}
@@ -160,6 +162,7 @@
   </div><!-- .block .primarysources -->
 
   <div class="toplink visible-phone"><a href="#top"><i class="icon-chevron-up"></i> Top</a></div>
+{% endif %}{# page.sources #}
 
 
 {% if page.ddr_objects %}

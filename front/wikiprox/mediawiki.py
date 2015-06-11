@@ -80,8 +80,7 @@ def parse_mediawiki_text(text, primary_sources, public=False, printed=False):
     #soup = wrap_sections(soup)
     soup = rewrite_newpage_links(soup)
     soup = rewrite_prevnext_links(soup)
-    if public:
-        soup = remove_status_markers(soup)
+    soup = remove_status_markers(soup)
     if not printed:
         soup = add_top_links(soup)
     soup = remove_primary_sources(soup, primary_sources)

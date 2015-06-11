@@ -162,15 +162,29 @@
   <div class="toplink visible-phone"><a href="#top"><i class="icon-chevron-up"></i> Top</a></div>
 
 
-{% if page.topics %}
-<div style="border:5px dashed orange; margin-top:10px; margin-bottom:10px;">
-  <h3>DDR Topics</h3>
-  <ul>
-  {% for term in page.topics %}
-    <li><a href="{{ term.ddr_topic_url }}">{{ term.title }}</a></li>
-  {% endfor %}
-  </ul>
-</div>
+{% if page.ddr_objects %}
+  <div class="block">
+    <p>
+    <strong>From the Densho Digital Repository</strong>
+    </p>
+    <p>
+{% for object in page.ddr_objects %}
+{% thumbnail object.img_url "130x100" as img %}
+<a href="/ddr/{{ page.title }}/" data-lightview-caption="{{ object.title }} ({{ object.id }})">
+    <img src="{{ THUMBNAIL_URL }}{{ img }}"
+         large="{{ THUMBNAIL_URL }}{{ img }}"
+         more=""
+         title="{{ object.title|safe }}"
+         alt="{{ object.title|safe }}" />
+  </a>
+{% endthumbnail %}
+{% endfor %}
+    </p>
+    <p>
+    <a href="/ddr/{{ page.title }}/" class="more">See more »</a>
+    </p>
+  </div>
+  <div class="toplink visible-phone"><a href="#top"><i class="icon-chevron-up"></i> Top</a></div>
 {% endif %}
 
 

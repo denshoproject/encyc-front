@@ -168,10 +168,18 @@ def related_ddr(request, url_title='index', template_name='wikiprox/related-ddr.
         if term['objects']
     ]
     show_topics_ul = len(page_topics) - 1
+    # show small number of objects, distributed among topics
+    TOTAL_OBJECTS = 10
+    terms_objects = page.ddr_terms_objects(size=TOTAL_OBJECTS)
+    ddr_terms_objects = ddr.distribute(
+        terms_objects,
+        TOTAL_OBJECTS
+    )
     return render_to_response(
         template_name,
         {
             'page': page,
+            'ddr_terms_objects': ddr_terms_objects,
             'show_topics_ul': show_topics_ul,
             'THUMBNAIL_URL': settings.THUMBNAIL_URL,
         },

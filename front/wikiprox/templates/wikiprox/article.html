@@ -205,19 +205,18 @@
     </p>
     <p>
 {% for object in page.ddr_objects %}
-{% thumbnail object.img_url "400x400" as img %}
-<a class="image lightview"
-      href="{{ THUMBNAIL_URL }}{{ img }}"
-      data-lightview-caption="{{ object.title }} ({{ object.id }})">
-    <img class="img-polaroid"
-      src="{{ THUMBNAIL_URL }}{{ img }}"
-      large="{{ THUMBNAIL_URL }}{{ img }}"
-      more=""
-      title="{{ object.title|safe }}"
-      alt="{{ object.title|safe }}" />
-    </a>
+{% thumbnail object.img_url "130x100" as img %}
+<a href="/ddr/{{ page.title }}/" data-lightview-caption="{{ object.title }} ({{ object.id }})">
+    <img src="{{ THUMBNAIL_URL }}{{ img }}"
+         large="{{ THUMBNAIL_URL }}{{ img }}"
+         more=""
+         title="{{ object.title|safe }}"
+         alt="{{ object.title|safe }}" />
+  </a>
 {% endthumbnail %}
 {% endfor %}
+    </p>
+    <p>
     <a href="/ddr/{{ page.title }}/" class="more">See more »</a>
     </p>
 </div>

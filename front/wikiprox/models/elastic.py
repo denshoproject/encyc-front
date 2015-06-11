@@ -348,20 +348,20 @@ class Page(DocType):
         
         @returns: list
         """
-        if not hasattr(self, '_topics'):
-            # return list of dicts rather than an Elasticsearch results object
-            _topics = [
-                {key: val for key,val in t.iteritems()}
-                for t in Elasticsearch.topics_by_url().get(self.absolute_url(), [])
-            ]
-            for term in _topics:
-                term['ddr_topic_url'] = '%s/%s/' % (
-                    settings.DDR_TOPICS_BASE,
-                    term['id']
-                )
-                term.pop('encyc_urls')
-            self._topics = _topics
-        return self._topics
+        # return list of dicts rather than an Elasticsearch results object
+        terms = []
+        for t in Elasticsearch.topics_by_url().get(self.absolute_url(), []):
+            term = {
+                key: val
+                for key,val in t.iteritems()
+            }
+            term.pop('encyc_urls')
+            term['ddr_topic_url'] = '%s/%s/' % (
+                settings.DDR_TOPICS_BASE,
+                term['id']
+            )
+            terms.append(term)
+        return terms
     
     def ddr_terms_objects(self, size=100):
         """Get dict of DDR objects for article's DDR topic terms.

@@ -22,8 +22,9 @@ def _term_documents(term_id, size):
     if cached:
         objects = json.loads(cached)
     else:
-        url = '%s/facet/topics/%s/objects/?%s=1' % (
-            settings.DDRPUBLIC_API, term_id, settings.DDRPUBLIC_LOCAL_MEDIA_MARKER)
+        url = '%s/facet/topics/%s/objects/?limit=%s&%s=1' % (
+            settings.DDRPUBLIC_API, term_id, size, settings.DDRPUBLIC_LOCAL_MEDIA_MARKER
+        )
         r = requests.get(
             url,
             headers={'content-type':'application/json'},
@@ -60,11 +61,34 @@ def _balance(results, size):
     round2 = [doc for doc in round1 if doc]
     return round2
 
+def distribute(terms_objects, limit):
+    """
+    @param terms_objects: list of dicts
+    @param limit: int
+    """
+    termid_objs = {}
+    hits = 0
+    misses = 0
+    while (hits < limit) and (misses < limit):
+        for term in terms_objects:
+            term_id = term['id']
+            if not termid_objs.get(term_id):
+                termid_objs[term_id] = []
+            if term['objects'] and (hits < limit):
+                o = term['objects'].pop(0)
+                termid_objs[term_id].append(o)
+                hits = hits + 1
+            else:
+                misses = misses + 1
+    for term in terms_objects:
+        term['objects'] = termid_objs.pop(term['id'])
+    return terms_objects
+
 def related_by_topic(term_ids, size):
     """Documents from DDR related to terms.
     
     @param term_ids: list of Topic term IDs.
-    @param size: int Maximum number of results to return.
+    @param size: int Number of results per term.
     """
     term_results = {
         tid: _term_documents(tid, size)

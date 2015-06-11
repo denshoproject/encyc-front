@@ -282,6 +282,7 @@ install-configs:
 	cp /usr/local/src/encyc-front/debian/conf/settings.py /usr/local/src/encyc-front/front/front/
 	chown root.root /usr/local/src/encyc-front/front/front/settings.py
 	chmod 644 /usr/local/src/encyc-front/front/front/settings.py
+	-mkdir /etc/encyc
 	cp /usr/local/src/encyc-front/debian/conf/production.cfg /etc/encyc/
 	chown root.encyc /etc/encyc/production.cfg
 	chmod 640 /etc/encyc/production.cfg

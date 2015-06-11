@@ -16,7 +16,7 @@ from wikiprox import mediawiki
 
 
 NON_ARTICLE_PAGES = ['about', 'categories', 'contact', 'contents', 'search',]
-TIMEOUT = settings.WIKIPROX_MEDIAWIKI_API_TIMEOUT
+TIMEOUT = float(settings.WIKIPROX_MEDIAWIKI_API_TIMEOUT)
 
 
 def api_login_round1(username, password):

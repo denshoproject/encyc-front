@@ -52,15 +52,15 @@ for node in config.get('elasticsearch', 'hosts').strip().split(','):
 DOCSTORE_INDEX = config.get('elasticsearch', 'index')
 
 # mediawiki
-WIKIPROX_MEDIAWIKI_HTML = 'http://dango.densho.org:9066/mediawiki/index.php'
-WIKIPROX_MEDIAWIKI_API  = config.get('mediawiki', 'api_url')
-WIKIPROX_MEDIAWIKI_API_USERNAME = config.get('mediawiki', 'api_username')
-WIKIPROX_MEDIAWIKI_API_PASSWORD = config.get('mediawiki', 'api_password')
-WIKIPROX_MEDIAWIKI_API_TIMEOUT = config.get('mediawiki', 'api_timeout')
-WIKIPROX_MEDIAWIKI_DEFAULT_PAGE = 'Encyclopedia'
-WIKIPROX_MEDIAWIKI_TITLE = ' - Densho Encyclopedia'
-WIKIPROX_SHOW_UNPUBLISHED = False
-WIKIPROX_HIDDEN_CATEGORIES = (
+MEDIAWIKI_HTML = 'http://dango.densho.org:9066/mediawiki/index.php'
+MEDIAWIKI_API  = config.get('mediawiki', 'api_url')
+MEDIAWIKI_API_USERNAME = config.get('mediawiki', 'api_username')
+MEDIAWIKI_API_PASSWORD = config.get('mediawiki', 'api_password')
+MEDIAWIKI_API_TIMEOUT = config.get('mediawiki', 'api_timeout')
+MEDIAWIKI_DEFAULT_PAGE = 'Encyclopedia'
+MEDIAWIKI_TITLE = ' - Densho Encyclopedia'
+MEDIAWIKI_SHOW_UNPUBLISHED = False
+MEDIAWIKI_HIDDEN_CATEGORIES = (
     'Articles_Needing_Primary_Source_Video',
     'CAL60',
     'In_Camp',

@@ -224,7 +224,7 @@ class Proxy(object):
         page = Page()
         page.url_title = url_title
         page.uri = reverse('wikiprox-page', args=[url_title])
-        page.url = mediawiki.page_data_url(settings.WIKIPROX_MEDIAWIKI_API, page.url_title)
+        page.url = mediawiki.page_data_url(settings.MEDIAWIKI_API, page.url_title)
         logger.debug(page.url)
         auth = (settings.DANGO_HTPASSWD_USER, settings.DANGO_HTPASSWD_PWD)
         r = requests.get(page.url, auth=auth)
@@ -239,7 +239,7 @@ class Proxy(object):
             # note: header is added by Nginx, should not appear when connected directly
             # to the app server.
             page.published = mediawiki.page_is_published(pagedata)
-            page.lastmod = mediawiki.page_lastmod(settings.WIKIPROX_MEDIAWIKI_API, page.url_title)
+            page.lastmod = mediawiki.page_lastmod(settings.MEDIAWIKI_API, page.url_title)
             # basic page context
             page.title = pagedata['parse']['displaytitle']
             page.title_sort = page.title
@@ -333,7 +333,7 @@ class Elasticsearch(object):
         ).fields([
             'title', 'title_sort', 'categories',
         ])[0:docstore.MAX_SIZE]
-        if not settings.WIKIPROX_SHOW_UNPUBLISHED:
+        if not settings.MEDIAWIKI_SHOW_UNPUBLISHED:
             s = s.query('match', published=True)
         response = s.execute()
         pages = []
@@ -349,7 +349,7 @@ class Elasticsearch(object):
         for page in articles:
             for category in page.categories:
                 # exclude internal editorial categories
-                if category not in settings.WIKIPROX_HIDDEN_CATEGORIES:
+                if category not in settings.MEDIAWIKI_HIDDEN_CATEGORIES:
                     if category not in categories.keys():
                         categories[category] = []
                     # pages already sorted so category lists will be sorted
@@ -431,7 +431,7 @@ class Elasticsearch(object):
         categories = [
             category
             for category in page.categories
-            if category not in settings.WIKIPROX_HIDDEN_CATEGORIES
+            if category not in settings.MEDIAWIKI_HIDDEN_CATEGORIES
         ]
         page.categories = categories
         # sources
@@ -511,7 +511,7 @@ class Elasticsearch(object):
             if (posted < num) and (n > start):
                 logging.debug('%s/%s %s' % (n, len(titles), title))
                 page = Proxy().page(title)
-                if (page.published or settings.WIKIPROX_SHOW_UNPUBLISHED):
+                if (page.published or settings.MEDIAWIKI_SHOW_UNPUBLISHED):
                     page_sources = [source['encyclopedia_id'] for source in page.sources]
                     for source in page.sources:
                         logging.debug('     %s' % source['encyclopedia_id'])

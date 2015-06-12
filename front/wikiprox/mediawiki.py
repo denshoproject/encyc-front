@@ -12,7 +12,7 @@ from django.conf import settings
 
 TS_FORMAT = '%Y-%m-%dT%H:%M:%S'
 TS_FORMAT_ZONED = '%Y-%m-%dT%H:%M:%SZ'
-TIMEOUT = float(settings.WIKIPROX_MEDIAWIKI_API_TIMEOUT)
+TIMEOUT = float(settings.MEDIAWIKI_API_TIMEOUT)
 
 
 def page_data_url(api_url, page_title):

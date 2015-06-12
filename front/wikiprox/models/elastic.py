@@ -307,7 +307,7 @@ class Page(DocType):
             for page in Page.pages():
                 for category in page.categories:
                     # exclude internal editorial categories
-                    if category not in settings.WIKIPROX_HIDDEN_CATEGORIES:
+                    if category not in settings.MEDIAWIKI_HIDDEN_CATEGORIES:
                         if category not in categories.keys():
                             categories[category] = []
                         # pages already sorted so category lists will be sorted
@@ -610,7 +610,7 @@ class Elasticsearch(object):
             if (posted < num) and (n > start):
                 logging.debug('%s/%s %s' % (n, len(titles), title))
                 mwpage = Proxy().page(title)
-                if (mwpage.published or settings.WIKIPROX_SHOW_UNPUBLISHED):
+                if (mwpage.published or settings.MEDIAWIKI_SHOW_UNPUBLISHED):
                     page_sources = [source['encyclopedia_id'] for source in mwpage.sources]
                     for mwsource in mwpage.sources:
                         logging.debug('     %s' % mwsource['encyclopedia_id'])

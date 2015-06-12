@@ -9,7 +9,7 @@ urlpatterns = patterns(
     url(r"^index.php/(?P<page>[\w\W]+)/$", views.page, name='wikiprox-page'),
     url(r"^(?P<page>[\w\W]+)/$", views.page, name='wikiprox-page'),
     #
-    url(r'^$', lambda x: HttpResponseRedirect('/wiki/%s' % settings.WIKIPROX_MEDIAWIKI_DEFAULT_PAGE)),
+    url(r'^$', lambda x: HttpResponseRedirect('/wiki/%s' % settings.MEDIAWIKI_DEFAULT_PAGE)),
 )
 
 # problematic page titles

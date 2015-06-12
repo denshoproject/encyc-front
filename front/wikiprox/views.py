@@ -89,7 +89,7 @@ def article(request, url_title='index', printed=False, template_name='wikiprox/p
             return HttpResponseRedirect(reverse('wikiprox-author', args=[alt_title]))
         raise Http404
     
-    if (not page.published) and (not settings.WIKIPROX_SHOW_UNPUBLISHED):
+    if (not page.published) and (not settings.MEDIAWIKI_SHOW_UNPUBLISHED):
         template_name = 'wikiprox/unpublished.html'
     elif printed:
         template_name = 'wikiprox/article-print.html'
@@ -126,7 +126,7 @@ def page_cite(request, url_title, template_name='wikiprox/cite.html'):
         page = Page.get(url_title)
     except NotFoundError:
         raise Http404
-    if (not page.published) and (not settings.WIKIPROX_SHOW_UNPUBLISHED):
+    if (not page.published) and (not settings.MEDIAWIKI_SHOW_UNPUBLISHED):
         raise Http404
     citation = Citation(page, request)
     return render_to_response(

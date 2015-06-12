@@ -133,7 +133,7 @@ def articles(report=False, dryrun=False):
         logprint('debug', '%s/%s %s' % (n+1, len(articles_update), title))
         logprint('debug', 'getting from mediawiki')
         mwpage = Proxy().page(title)
-        if (mwpage.published or settings.WIKIPROX_SHOW_UNPUBLISHED):
+        if (mwpage.published or settings.MEDIAWIKI_SHOW_UNPUBLISHED):
             page_sources = [source['encyclopedia_id'] for source in mwpage.sources]
             for mwsource in mwpage.sources:
                 logprint('debug', '- source %s' % mwsource['encyclopedia_id'])

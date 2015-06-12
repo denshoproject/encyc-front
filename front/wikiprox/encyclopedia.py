@@ -16,11 +16,11 @@ from wikiprox import mediawiki
 
 
 NON_ARTICLE_PAGES = ['about', 'categories', 'contact', 'contents', 'search',]
-TIMEOUT = float(settings.WIKIPROX_MEDIAWIKI_API_TIMEOUT)
+TIMEOUT = float(settings.MEDIAWIKI_API_TIMEOUT)
 
 
 def api_login_round1(username, password):
-    url = '%s?action=login&format=xml' % (settings.WIKIPROX_MEDIAWIKI_API)
+    url = '%s?action=login&format=xml' % (settings.MEDIAWIKI_API)
     domain = urlparse(url).netloc
     if domain.find(':') > -1:
         domain = domain.split(':')[0]
@@ -38,7 +38,7 @@ def api_login_round1(username, password):
     return result
 
 def api_login_round2(username, password, result):
-    url = '%s?action=login&format=xml' % (settings.WIKIPROX_MEDIAWIKI_API)
+    url = '%s?action=login&format=xml' % (settings.MEDIAWIKI_API)
     domain = urlparse(url).netloc
     if domain.find(':') > -1:
         domain = domain.split(':')[0]
@@ -68,8 +68,8 @@ def api_login():
     HTTP requests.
     """
     cookies = []
-    username = settings.WIKIPROX_MEDIAWIKI_API_USERNAME
-    password = settings.WIKIPROX_MEDIAWIKI_API_PASSWORD
+    username = settings.MEDIAWIKI_API_USERNAME
+    password = settings.MEDIAWIKI_API_PASSWORD
     round1 = api_login_round1(username, password)
     round2 = api_login_round2(username, password, round1)
     if round2.get('result',None) \
@@ -79,7 +79,7 @@ def api_login():
     return cookies
 
 def api_logout():
-    url = '%s?action=logout' % (settings.WIKIPROX_MEDIAWIKI_API)
+    url = '%s?action=logout' % (settings.MEDIAWIKI_API)
     headers = {'content-type': 'application/json'}
     r = requests.post(url, headers=headers, timeout=TIMEOUT)
 
@@ -97,7 +97,7 @@ def all_pages():
         cookies = api_login()
         # all articles
         LIMIT=5000
-        url = '%s?action=query&generator=allpages&prop=revisions&rvprop=timestamp&gaplimit=5000&format=json' % (settings.WIKIPROX_MEDIAWIKI_API)
+        url = '%s?action=query&generator=allpages&prop=revisions&rvprop=timestamp&gaplimit=5000&format=json' % (settings.MEDIAWIKI_API)
         r = requests.get(url, headers={'content-type':'application/json'}, cookies=cookies, timeout=TIMEOUT)
         if r.status_code == 200:
             response = json.loads(r.text)
@@ -196,7 +196,7 @@ def category_members(category_name, namespace_id=None):
     else:
         cookies = api_login()
         LIMIT = 5000
-        url = '%s?format=json&action=query&list=categorymembers&cmsort=sortkey&cmprop=ids|sortkeyprefix|title&cmtitle=Category:%s&cmlimit=5000' % (settings.WIKIPROX_MEDIAWIKI_API, category_name)
+        url = '%s?format=json&action=query&list=categorymembers&cmsort=sortkey&cmprop=ids|sortkeyprefix|title&cmtitle=Category:%s&cmlimit=5000' % (settings.MEDIAWIKI_API, category_name)
         if namespace_id != None:
             url = '%s&gcmnamespace=%s' % (url, namespace_id)
         r = requests.get(url, headers={'content-type':'application/json'}, cookies=cookies, timeout=TIMEOUT)
@@ -248,7 +248,7 @@ def namespaces():
     if cached:
         namespaces = json.loads(cached)
     else:
-        url = '%s?action=query&meta=siteinfo&siprop=namespaces|namespacealiases&format=json' % (settings.WIKIPROX_MEDIAWIKI_API)
+        url = '%s?action=query&meta=siteinfo&siprop=namespaces|namespacealiases&format=json' % (settings.MEDIAWIKI_API)
         r = requests.get(url, headers={'content-type':'application/json'}, timeout=TIMEOUT)
         if r.status_code == 200:
             response = json.loads(r.text)
@@ -288,7 +288,7 @@ def page_categories(title, whitelist=[]):
             whitelist = category_article_types()
         article_categories = [c['title'] for c in whitelist]
         #
-        url = '%s?format=json&action=query&prop=categories&titles=%s' % (settings.WIKIPROX_MEDIAWIKI_API, title)
+        url = '%s?format=json&action=query&prop=categories&titles=%s' % (settings.MEDIAWIKI_API, title)
         r = requests.get(url, headers={'content-type':'application/json'}, timeout=TIMEOUT)
         if r.status_code == 200:
             response = json.loads(r.text)
@@ -363,7 +363,7 @@ def what_links_here(title):
     else:
         published = [page['title'] for page in published_pages()]
         #
-        url = '%s?format=json&action=query&list=backlinks&bltitle=%s&bllimit=5000' % (settings.WIKIPROX_MEDIAWIKI_API, title)
+        url = '%s?format=json&action=query&list=backlinks&bltitle=%s&bllimit=5000' % (settings.MEDIAWIKI_API, title)
         r = requests.get(url, headers={'content-type':'application/json'}, timeout=TIMEOUT)
         if r.status_code == 200:
             response = json.loads(r.text)

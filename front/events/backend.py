@@ -18,7 +18,7 @@ def events():
     if cached:
         objects = json.loads(cached)
     else:
-        url = '%s/events/' % settings.TANSU_API
+        url = '%s/events/' % settings.SOURCES_API
         r = requests.get(
             url, params={'limit':1000},
             headers={'content-type':'application/json'},

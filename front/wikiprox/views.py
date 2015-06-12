@@ -191,7 +191,7 @@ def media(request, filename, template_name='wikiprox/mediafile.html'):
     """
     """
     mediafile = None
-    url = '%s/imagefile/?uri=tansu/%s' % (settings.TANSU_API, filename)
+    url = '%s/imagefile/?uri=tansu/%s' % (settings.SOURCES_API, filename)
     r = requests.get(url, headers={'content-type':'application/json'})
     if r.status_code != 200:
         assert False
@@ -201,7 +201,7 @@ def media(request, filename, template_name='wikiprox/mediafile.html'):
     return render_to_response(
         template_name,
         {
-            'media_url': settings.TANSU_MEDIA_URL,
+            'media_url': settings.SOURCES_MEDIA_URL,
             'mediafile': mediafile,
         },
         context_instance=RequestContext(request)

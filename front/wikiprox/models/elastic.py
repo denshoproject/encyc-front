@@ -338,8 +338,8 @@ class Page(DocType):
         # sorl.thumbnail-friendly URL
         for source in objects:
             source.img_url = source.display.replace(
-                settings.TANSU_MEDIA_URL,
-                settings.TANSU_MEDIA_URL_LOCAL
+                settings.SOURCES_MEDIA_URL,
+                settings.SOURCES_MEDIA_URL_LOCAL
             )
         return objects
     

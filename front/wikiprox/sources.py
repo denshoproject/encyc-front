@@ -16,7 +16,7 @@ TS_FORMAT = '%Y-%m-%d %H:%M:%S'
 
 def source(encyclopedia_id):
     source = None
-    url = '%s/primarysource/?encyclopedia_id=%s' % (settings.TANSU_API, encyclopedia_id)
+    url = '%s/primarysource/?encyclopedia_id=%s' % (settings.SOURCES_API, encyclopedia_id)
     r = requests.get(url, headers={'content-type':'application/json'})
     if r.status_code == 200:
         response = json.loads(r.text)
@@ -35,7 +35,7 @@ def published_sources():
         for source in sources:
             source['modified'] = datetime.strptime(source['modified'], TS_FORMAT)
     else:
-        url = '%s/primarysource/sitemap/' % settings.TANSU_API
+        url = '%s/primarysource/sitemap/' % settings.SOURCES_API
         r = requests.get(url, headers={'content-type':'application/json'})
         if r.status_code == 200:
             response = json.loads(r.text)
@@ -50,7 +50,7 @@ def format_primary_source(source, lightbox=False):
               'media_format': source.media_format,
               'MEDIA_URL': settings.MEDIA_URL,
               'STATIC_URL': settings.STATIC_URL,
-              'SOURCE_MEDIA_URL': settings.TANSU_MEDIA_URL,
+              'SOURCE_MEDIA_URL': settings.SOURCES_MEDIA_URL,
               'href': source.absolute_url(),
               'caption': source.caption,
               'courtesy': source.courtesy,

@@ -247,7 +247,7 @@ class Proxy(object):
                 if prop.get('name',None) and prop['name'] and (prop['name'] == 'defaultsort'):
                     page.title_sort = prop['*']
             page.sources = mediawiki.find_primary_sources(
-                settings.TANSU_API,
+                settings.SOURCES_API,
                 pagedata['parse']['images'])
             page.body = mediawiki.parse_mediawiki_text(
                 pagedata['parse']['text']['*'],

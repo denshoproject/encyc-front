@@ -22,7 +22,7 @@ def locations():
     if cached:
         locations = json.loads(cached)
     else:
-        url = '%s/locations/' % settings.TANSU_API
+        url = '%s/locations/' % settings.SOURCES_API
         r = requests.get(
             url, params={'limit':'1000'},
             headers={'content-type':'application/json'},

@@ -249,7 +249,7 @@ def find_primary_sources(api_url, images):
     
     Called by parse_mediawiki_text.
     
-    @param api_url: TANSU_URL
+    @param api_url: SOURCES_URL
     @param images: list
     @returns: list of sources
     """

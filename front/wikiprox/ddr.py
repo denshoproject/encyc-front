@@ -23,7 +23,7 @@ def _term_documents(term_id, size):
         objects = json.loads(cached)
     else:
         url = '%s/facet/topics/%s/objects/?limit=%s&%s=1' % (
-            settings.DDRPUBLIC_API, term_id, size, settings.DDRPUBLIC_LOCAL_MEDIA_MARKER
+            settings.DDR_API, term_id, size, settings.DDR_MEDIA_URL_LOCAL_MARKER
         )
         r = requests.get(
             url,

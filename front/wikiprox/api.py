@@ -41,7 +41,7 @@ def article(request, url_title, format=None):
         for source_id in page.source_ids
     ]
     topic_term_ids = [
-        '%s/facet/topics/%s/objects/' % (settings.DDRPUBLIC_API, term['id'])
+        '%s/facet/topics/%s/objects/' % (settings.DDR_API, term['id'])
         for term in page.topics()
     ]
     authors = [

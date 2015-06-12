@@ -80,10 +80,10 @@ RTMP_STREAMER = config.get('sources', 'rtmp_streamer')
 # ddr
 DDR_TOPICS_SRC_URL = config.get('ddr', 'topics_src_url')
 DDR_TOPICS_BASE = config.get('ddr', 'topics_base')
-DDRPUBLIC_API = config.get('ddr', 'api_url')
-DDRPUBLIC_MEDIA_URL = config.get('ddr', 'media_url')
-DDRPUBLIC_MEDIA_URL_LOCAL = config.get('ddr', 'media_url_local')
-DDRPUBLIC_LOCAL_MEDIA_MARKER = config.get('ddr', 'media_url_local_marker')
+DDR_API = config.get('ddr', 'api_url')
+DDR_MEDIA_URL = config.get('ddr', 'media_url')
+DDR_MEDIA_URL_LOCAL = config.get('ddr', 'media_url_local')
+DDR_MEDIA_URL_LOCAL_MARKER = config.get('ddr', 'media_url_local_marker')
 
 # sorl
 THUMBNAIL_URL = config.get('ddr', 'media_url')

@@ -174,8 +174,8 @@
 {% for object in page.ddr_objects %}
 {% thumbnail object.img_url "130x100" as img %}
 <a href="/ddr/{{ page.title }}/" data-lightview-caption="{{ object.title }} ({{ object.id }})">
-    <img src="{{ THUMBNAIL_URL }}{{ img }}"
-         large="{{ THUMBNAIL_URL }}{{ img }}"
+    <img src="{{ DDR_MEDIA_URL }}{{ img }}"
+         large="{{ DDR_MEDIA_URL }}{{ img }}"
          more=""
          title="{{ object.title|safe }}"
          alt="{{ object.title|safe }}" />
@@ -224,8 +224,8 @@
 {% for object in page.ddr_objects %}
 {% thumbnail object.img_url "130x100" as img %}
 <a href="/ddr/{{ page.title }}/" data-lightview-caption="{{ object.title }} ({{ object.id }})">
-    <img src="{{ THUMBNAIL_URL }}{{ img }}"
-         large="{{ THUMBNAIL_URL }}{{ img }}"
+    <img src="{{ DDR_MEDIA_URL }}{{ img }}"
+         large="{{ DDR_MEDIA_URL }}{{ img }}"
          more=""
          title="{{ object.title|safe }}"
          alt="{{ object.title|safe }}" />

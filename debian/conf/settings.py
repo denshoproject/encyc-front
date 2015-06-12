@@ -85,9 +85,6 @@ DDR_MEDIA_URL = config.get('ddr', 'media_url')
 DDR_MEDIA_URL_LOCAL = config.get('ddr', 'media_url_local')
 DDR_MEDIA_URL_LOCAL_MARKER = config.get('ddr', 'media_url_local_marker')
 
-# sorl
-THUMBNAIL_URL = config.get('ddr', 'media_url')
-
 # search
 GOOGLE_CUSTOM_SEARCH_PASSWORD = config.get('search', 'google_custom_search_password')
 

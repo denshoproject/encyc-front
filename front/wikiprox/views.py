@@ -99,7 +99,7 @@ def article(request, url_title='index', printed=False, template_name='wikiprox/p
         template_name,
         {
             'page': page,
-            'THUMBNAIL_URL': settings.THUMBNAIL_URL,
+            'DDR_MEDIA_URL': settings.DDR_MEDIA_URL,
         },
         context_instance=RequestContext(request)
     )
@@ -181,7 +181,7 @@ def related_ddr(request, url_title='index', template_name='wikiprox/related-ddr.
             'page': page,
             'ddr_terms_objects': ddr_terms_objects,
             'show_topics_ul': show_topics_ul,
-            'THUMBNAIL_URL': settings.THUMBNAIL_URL,
+            'DDR_MEDIA_URL': settings.DDR_MEDIA_URL,
         },
         context_instance=RequestContext(request)
     )

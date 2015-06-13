@@ -74,7 +74,6 @@ SOURCES_API  = config.get('sources', 'api_url')
 SOURCES_MEDIA_URL = config.get('sources', 'media_url')
 SOURCES_MEDIA_URL_LOCAL  = config.get('sources', 'media_url_local')
 SOURCES_MEDIA_URL_LOCAL_MARKER = config.get('sources', 'media_url_local_marker')
-SOURCES_BASE = config.get('sources', 'base_url')
 RTMP_STREAMER = config.get('sources', 'rtmp_streamer')
 
 # ddr

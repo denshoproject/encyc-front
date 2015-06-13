@@ -114,7 +114,6 @@ def source(request, encyclopedia_id, template_name='wikiprox/source.html'):
         template_name,
         {
             'source': source,
-            'SOURCES_BASE': settings.SOURCES_BASE,
             'rtmp_streamer': settings.RTMP_STREAMER,
         },
         context_instance=RequestContext(request)

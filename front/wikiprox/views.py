@@ -104,11 +104,15 @@ def article(request, url_title='index', printed=False, template_name='wikiprox/p
         terms_objects,
         PAGE_OBJECTS
     )
+    ddr_objects_width = 280
+    ddr_img_width = ddr_objects_width / (PAGE_OBJECTS / 2)
     return render_to_response(
         template_name,
         {
             'page': page,
             'ddr_objects': ddr_objects,
+            'ddr_objects_width': ddr_objects_width,
+            'ddr_img_width': ddr_img_width,
             'DDR_MEDIA_URL': settings.DDR_MEDIA_URL,
         },
         context_instance=RequestContext(request)

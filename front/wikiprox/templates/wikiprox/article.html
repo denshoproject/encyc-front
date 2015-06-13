@@ -8,6 +8,11 @@
 
 {% block css %}{{ block.super }}
   <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}lightview-3.2.2/css/lightview/lightview.css"/>
+  <style>
+  .ddr_objects { width:{{ ddr_objects_width }}px; margin-left:10px; }
+  .ddr_img { width:{{ ddr_img_width }}px; height:{{ ddr_img_width }}px; margin:0px; padding:0px; }
+  .ddr_img_empty { border:1px dashed red; }
+  </style>
 {% endblock css %}
 
 
@@ -165,23 +170,25 @@
 {% endif %}{# page.sources #}
 
 
-{% if page.ddr_objects %}
-  <div class="block">
+{% if ddr_objects %}
+  <div class="block ddr_objects">
     <p>
     <strong>From the Densho Digital Repository</strong>
     </p>
     <p>
-{% for object in page.ddr_objects %}
-{% thumbnail object.img_url "130x100" as img %}
-<a href="/ddr/{{ page.title }}/" data-lightview-caption="{{ object.title }} ({{ object.id }})">
-    <img src="{{ DDR_MEDIA_URL }}{{ img }}"
-         large="{{ DDR_MEDIA_URL }}{{ img }}"
-         more=""
-         title="{{ object.title|safe }}"
-         alt="{{ object.title|safe }}" />
-  </a>
-{% endthumbnail %}
-{% endfor %}
+{% for object in ddr_objects %}<!--
+{{ object.img_url }}
+--><a
+  href="/ddr/{{ page.title }}/"
+  data-lightview-caption="{{ object.title }} ({{ object.id }})"
+>{% thumbnail object.img_url "130x100" as thumb %}<img
+  class="ddr_img"
+  src="{{ DDR_MEDIA_URL }}{{ thumb }}"
+  large="{{ DDR_MEDIA_URL }}{{ thumb }}"
+  more=""
+  title="{{ object.title|safe }}"
+  alt="{{ object.title|safe }}"
+/>{% empty %}<img class="ddr_img_empty" src="" />{% endthumbnail %}</a>{% endfor %}
     </p>
     <p>
     <a href="/ddr/{{ page.title }}/" class="more">See more »</a>
@@ -215,23 +222,25 @@
   <div class="toplink visible-phone"><a href="#top"><i class="icon-chevron-up"></i> Top</a></div>
 
 
-{% if page.ddr_objects %}
-  <div class="block">
+{% if ddr_objects %}
+  <div class="block ddr_objects">
     <p>
     <strong>From the Densho Digital Repository</strong>
     </p>
     <p>
-{% for object in page.ddr_objects %}
-{% thumbnail object.img_url "130x100" as img %}
-<a href="/ddr/{{ page.title }}/" data-lightview-caption="{{ object.title }} ({{ object.id }})">
-    <img src="{{ DDR_MEDIA_URL }}{{ img }}"
-         large="{{ DDR_MEDIA_URL }}{{ img }}"
-         more=""
-         title="{{ object.title|safe }}"
-         alt="{{ object.title|safe }}" />
-  </a>
-{% endthumbnail %}
-{% endfor %}
+{% for object in ddr_objects %}<!--
+{{ object.img_url }}
+--><a
+  href="/ddr/{{ page.title }}/"
+  data-lightview-caption="{{ object.title }} ({{ object.id }})"
+>{% thumbnail object.img_url "130x100" as thumb %}<img
+  class="ddr_img"
+  src="{{ DDR_MEDIA_URL }}{{ thumb }}"
+  large="{{ DDR_MEDIA_URL }}{{ thumb }}"
+  more=""
+  title="{{ object.title|safe }}"
+  alt="{{ object.title|safe }}"
+/>{% empty %}<img class="ddr_img_empty" src="" />{% endthumbnail %}</a>{% endfor %}
     </p>
     <p>
     <a href="/ddr/{{ page.title }}/" class="more">See more »</a>

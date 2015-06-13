@@ -95,10 +95,20 @@ def article(request, url_title='index', printed=False, template_name='wikiprox/p
         template_name = 'wikiprox/article-print.html'
     else:
         template_name = 'wikiprox/article.html'
+    # DDR objects
+    # show small number of objects, distributed among topics
+    TOTAL_OBJECTS = 10
+    PAGE_OBJECTS = 8
+    terms_objects = page.ddr_terms_objects(size=TOTAL_OBJECTS)
+    ddr_objects = ddr.distribute_list(
+        terms_objects,
+        PAGE_OBJECTS
+    )
     return render_to_response(
         template_name,
         {
             'page': page,
+            'ddr_objects': ddr_objects,
             'DDR_MEDIA_URL': settings.DDR_MEDIA_URL,
         },
         context_instance=RequestContext(request)
@@ -170,7 +180,7 @@ def related_ddr(request, url_title='index', template_name='wikiprox/related-ddr.
     # show small number of objects, distributed among topics
     TOTAL_OBJECTS = 10
     terms_objects = page.ddr_terms_objects(size=TOTAL_OBJECTS)
-    ddr_terms_objects = ddr.distribute(
+    ddr_terms_objects = ddr.distribute_dict(
         terms_objects,
         TOTAL_OBJECTS
     )

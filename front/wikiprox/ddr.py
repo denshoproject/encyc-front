@@ -61,14 +61,38 @@ def _balance(results, size):
     round2 = [doc for doc in round1 if doc]
     return round2
 
-def distribute(terms_objects, limit):
-    """
+def distribute_dict(terms_objects, limit):
+    """Given list of term:object dicts, limit to N objects.
+    
+    Ensures no more than {limit} total objects, as evenly distributed
+    among the terms as possible.
+    
+    terms_objects = [
+        {
+            'id':123, 'title':'Term 0',
+            'objects': [
+                'thing 1',
+                'thing 2',
+            ]
+        },
+        {
+            'id':124, 'title':'Term 1',
+            'objects': [
+                'object0',
+                'object1',
+                'object2',
+            ]
+        },
+        ...
+    ]
+    
     @param terms_objects: list of dicts
     @param limit: int
+    @returns: dict
     """
     termid_objs = {}
-    hits = 0
-    misses = 0
+    hits = 0   # so we don't add too many
+    misses = 0 # prevent infinite loop
     while (hits < limit) and (misses < limit):
         for term in terms_objects:
             term_id = term['id']
@@ -83,6 +107,26 @@ def distribute(terms_objects, limit):
     for term in terms_objects:
         term['objects'] = termid_objs.pop(term['id'])
     return terms_objects
+
+def distribute_list(terms_objects, limit):
+    """Given list of term:object dicts, make list of {limit} objects.
+    
+    @param terms_objects: list of dicts
+    @param limit: int
+    @returns: list
+    """
+    objects = []
+    hits = 0   # so we don't add too many
+    misses = 0 # prevent infinite loop
+    while (hits < limit) and (misses < limit):
+        for term in terms_objects:
+            term_id = term['id']
+            if term['objects'] and (hits < limit):
+                objects.append(term['objects'].pop(0))
+                hits = hits + 1
+            else:
+                misses = misses + 1
+    return objects
 
 def related_by_topic(term_ids, size):
     """Documents from DDR related to terms.

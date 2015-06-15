@@ -1,4 +1,5 @@
 from django import template
+from django.conf import settings
 
 from wikiprox.sources import format_primary_source
 
@@ -39,3 +40,17 @@ def do_primarysource_lightbox(parser, token):
 
 register.tag('primarysource', do_primarysource)
 register.tag('primarysource_lightbox', do_primarysource_lightbox)
+
+
+def ddrobject( page, obj ):
+    """DDR object in sidebar
+    """
+    t = template.loader.get_template('wikiprox/ddr-object.html')
+    c = template.Context({
+        'page': page,
+        'object': obj,
+        'DDR_MEDIA_URL': settings.DDR_MEDIA_URL,
+    })
+    return t.render(c)
+
+register.simple_tag(ddrobject)

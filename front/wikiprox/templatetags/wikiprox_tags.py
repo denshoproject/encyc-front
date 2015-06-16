@@ -49,8 +49,9 @@ def ddrobject( page, obj ):
     c = template.Context({
         'page': page,
         'object': obj,
+        'MEDIA_URL': settings.MEDIA_URL,
         'DDR_MEDIA_URL': settings.DDR_MEDIA_URL,
     })
-    return t.render(c)
+    return t.render(c).strip()
 
 register.simple_tag(ddrobject)

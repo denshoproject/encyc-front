@@ -1,15 +1,14 @@
 {% load thumbnail %}<span class="ddr_object"
-><a href="{{ object.img_url }}"
+><a href="{{ DDR_MEDIA_URL }}{{ object.img_path }}"
     class="document lightview"
     data-lightview-caption="{{ object.title }} ({{ object.id }})"
->{% thumbnail object.img_url "67x67" crop="center" as thumb %}<img
-      src="{{ DDR_MEDIA_URL }}{{ thumb }}"
-      large="{{ object.img_url }}"
+>{% thumbnail object.img_url_local "67x67" crop="center" as thumb %}<img
+      src="{{ MEDIA_URL }}{{ thumb }}"
+      large="{{ DDR_MEDIA_URL }}{{ object.img_path }}"
       more="/ddr/{{ page.title }}/"
       title="{{ object.title|safe }}"
       alt="{{ object.title|safe }}"
 />{% empty %}<img
       class="ddr_img_empty"
-      src="http://ddrstage.densho.org/media/ddr-densho/logo.png" width="67"
-/>{% endthumbnail %}</a></span
->
+      src="{{ MEDIA_URL }}pixel.png" width="67"
+/>{% endthumbnail %}</a></span>

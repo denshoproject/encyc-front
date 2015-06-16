@@ -1,6 +1,7 @@
 """front.ddr -- Links to the DDR REST API
 """
 import json
+import os
 
 import requests
 
@@ -38,6 +39,11 @@ def _term_documents(term_id, size):
                 objects = data['results']
             elif isinstance(data, list):
                 objects = data
+        # add img_url_local
+        for o in objects:
+            o['img_url_local'] = os.path.join(
+                settings.DDR_MEDIA_URL_LOCAL, o['img_path']
+            )
         cache.set(cache_key, json.dumps(objects), settings.CACHE_TIMEOUT)
     return objects
 

@@ -10,15 +10,14 @@
   
   <title>Locations | Densho Encyclopedia</title>
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <link rel="SHORTCUT ICON" href="{{ STATIC_URL }}favicon.ico">
+  <!-- <link rel="SHORTCUT ICON" href="{{ MEDIA_URL }}favicon.ico"> -->
+
+  <script type="text/javascript" src="{{ STATIC_URL }}modernizr-2.5.3.js"></script>
   
-  <script type="text/javascript" src="{{ STATIC_URL }}modernizr/modernizr-dev-2.5.3.js"></script>
-  
-  <link rel="stylesheet" href="{{ STATIC_URL }}openlayers-2.12/theme/default/style.css" type="text/css">
-  <link rel="stylesheet" href="{{ STATIC_URL }}openlayers-2.12/examples/style.css" type="text/css">
+  <link rel="stylesheet" href="{{ STATIC_URL }}OpenLayers-2.12/theme/default/style.css" type="text/css">
+  <link rel="stylesheet" href="{{ STATIC_URL }}OpenLayers-2.12/examples/style.css" type="text/css">
   
   <style type="text/css">
       /* brown:        #5C5823 */
@@ -238,8 +237,8 @@
 
 
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}openlayers-2.12/OpenLayers.js"></script>
 
+<script type="text/javascript" src="{{ STATIC_URL }}OpenLayers-2.12/lib/OpenLayers.js"></script>
 
 <script type="text/javascript">
 $(document).ready(function(){

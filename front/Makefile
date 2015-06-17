@@ -18,6 +18,7 @@ JQUERY=jquery-1.7.2.min.js
 JWPLAYER=jwplayer-5.9
 LIGHTVIEW=lightview-3.2.2
 SWFOBJECT=swfobject-2.2
+OPENLAYERS=OpenLayers-2.12
 # wget https://github.com/twbs/bootstrap/archive/v2.0.4.zip
 # wget http://code.jquery.com/jquery-1.7.2.min.js
 # wget http://modernizr.com/downloads/modernizr-2.5.3.js
@@ -207,7 +208,7 @@ clean-pip:
 
 
 
-install-static: install-bootstrap install-jquery install-jwplayer install-lightview install-modernizr install-swfobject
+install-static: install-bootstrap install-jquery install-jwplayer install-lightview install-modernizr install-swfobject install-openlayers
 
 get-assets:
 	@echo ""
@@ -257,6 +258,13 @@ install-swfobject:
 	-7z x -y -o/tmp/ /tmp/$(SWFOBJECT).zip
 	-mv /tmp/swfobject/ $(STATIC_ROOT)/$(SWFOBJECT)
 
+install-openlayers:
+	@echo ""
+	@echo "OpenLayers -------------------------------------------------------------"
+	-wget -nc -P /tmp/ http://$(PACKAGE_SERVER)/$(OPENLAYERS).tar.gz
+	-tar xzf /tmp/$(OPENLAYERS).tar.gz -C /tmp/
+	-mv /tmp/$(OPENLAYERS) $(STATIC_ROOT)/
+
 set-perms:
 #	recursively chmod directories 755, files 644
 #	from CWD
@@ -266,7 +274,7 @@ set-perms:
 	for i in `find . -type f`; do chmod 644 $i; done
 
 
-clean-static: clean-bootstrap clean-jquery clean-jwplayer clean-lightview clean-modernizr clean-swfobject
+clean-static: clean-bootstrap clean-jquery clean-jwplayer clean-lightview clean-modernizr clean-swfobject clean-openlayers
 
 clean-bootstrap:
 	-rm -Rf $(STATIC_ROOT)/$(BOOTSTRAP)
@@ -285,6 +293,9 @@ clean-modernizr:
 
 clean-swfobject:
 	-rm -Rf $(STATIC_ROOT)/$(SWFOBJECT)
+
+clean-openlayers:
+	-rm -Rf $(STATIC_ROOT)/$(OPENLAYERS)
 
 
 install-configs:

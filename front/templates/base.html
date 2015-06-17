@@ -15,10 +15,10 @@
 
   <!-- <link rel="SHORTCUT ICON" href="{{ STATIC_URL }}favicon.ico"> -->
 
-  <script type="text/javascript" src="{{ STATIC_URL }}modernizr/modernizr-dev-2.5.3.js"></script>
+  <script type="text/javascript" src="{{ STATIC_URL }}modernizr-2.5.3.js"></script>
 
-  <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap/assets/css/bootstrap.css" />
-  <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap/assets/css/bootstrap-responsive.css" />
+  <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap/css/bootstrap.css" />
+  <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap/css/bootstrap-responsive.css" />
   <link rel="stylesheet" href="{{ STATIC_URL }}css/mediawiki-common.css" />
   
   <style>
@@ -101,7 +101,7 @@
 	  <div class="navbar-inner">
 	    <div class="container">
 	      <a class="brand" href="/">
-	        <img src="{{ MEDIA_URL }}img/logo-white.png" height="30" /> Densho Encyclopedia
+	        <img src="{{ STATIC_URL }}img/logo-white.png" height="30" /> Densho Encyclopedia
 	      </a>
 		 <button type="buton" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
 		 	<span class="icon-bar"></span>
@@ -151,7 +151,8 @@
 
 
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}bootstrap/assets/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}bootstrap/js/bootstrap.min.js"></script>
+
 {% block javascript %}{% endblock javascript %}
 
 <script type="text/javascript">

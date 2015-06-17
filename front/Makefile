@@ -8,11 +8,12 @@ INSTALLDIR=/usr/local/src/encyc-front
 
 ELASTICSEARCH=elasticsearch-1.0.1.deb
 # wget https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.0.1.deb
-BOOTSTRAP=bootstrap-3.1.1-dist
-JQUERY=jquery-1.11.0.min.js
+
+MODERNIZR=modernizr-2.5.3
+BOOTSTRAP=bootstrap-2.3.1
+JQUERY=jquery-1.7.2.min.js
 JWPLAYER=jwplayer-5.9
 LIGHTVIEW=lightview-3.2.2
-MODERNIZR=modernizr-2.6.2
 SWFOBJECT=swfobject-2.2
 # wget https://github.com/twbs/bootstrap/archive/v2.0.4.zip
 # wget http://code.jquery.com/jquery-1.7.2.min.js

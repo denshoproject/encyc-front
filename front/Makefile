@@ -5,7 +5,7 @@ PACKAGE_SERVER=tank.densho.org
 PIP_CACHE_DIR=/usr/local/src/pip-cache
 VIRTUALENV=/usr/local/src/env/front
 INSTALLDIR=/usr/local/src/encyc-front
-MEDIA_BASE=/var/www/front
+MEDIA_BASE=/var/www/html/front
 MEDIA_ROOT=$(MEDIA_BASE)/media
 STATIC_ROOT=$(MEDIA_BASE)/static
 

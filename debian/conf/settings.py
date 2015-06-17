@@ -138,7 +138,7 @@ CACHE_MIDDLEWARE_KEY_PREFIX = 'front'
 CACHE_TIMEOUT = 60 * 5
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
-MEDIA_ROOT = '/var/www/front/media/'
+MEDIA_ROOT = '/var/www/html/front/media/'
 
 TEMPLATE_DIRS = (
     os.path.join(BASE_DIR, 'templates/'),

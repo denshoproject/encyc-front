@@ -5,6 +5,9 @@ PACKAGE_SERVER=tank.densho.org
 PIP_CACHE_DIR=/usr/local/src/pip-cache
 VIRTUALENV=/usr/local/src/env/front
 INSTALLDIR=/usr/local/src/encyc-front
+MEDIA_BASE=/var/www/front
+MEDIA_ROOT=$(MEDIA_BASE)/media
+STATIC_ROOT=$(MEDIA_BASE)/static
 
 ELASTICSEARCH=elasticsearch-1.0.1.deb
 # wget https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.0.1.deb
@@ -21,7 +24,7 @@ SWFOBJECT=swfobject-2.2
 # jwplayer-5.9
 # lightview-3.2.2
 # wget https://swfobject.googlecode.com/files/swfobject_2_2.zip
-ASSETS=encyc-front-assets.tar.gz
+ASSETS=encyc-front-assets.tgz
 
 .PHONY: help
 
@@ -130,7 +133,7 @@ install-elasticsearch:
 	apt-get --assume-yes install openjdk-7-jre
 	wget -nc -P /tmp/downloads http://$(PACKAGE_SERVER)/$(ELASTICSEARCH)
 	gdebi --non-interactive /tmp/downloads/$(ELASTICSEARCH)
-	cp /usr/local/src/encyc-front/debian/conf/elasticsearch.yml /etc/elasticsearch/
+	cp $(INSTALLDIR)/debian/conf/elasticsearch.yml /etc/elasticsearch/
 	chown root.root /etc/elasticsearch/elasticsearch.yml
 	chmod 644 /etc/elasticsearch/elasticsearch.yml
 	@echo "${bldgrn}search engine (re)start${txtrst}"
@@ -153,7 +156,7 @@ install-encyc-front:
 	test -d $(VIRTUALENV) || virtualenv $(VIRTUALENV)
 	source $(VIRTUALENV)/bin/activate
 	pip install -U --download-cache=$(PIP_CACHE_DIR) bpython setuptools
-	pip install -U --download-cache=$(PIP_CACHE_DIR) -r /usr/local/src/encyc-front/front/requirements/production.txt
+	pip install -U --download-cache=$(PIP_CACHE_DIR) -r $(INSTALLDIR)/front/requirements/production.txt
 	-mkdir /var/log/encyc
 	chown -R encyc.root /var/log/encyc
 	chmod -R 755 /var/log/encyc
@@ -161,13 +164,18 @@ install-encyc-front:
 	-mkdir /var/lib/encyc
 	chown -R encyc.root /var/lib/encyc
 	chmod -R 755 /var/lib/encyc
-	-mkdir -p /var/www/front/media
-	chown -R encyc.root /var/www/front
-	chmod -R 755 /var/www/front
+	-mkdir -p $(MEDIA_ROOT)
+	-mkdir -p $(STATIC_ROOT)
+	chown -R encyc.root $(STATIC_ROOT)
+	chmod -R 755 $(STATIC_ROOT)
+	cp -R $(INSTALLDIR)/front/static/* $(STATIC_ROOT)/
+	cp -R $(INSTALLDIR)/front/wikiprox/static/* $(STATIC_ROOT)/
+	chown -R encyc.root $(MEDIA_BASE)
+	chmod -R 755 $(MEDIA_BASE)
 
 syncdb:
 	source $(VIRTUALENV)/bin/activate
-	cd /usr/local/src/encyc-front/front && python manage.py syncdb --noinput
+	cd $(INSTALLDIR)/front && python manage.py syncdb --noinput
 	chown -R encyc.root /var/lib/encyc
 	chmod -R 750 /var/lib/encyc
 	chown -R encyc.root /var/log/encyc
@@ -178,12 +186,12 @@ update-encyc-front:
 	@echo "encyc-front --------------------------------------------------------------"
 	git fetch && git pull
 	source $(VIRTUALENV)/bin/activate; \
-	pip install -U --download-cache=$(PIP_CACHE_DIR) -r /usr/local/src/encyc-front/front/requirements/production.txt
+	pip install -U --download-cache=$(PIP_CACHE_DIR) -r $(INSTALLDIR)/front/requirements/production.txt
 
 uninstall-encyc-front:
-	cd /usr/local/src/encyc-front/front
+	cd $(INSTALLDIR)/front
 	source $(VIRTUALENV)/bin/activate; \
-	-pip uninstall -r /usr/local/src/encyc-front/front/requirements/production.txt
+	-pip uninstall -r $(INSTALLDIR)/front/requirements/production.txt
 	-rm /usr/local/lib/python2.7/dist-packages/front-*
 	-rm -Rf /usr/local/lib/python2.7/dist-packages/front
 
@@ -191,8 +199,8 @@ restart-front:
 	/etc/init.d/supervisor restart front
 
 clean-encyc-front:
-	-rm -Rf /usr/local/src/encyc-front/front/env/
-	-rm -Rf /usr/local/src/encyc-front/front/src
+	-rm -Rf $(INSTALLDIR)/front/env/
+	-rm -Rf $(INSTALLDIR)/front/src
 
 clean-pip:
 	-rm -Rf $(PIP_CACHE_DIR)/*
@@ -204,100 +212,103 @@ install-static: install-bootstrap install-jquery install-jwplayer install-lightv
 get-assets:
 	@echo ""
 	@echo "get assets --------------------------------------------------------------"
-	-mkdir -p /var/www/front
-	chown -R root.root /var/www/front
-	chmod -R 755 /var/www/front
+	-mkdir -p $(MEDIA_BASE)
+	chown -R root.root $(MEDIA_BASE)
+	chmod -R 755 $(MEDIA_BASE)
 	wget -nc -P /tmp http://$(PACKAGE_SERVER)/$(ASSETS)
-	tar xzvf /tmp/encyc-front-assets.tar.gz -C /var/www/
+	tar xzvf /tmp/$(ASSETS) -C /tmp/
+	cp -R /tmp/encyc-front-assets/* $(MEDIA_ROOT)
 
 install-bootstrap:
 	@echo ""
 	@echo "Bootstrap --------------------------------------------------------------"
 	wget -nc -P /tmp/ http://$(PACKAGE_SERVER)/$(BOOTSTRAP).zip
-	7z x -y -o/var/www/front/static/ /tmp/$(BOOTSTRAP).zip
+	7z x -y -o$(STATIC_ROOT)/ /tmp/$(BOOTSTRAP).zip
 
 install-jquery:
 	@echo ""
 	@echo "jQuery -----------------------------------------------------------------"
-	wget -nc -P /var/www/front/static/ http://$(PACKAGE_SERVER)/$(JQUERY)
+	wget -nc -P $(STATIC_ROOT)/ http://$(PACKAGE_SERVER)/$(JQUERY)
 
 install-jwplayer:
 	@echo ""
 	@echo "jwplayer ---------------------------------------------------------------"
 	-wget -nc -P /tmp/ http://$(PACKAGE_SERVER)/$(JWPLAYER).tgz
 	-tar xzf /tmp/$(JWPLAYER).tgz -C /tmp/
-	-mv /tmp/$(JWPLAYER) /var/www/front/static/
+	-mv /tmp/$(JWPLAYER) $(STATIC_ROOT)/
 
 install-lightview:
 	@echo ""
 	@echo "lightview --------------------------------------------------------------"
 	-wget -nc -P /tmp/ http://$(PACKAGE_SERVER)/$(LIGHTVIEW).tgz
 	-tar xzf /tmp/$(LIGHTVIEW).tgz -C /tmp/
-	-mv /tmp/$(LIGHTVIEW) /var/www/front/static/
+	-mv /tmp/$(LIGHTVIEW) $(STATIC_ROOT)/
 
 install-modernizr:
 	@echo ""
 	@echo "Modernizr --------------------------------------------------------------"
-	-rm /var/www/front/static/js/$(MODERNIZR)*
-	-wget -nc -P /var/www/front/static/ http://$(PACKAGE_SERVER)/$(MODERNIZR).js
+	-rm $(STATIC_ROOT)/js/$(MODERNIZR)*
+	-wget -nc -P $(STATIC_ROOT)/ http://$(PACKAGE_SERVER)/$(MODERNIZR).js
 
 install-swfobject:
 	@echo ""
 	@echo "swfobject --------------------------------------------------------------"
 	-wget -nc -P /tmp/ http://$(PACKAGE_SERVER)/$(SWFOBJECT).zip
 	-7z x -y -o/tmp/ /tmp/$(SWFOBJECT).zip
-	-mv /tmp/swfobject/ /var/www/front/static/$(SWFOBJECT)
+	-mv /tmp/swfobject/ $(STATIC_ROOT)/$(SWFOBJECT)
 
 set-perms:
 #	recursively chmod directories 755, files 644
 #	from CWD
-	for i in `find /var/www/front/ -type d`; do chmod 755 $i; done
-	for i in `find /var/www/front/ -type f`; do chmod 644 $i; done
+	chown -R encyc.root $(MEDIA_BASE)
+	cd $(MEDIA_BASE)
+	for i in `find . -type d`; do chmod 755 $i; done
+	for i in `find . -type f`; do chmod 644 $i; done
 
 
 clean-static: clean-bootstrap clean-jquery clean-jwplayer clean-lightview clean-modernizr clean-swfobject
 
 clean-bootstrap:
-	-rm -Rf /var/www/front/static/$(BOOTSTRAP)
+	-rm -Rf $(STATIC_ROOT)/$(BOOTSTRAP)
 
 clean-jquery:
-	-rm -Rf /var/www/front/static/$(JQUERY)
+	-rm -Rf $(STATIC_ROOT)/$(JQUERY)
 
 clean-jwplayer:
-	-rm -Rf /var/www/front/static/$(JWPLAYER)
+	-rm -Rf $(STATIC_ROOT)/$(JWPLAYER)
 
 clean-lightview:
-	-rm -Rf /var/www/front/static/$(LIGHTVIEW)
+	-rm -Rf $(STATIC_ROOT)/$(LIGHTVIEW)
 
 clean-modernizr:
-	-rm /var/www/front/static/$(MODERNIZR).js
+	-rm $(STATIC_ROOT)/$(MODERNIZR).js
 
 clean-swfobject:
-	-rm -Rf /var/www/front/static/$(SWFOBJECT)
+	-rm -Rf $(STATIC_ROOT)/$(SWFOBJECT)
 
 
 install-configs:
 	@echo ""
 	@echo "installing configs ----------------------------------------------------"
 # web app settings
-	cp /usr/local/src/encyc-front/debian/conf/settings.py /usr/local/src/encyc-front/front/front/
-	chown root.root /usr/local/src/encyc-front/front/front/settings.py
-	chmod 644 /usr/local/src/encyc-front/front/front/settings.py
+	cp $(INSTALLDIR)/debian/conf/settings.py $(INSTALLDIR)/front/front/
+	chown root.root $(INSTALLDIR)/front/front/settings.py
+	chmod 644 $(INSTALLDIR)/front/front/settings.py
 	-mkdir /etc/encyc
-	cp /usr/local/src/encyc-front/debian/conf/production.cfg /etc/encyc/
+	cp $(INSTALLDIR)/debian/conf/production.cfg /etc/encyc/
 	chown root.encyc /etc/encyc/production.cfg
 	chmod 640 /etc/encyc/production.cfg
 	touch /etc/encyc/local.cfg
 	chown root.encyc /etc/encyc/local.cfg
 	chmod 640 /etc/encyc/local.cfg
 # nginx settings
-	cp /usr/local/src/encyc-front/debian/conf/front.conf /etc/nginx/sites-available
+	cp $(INSTALLDIR)/debian/conf/front.conf /etc/nginx/sites-available
 	chown root.root /etc/nginx/sites-available/front.conf
 	chmod 644 /etc/nginx/sites-available/front.conf
 	-ln -s /etc/nginx/sites-available/front.conf /etc/nginx/sites-enabled/front.conf
 	-rm /etc/nginx/sites-enabled/default
 # supervisord
-	cp /usr/local/src/encyc-front/debian/conf/gunicorn_front.conf /etc/supervisor/conf.d/
+	cp $(INSTALLDIR)/debian/conf/gunicorn_front.conf /etc/supervisor/conf.d/
 	chown root.root /etc/supervisor/conf.d/gunicorn_front.conf
 	chmod 644 /etc/supervisor/conf.d/gunicorn_front.conf
 
@@ -305,7 +316,7 @@ uninstall-configs:
 	-rm /etc/nginx/sites-available/front.conf
 	-rm /etc/nginx/sites-enabled/front.conf
 	-rm /etc/supervisor/conf.d/gunicorn_front.conf
-	-rm /usr/local/src/encyc-front/front/settings.py
+	-rm $(INSTALLDIR)/front/settings.py
 
 
 reload: reload-nginx reload-supervisor
@@ -341,4 +352,4 @@ status:
 
 git-status:
 	@echo "------------------------------------------------------------------------"
-	cd /usr/local/src/encyc-front && git status
+	cd $(INSTALLDIR) && git status

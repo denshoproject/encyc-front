@@ -260,10 +260,16 @@ class Proxy(object):
                 page.sources = sources.replace_source_urls(page.sources, request)
             page.is_article = encyclopedia.is_article(page.title)
             if page.is_article:
-                # TODO be better at removing non-public categories
+                # only include categories from Category:Articles
+                categories_whitelist = [
+                    category['title'].split(':')[1]
+                    for category in encyclopedia.category_article_types()
+                ]
                 page.categories = [
-                    c['*'] for c in pagedata['parse']['categories']
-                    if not c.has_key('hidden')]
+                    c['*']
+                    for c in pagedata['parse']['categories']
+                    if c['*'] in categories_whitelist
+                ]
                 page.prev_page = encyclopedia.article_prev(page.title)
                 page.next_page = encyclopedia.article_next(page.title)
                 page.coordinates = mediawiki.find_databoxcamps_coordinates(pagedata['parse']['text']['*'])

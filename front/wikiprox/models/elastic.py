@@ -476,6 +476,12 @@ class Source(DocType):
     def from_mw(mwsource):
         """Creates an Source object from a models.legacy.Source object.
         """
+        # source.streaming_url has to be relative to RTMP_STREAMER
+        # TODO this should really happen when it's coming in from MediaWiki.
+        if mwsource.get('streaming_url'):
+            streaming_url = mwsource['streaming_url'].replace(settings.RTMP_STREAMER, '')
+        else:
+            streaming_url = ''
         source = Source(
             meta = {'id': mwsource['encyclopedia_id']},
             encyclopedia_id = mwsource['encyclopedia_id'],
@@ -490,7 +496,7 @@ class Source(DocType):
             creative_commons = mwsource['creative_commons'],
             headword = mwsource['headword'],
             original_url = mwsource['original'],
-            streaming_url = mwsource['streaming_url'],
+            streaming_url = streaming_url,
             thumbnail_sm = mwsource['thumbnail_sm'],
             thumbnail_lg = mwsource['thumbnail_lg'],
             external_url = mwsource['external_url'],

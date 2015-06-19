@@ -96,6 +96,8 @@ def distribute_dict(terms_objects, limit):
     @param limit: int
     @returns: dict
     """
+    if not terms_objects:
+        return {}
     termid_objs = {}
     hits = 0   # so we don't add too many
     misses = 0 # prevent infinite loop
@@ -121,6 +123,8 @@ def distribute_list(terms_objects, limit):
     @param limit: int
     @returns: list
     """
+    if not terms_objects:
+        return []
     objects = []
     hits = 0   # so we don't add too many
     misses = 0 # prevent infinite loop

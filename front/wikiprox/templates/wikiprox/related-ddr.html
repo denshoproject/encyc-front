@@ -1,0 +1,94 @@
+{% extends "wikiprox/base.html" %}
+{% load thumbnail %}
+
+
+
+{% block title %}{{ page.title|safe }} | Related Content{% endblock %}
+
+
+
+{% block contents %}
+<!-- wikiprox/source.html -->
+<!-- <div class="row"> -->
+  <div class="span12">
+
+<p>
+<a href="/{{ page.title|safe }}/">&laquo; Back to article {{ page.title|safe }}</a>
+</p>
+
+
+<h1 id="firstHeading" class="firstHeading">
+From the Densho Digital Repository
+</h1>
+
+<p>
+Related topics and primary source items from the <a href="http://ddr.densho.org/" target="_blank">Densho Digital Repository</a>.
+</p>
+
+{% if show_topics_ul %}
+<ul>
+{% for term in ddr_terms_objects %}
+{% if term.objects %}
+  <li><a href="#{{ term.id }}">{{ term.title|safe }}</a></li>
+{% endif %}
+{% endfor %}
+</ul>
+{% endif %}
+
+  </div><!-- .span12 -->
+</div><!-- .row -->
+
+
+{% for term in ddr_terms_objects %}
+{% if term.objects %}
+<a name="{{ term.id }}"></a>
+<div class="row">
+  <div class="span12">
+    <h2>{{ term.title|safe }}</h2>
+  </div><!-- .span12 -->
+</div><!-- .row -->
+
+{% for object in term.objects %}
+{% thumbnail object.img_url_local "400x400" as img %}
+<div class="row">
+  <div class="span3">
+    <a href="{{ object.absolute_url }}">
+      <img class="img-responsive img-polaroid" src="{{ MEDIA_URL }}{{ img }}">
+    </a>
+  </div>
+  <div class="span9">
+    <h4>{{ object.title|safe }}</h4>
+    {{ object.description|safe|truncatewords_html:50 }}
+    <br/>
+    <a class="more" href="{{ object.absolute_url }}">View in DDR &raquo;</a>
+  </div>
+</div>
+{% endthumbnail %}
+{% endfor %}
+<div class="row">
+  <div class="span3">
+    &nbsp;
+  </div>
+  <div class="span9">
+    <p>
+    <a class="more" href="{{ term.ddr_topic_url }}">See more items for "{{ term.title|safe }}" in the DDR &raquo;</a>
+    </p>
+  </div>
+</div><!-- .row -->
+{% endif %}{# term.objects #}
+{% endfor %}{# page.ddr_terms_objects #}
+
+
+<div class="row">
+  <div class="span12">
+
+{% if page.related_ddr %}
+<p>
+<a href="/{{ page.title }}/">&laquo; Back to article {{ page.title }}</a>
+</p>
+{% endif %}
+
+  </div><!-- .span12 -->
+<!-- </div> .row -->
+
+{% endblock contents %}

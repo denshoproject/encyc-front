@@ -1,0 +1,35 @@
+{% extends "wikiprox/base.html" %}
+
+
+{% block title %}Browse Topics{% endblock %}
+
+
+{% block contents %}
+<!-- wikiprox/categories.html -->
+<div class="span12">
+
+<p>
+              <b>Browse Topics</b>
+&nbsp;|&nbsp; <a href="/contents">Table of Contents A-Z</a>
+&nbsp;|&nbsp; <a href="/authors/">Authors</a>
+&nbsp;|&nbsp; <a href="/search">Search</a>
+</p>
+
+<h1>Browse Topics</h1>
+
+{% include "wikiprox/comingsoonmessage.html" %}
+
+<dl>
+{% for category in articles_by_category %}
+<a name="{{ category.0 }}"></a>
+<dt><h2>{{ category.0 }}</h2></dt>
+<dd>
+{% for article in category.1 %}
+<a href="{{ article.absolute_url }}">{{ article.title }}</a>{% if not forloop.last %},&nbsp;&nbsp;{% endif %}
+{% endfor %}
+</dd>
+{% endfor %}
+</dl>
+
+</div><!-- .span12 -->
+{% endblock contents %}

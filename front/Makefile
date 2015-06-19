@@ -155,9 +155,11 @@ install-encyc-front:
 	@echo "encyc-front --------------------------------------------------------------"
 	apt-get --assume-yes install imagemagick libjpeg62-turbo-dev libxml2 libxslt1.1 libxslt1-dev python-dev python-pip python-virtualenv supervisor zlib1g-dev
 	test -d $(VIRTUALENV) || virtualenv $(VIRTUALENV)
-	source $(VIRTUALENV)/bin/activate
+	source $(VIRTUALENV)/bin/activate; \
 	pip install -U --download-cache=$(PIP_CACHE_DIR) bpython setuptools
+	source $(VIRTUALENV)/bin/activate; \
 	pip install -U --download-cache=$(PIP_CACHE_DIR) -r $(INSTALLDIR)/front/requirements/production.txt
+# log dir
 	-mkdir /var/log/encyc
 	chown -R encyc.root /var/log/encyc
 	chmod -R 755 /var/log/encyc
@@ -165,6 +167,7 @@ install-encyc-front:
 	-mkdir /var/lib/encyc
 	chown -R encyc.root /var/lib/encyc
 	chmod -R 755 /var/lib/encyc
+# media dirs
 	-mkdir -p $(MEDIA_ROOT)
 	-mkdir -p $(STATIC_ROOT)
 	chown -R encyc.root $(STATIC_ROOT)

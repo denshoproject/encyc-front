@@ -291,7 +291,7 @@ class Proxy(object):
         source.original_size = int(data['original_size'])
         source.created = datetime.strptime(data['created'], mediawiki.TS_FORMAT)
         source.modified = datetime.strptime(data['modified'], mediawiki.TS_FORMAT)
-        if getattr(source, 'streaming_url', None) and ('rtmp' in source.streaming_url):
+        if getattr(source, 'streaming_url', None):
             source.streaming_url = source.streaming_url.replace(settings.RTMP_STREAMER,'')
             source.rtmp_streamer = settings.RTMP_STREAMER
         return source

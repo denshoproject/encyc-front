@@ -229,6 +229,11 @@
 {% endif %}{# page.sources #}
 
 
+{% if ddr_error %}
+  <div id="error" style="display:block;">
+    Could not get related DR objects: (DDR_API: {{ ddr_error }}).
+  </div>
+{% endif %}
 {% if ddr_objects %}
   <div class="block ddr_objects">
     <p>

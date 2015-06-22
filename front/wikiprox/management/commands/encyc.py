@@ -3,7 +3,7 @@
 Add this to `/etc/crontab`:
 
     SHELL=/bin/bash
-    MIN *     * * *   encyc     cd /usr/local/src/encyc-front/front && /usr/local/src/env/front/bin/python manage.py encycupdate
+    MIN *     * * *   encyc     cd /usr/local/src/encyc-front/front && /usr/local/src/env/front/bin/python manage.py encyc
 
 """
 
@@ -213,7 +213,7 @@ class Command(BaseCommand):
             options['delete'] or options['create'] or options['reset']
             or options['authors'] or options['articles'] or options['topics']
         ):
-            print('Choose an action. Try "python manage.py encycupdate --help".')
+            print('Choose an action. Try "python manage.py encyc --help".')
             sys.exit(1)
         
         if options['delete'] and not options['confirm']:

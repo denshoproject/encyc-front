@@ -2,7 +2,7 @@
 ><a href="{{ DDR_MEDIA_URL }}{{ object.img_path }}"
     class="document lightview"
     data-lightview-caption="{{ object.title }} ({{ object.id }})"
->{% thumbnail object.img_url_local "67x67" crop="center" as thumb %}<img
+>{% thumbnail object.img_url_local "150x150" crop="center" as thumb %}<img
       src="{{ MEDIA_URL }}{{ thumb }}"
       large="{{ DDR_MEDIA_URL }}{{ object.img_path }}"
       more="/ddr/{{ page.title }}/"

@@ -39,6 +39,11 @@ Related topics and primary source items from the <a href="http://ddr.densho.org/
 </div><!-- .row -->
 
 
+{% if ddr_error %}
+<div id="error" style="display:block;">
+  Could not get related DR objects: (DDR_API: {{ ddr_error }}).
+</div>
+{% endif %}
 {% for term in ddr_terms_objects %}
 {% if term.objects %}
 <a name="{{ term.id }}"></a>

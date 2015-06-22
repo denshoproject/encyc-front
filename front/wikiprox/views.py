@@ -99,7 +99,15 @@ def article(request, url_title='index', printed=False, template_name='wikiprox/p
     # show small number of objects, distributed among topics
     TOTAL_OBJECTS = 10
     PAGE_OBJECTS = 8
-    terms_objects = page.ddr_terms_objects(size=TOTAL_OBJECTS)
+    try:
+        terms_objects = page.ddr_terms_objects(size=TOTAL_OBJECTS)
+        ddr_error = None
+    except requests.exceptions.ConnectionError:
+        terms_objects = []
+        ddr_error = 'ConnectionError'
+    except requests.exceptions.Timeout:
+        terms_objects = []
+        ddr_error = 'Timeout'
     ddr_objects = ddr.distribute_list(
         terms_objects,
         PAGE_OBJECTS
@@ -110,6 +118,7 @@ def article(request, url_title='index', printed=False, template_name='wikiprox/p
         template_name,
         {
             'page': page,
+            'ddr_error': ddr_error,
             'ddr_objects': ddr_objects,
             'ddr_objects_width': ddr_objects_width,
             'ddr_img_width': ddr_img_width,
@@ -172,25 +181,34 @@ def related_ddr(request, url_title='index', template_name='wikiprox/related-ddr.
         page = Page.get(url_title)
     except NotFoundError:
         raise Http404
-    # Don't show <ul> list of topics (with links) at top
-    # unless there are more than one
-    page_topics = [
-        term
-        for term in page.ddr_terms_objects()
-        if term['objects']
-    ]
-    show_topics_ul = len(page_topics) - 1
     # show small number of objects, distributed among topics
     TOTAL_OBJECTS = 10
-    terms_objects = page.ddr_terms_objects(size=TOTAL_OBJECTS)
+    try:
+        terms_objects = page.ddr_terms_objects(size=TOTAL_OBJECTS)
+        ddr_timeout = False
+    except requests.exceptions.ConnectionError:
+        terms_objects = []
+        ddr_error = 'ConnectionError'
+    except requests.exceptions.Timeout:
+        terms_objects = []
+        ddr_error = 'Timeout'
     ddr_terms_objects = ddr.distribute_dict(
         terms_objects,
         TOTAL_OBJECTS
     )
+    # Don't show <ul> list of topics (with links) at top
+    # unless there are more than one
+    page_topics = [
+        term
+        for term in terms_objects
+        if term['objects']
+    ]
+    show_topics_ul = len(page_topics) - 1
     return render_to_response(
         template_name,
         {
             'page': page,
+            'ddr_error': ddr_error,
             'ddr_terms_objects': ddr_terms_objects,
             'show_topics_ul': show_topics_ul,
             'DDR_MEDIA_URL': settings.DDR_MEDIA_URL,

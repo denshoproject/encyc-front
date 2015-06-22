@@ -42,25 +42,25 @@ def set_hosts_index():
     index = Index(settings.DOCSTORE_INDEX)
     return index
     
-def reset():
+def delete_index():
     index = set_hosts_index()
-
     logprint('debug', 'deleting old index')
     index.delete()
+    logprint('debug', 'DONE')
+    
+def create_index():
+    index = set_hosts_index()
     logprint('debug', 'creating new index')
     index = Index(settings.DOCSTORE_INDEX)
     index.create()
-    
     logprint('debug', 'creating mappings')
     Author.init()
     Page.init()
     Source.init()
-    
     logprint('debug', 'registering doc types')
     index.doc_type(Author)
     index.doc_type(Page)
     index.doc_type(Source)
-
     logprint('debug', 'DONE')
 
 def authors(report=False, dryrun=False):
@@ -179,12 +179,20 @@ class Command(BaseCommand):
             help='report number of MediaWiki/Elasticsearch records and number to be indexed/updated.'
         )
         parser.add_argument(
+            '--delete', action='store_const', const=1,
+            help='Delete index (requires --confirm).'
+        )
+        parser.add_argument(
             '--reset', action='store_const', const=1,
-            help='create new index (requires --confirm).'
+            help='Delete existing index and create new one (requires --confirm).'
+        )
+        parser.add_argument(
+            '--create', action='store_const', const=1,
+            help='Create new index.'
         )
         parser.add_argument(
             '--confirm', action='store_const', const=1,
-            help='confirm that you really seriously want to reset.'
+            help='Confirm that you really seriously want to delete/create/reset.'
         )
         parser.add_argument(
             '--authors', action='store_const', const=1,
@@ -200,19 +208,35 @@ class Command(BaseCommand):
         )
     
     def handle(self, *args, **options):
-
-        if not (options['reset'] or options['authors'] or options['articles'] or options['topics']):
+        
+        if not (
+            options['delete'] or options['create'] or options['reset']
+            or options['authors'] or options['articles'] or options['topics']
+        ):
             print('Choose an action. Try "python manage.py encycupdate --help".')
             sys.exit(1)
         
+        if options['delete'] and not options['confirm']:
+            print('*** Do you really want to delete?  All existing records will be deleted!')
+            print('*** If you want to proceed, add the --confirm argument.')
+            sys.exit(1)
+        if options['create'] and not options['confirm']:
+            print('*** Do you really want to make a new index?  All records will be deleted!')
+            print('*** If you want to proceed, add the --confirm argument.')
+            sys.exit(1)
         if options['reset'] and not options['confirm']:
             print('*** Do you really want to reset?  All existing records will be deleted!')
             print('*** If you want to proceed, add the --confirm argument.')
             sys.exit(1)
         
         try:
-            if options['reset'] and options['confirm']:
-                reset()
+            if   options['reset'] and options['confirm']:
+                delete_index()
+                create_index()
+            elif options['delete'] and options['confirm']:
+                delete_index()
+            elif options['create']:
+                create_index()
             elif options['authors']:
                 authors(report=options['report'], dryrun=options['dryrun'])
             elif options['articles']:

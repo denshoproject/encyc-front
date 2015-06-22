@@ -185,7 +185,7 @@ def related_ddr(request, url_title='index', template_name='wikiprox/related-ddr.
     TOTAL_OBJECTS = 10
     try:
         terms_objects = page.ddr_terms_objects(size=TOTAL_OBJECTS)
-        ddr_timeout = False
+        ddr_error = None
     except requests.exceptions.ConnectionError:
         terms_objects = []
         ddr_error = 'ConnectionError'

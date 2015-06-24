@@ -70,17 +70,19 @@ def logprint(msg):
         print('%s %s' % (datetime.now(), msg.strip()))
 
 def check_tmpdir():
+    """Make tmpdir if it doesn't exist
+    """
     if not os.path.exists(TMP_DIR):
         logprint('mkdir %s' % TMP_DIR)
         os.makedirs(TMP_DIR)
 
-def list_only(host):
-    """Run RSYNC_CMD and return results.
+def get_files_list(remote):
+    """Get list of files from remote
     
-    @param host: str USER@HOST:PATH
+    @param remote: str USER@HOST:PATH
     @returns: list RSYNC_CMD output split into lines.
     """
-    cmd = RSYNC_CMD + [host]
+    cmd = RSYNC_CMD + [remote]
     logprint(' '.join(cmd))
     raw = subprocess.check_output(cmd)
     return raw.splitlines()
@@ -94,15 +96,29 @@ def separate_files_dirs(raw):
     files = []
     dirs = []
     for line in raw:
-        info = parse_line(line)
+        info = parse_rsync_line(line)
         if info and (isinstance(info, dict)):
             files.append(info)
         elif info and (isinstance(info, basestring)):
             dirs.append(info)
     return files,dirs
 
-def parse_line(line):
+def parse_rsync_line(line):
     """Parse output of RSYNC_CMD, return file info dict.
+    
+    >>> line = 'drwxr-xr-x        4096 2012/10/19 16:08:57 sources/1/1677'
+    >>> parse_rsync_line(line)
+    'sources/1/1677'
+    
+    >>> line = '-rwxr-xr-x     1234567 2015/03/26 10:21:27 sources/1/123/en-my-file-1_1.jpg'
+    >>> parse_rsync_line(line)
+    {'perms': '-rwxr-xr-x', 'basename': 'en-my-file-1_1.jpg', 'size': 1234567, 
+    'modified': datetime.datetime(2015, 3, 26, 10, 21, 27), 'dirname': 'sources/1/123',
+    'path': 'sources/1/123/en-my-file-1_1.jpg'}
+
+    >>> line = 'lrwxrwxrwx          64 2015/01/15 16:45:05 sources/1/123/ddr-test-123-456.jpg -> /var/www/html/psms/media/sources/1/124/my-file-a1b2c3d4e5.jpg'
+    >>> parse_rsync_line(line)
+    >>> 
     
     @param line: str
     @returns: dict (file), str (directory), or None
@@ -112,24 +128,25 @@ def parse_line(line):
         # wrong num of parts
         return None
     perms,size,date,time,path = line.split()
-    pth,ext = os.path.splitext(path)
-    if not ext:
-        # no extension, must be a dir
+    if perms[0] == 'd':
+        # directory
         return path
-    # file
-    size = int(size.replace(',', ''))
-    y,m,d = date.split('/')
-    H,M,S = time.split(':')
-    modified = datetime(int(y),int(m),int(d),int(H),int(M),int(S))
-    parts = {
-        'perms': perms,
-        'size': size,
-        'modified': modified,
-        'path': path,
-        'dirname': os.path.dirname(path),
-        'basename': os.path.basename(path),
-    }
-    return parts
+    elif perms[0] == '-':
+        # file
+        size = int(size.replace(',', ''))
+        y,m,d = date.split('/')
+        H,M,S = time.split(':')
+        modified = datetime(int(y),int(m),int(d),int(H),int(M),int(S))
+        parts = {
+            'perms': perms,
+            'size': size,
+            'modified': modified,
+            'path': path,
+            'dirname': os.path.dirname(path),
+            'basename': os.path.basename(path),
+        }
+        return parts
+    return None
 
 def print_stats(raw, dirs, files):
     num_lines = len(raw)
@@ -160,29 +177,29 @@ def choose_files(src_files, dest_files):
     dest_keys = dest_files.keys()
     #for key in src_files.keys():
     for key in src_files.keys()[:10]:
-        if (key in dest_keys) \
-        and (src_files[key]['modified'] > dest_files[key]['modified']):
-            # file in both places, source is newer
-            chosen.append(src_files[key])
-        elif key not in dest_keys:
+        if (key in dest_keys):
+            if (src_files[key]['modified'] > dest_files[key]['modified']):
+                # file in both places, source is newer
+                chosen.append(src_files[key])
+        else:
             # file not in dest
             chosen.append(src_files[key])
-        else:
-            pass
     return chosen
 
-def make_scp_cmds(src_user_host, src_path, chosen, dest_user_host, dest_dir):
-    """subprocess-friendly command lists
+def make_scp_cmds(chosen, src_user_host, src_path, dest_user_host, dest_dir):
+    """Generate set of scp commands for each file.
     
-    Looks like we can't copy directly from SOURCE to DEST systems,
-    so scp file to local /tmp, scp to dest, then delete from /tmp.
+    Rsync can't copy directly from SOURCE to DESTINATION so 
+    - scp file to local /tmp,
+    - scp to dest,
+    - delete from /tmp.
     
     Example src_path: '/var/www/html/psms/media/sources'
     Example dest_path: '/var/www/media/encyc-psms'
     
+    @param chosen: list Chosen file info dicts
     @param src_user_host: str USER@HOST
     @param src_path: str Source path, including dir containing source files.
-    @param chosen: list Chosen file info dicts
     @param dest_user_host: str USER@HOST
     @param dest_dir: str Destination directory.
     @returns: list of commands for subprocess
@@ -194,21 +211,16 @@ def make_scp_cmds(src_user_host, src_path, chosen, dest_user_host, dest_dir):
     ]
     commands = []
     for spath in src_paths:
-        src_remote = '%s:%s' % (src_user_host, spath)
         tmp_path = os.path.join(TMP_DIR, os.path.basename(spath))
         dest_path = os.path.join(dest_dir, os.path.basename(spath))
-        dest_remote = '%s:%s' % (dest_user_host, dest_path)
         commands.append([
-            SCP_CMD + [src_remote, tmp_path],  # scp source tmp
-            SCP_CMD + [tmp_path, dest_remote], # scp tmp dest
-            ['rm', '-f', tmp_path],            # rm tmp
+            SCP_CMD + ['%s:%s' % (src_user_host, spath), tmp_path],
+            SCP_CMD + [tmp_path, '%s:%s' % (dest_user_host, dest_path)],
+            ['rm', '-f', tmp_path],
         ])
     return commands
 
-def run_commands(cmds, dryrun=False):
-    """
-    @param cmds: list of command lists for subprocess
-    """
+def copy_files(cmds, dryrun=False):
     outs = []
     for cmd in cmds:
         logprint(' '.join(cmd))
@@ -233,34 +245,36 @@ def main():
     if not configs_read:
         raise Exception('No config file!')
     
+    # source
     src_remote = config.get('sources', 'src_remote')
-    dest_remote = config.get('sources', 'dest_remote')
-    
     src_user_host,src_path = src_remote.split(':')
-    dest_user_host,dest_path = dest_remote.split(':')
-
-    src_raw = list_only(src_remote)
+    src_raw = get_files_list(src_remote)
     src_files_list,src_dirs = separate_files_dirs(src_raw)
     print_stats(src_raw, src_dirs, src_files_list)
     src_files = make_files_dict(src_files_list)
     
-    dest_raw = list_only(dest_remote)
+    # destination
+    dest_remote = config.get('sources', 'dest_remote')
+    dest_user_host,dest_path = dest_remote.split(':')
+    dest_raw = get_files_list(dest_remote)
     dest_files_list,dest_dirs = separate_files_dirs(dest_raw)
     print_stats(dest_raw, dest_dirs, dest_files_list)
     dest_files = make_files_dict(dest_files_list)
     
+    # find new/changed files
     chosen = choose_files(src_files, dest_files)
     num_chosen = len(chosen)
     logprint('copying %s files' % num_chosen)
     
-    scp_cmds = make_scp_cmds(src_user_host, src_path, chosen, dest_user_host, dest_path)
-    
+    scp_cmds = make_scp_cmds(chosen, src_user_host, src_path, dest_user_host, dest_path)
+
+    # OK go!
     check_tmpdir()
     n = 0
     for cmds in scp_cmds:
         n = n + 1
         logprint('%s/%s' % (n, num_chosen))
-        outs = run_commands(cmds)
+        outs = copy_files(cmds)
     logprint('DONE')
     
 

@@ -30,7 +30,7 @@
               src: "{{ STATIC_URL }}jwplayer-5.9/player.swf",
               config: {
                 provider: "rtmp",
-                streamer: "{{ rtmp_streamer }}",
+                streamer: "{{ RTMP_STREAMER }}",
                 file: "{{ source.streaming_url }}"
               }
             }{% if source.streaming_url and source.original_url %},{% endif %}

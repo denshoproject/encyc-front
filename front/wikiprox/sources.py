@@ -51,6 +51,7 @@ def format_primary_source(source, lightbox=False):
               'MEDIA_URL': settings.MEDIA_URL,
               'STATIC_URL': settings.STATIC_URL,
               'SOURCE_MEDIA_URL': settings.SOURCES_MEDIA_URL,
+              'RTMP_STREAMER': settings.RTMP_STREAMER,
               'href': source.absolute_url(),
               'caption': source.caption,
               'courtesy': source.courtesy,
@@ -69,10 +70,8 @@ def format_primary_source(source, lightbox=False):
         # remove rtmp_streamer from streaming_url
         if source.streaming_url and ('rtmp' in source.streaming_url):
             streaming_url = source.streaming_url.replace(settings.RTMP_STREAMER, '')
-            rtmp_streamer = settings.RTMP_STREAMER
         else:
             streaming_url = source.streaming_url
-            rtmp_streamer = ''
         # add 20px to vertical for JWplayer
         xy[1] = xy[1] + 20
         # mediaspace <div>
@@ -81,7 +80,6 @@ def format_primary_source(source, lightbox=False):
             'original': original_url,
             'img_url': source.img_url(),
             'img_url_local': source.img_url_local(),
-            'rtmp_streamer': rtmp_streamer,
             'streaming_url': streaming_url,
             'xy': xy,
             'xyms': xyms,

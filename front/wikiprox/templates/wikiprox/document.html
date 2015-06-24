@@ -1,10 +1,13 @@
+{% load thumbnail %}
+{% thumbnail img_url_local "260x400" as thumb_sm %}
+{% thumbnail img_url_local "700x700" as thumb_lg %}
 {% if lightbox %}
 <div class="primarysource"><!-- lightbox -->
-  <a href="{{ thumb_lg }}"
+  <a href="{{ MEDIA_URL }}{{ thumb_lg }}"
      class="document lightview"
      data-lightview-caption="{{ caption }} {{ courtesy }} <a class='more' href='{{ href }}'>More info &raquo;</a>">
-    <img src="{{ thumb_sm }}"
-         large="{{ thumb_lg }}"
+    <img src="{{ MEDIA_URL }}{{ thumb_sm }}"
+         large="{{ MEDIA_URL }}{{ thumb_lg }}"
          more="{{ href }}" />
   </a>
   </span>
@@ -17,7 +20,7 @@
 </div>
 {% else %}
 <div class="primarysource">
-  <a href="{{ href }}"><img src="{{ thumb_sm }}" /></a>
+  <a href="{{ href }}"><img src="{{ MEDIA_URL }}{{ thumb_sm }}" /></a>
   </span>
   <br/>
   <span class="caption">
@@ -27,3 +30,5 @@
   </span>
 </div>
 {% endif %}{# lightbox #}
+{% endthumbnail %}
+{% endthumbnail %}

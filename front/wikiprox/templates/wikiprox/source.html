@@ -1,4 +1,5 @@
 {% extends "wikiprox/base.html" %}
+{% load thumbnail %}
 
 
 
@@ -8,13 +9,14 @@
 
 {% block javascript %}{{ block.super }}
 {% if source.media_format == 'video' %}
+{% thumbnail source.img_url_local "700x700" as thumb_lg %}
 <script type="text/javascript">
     jwplayer("videocontainer").setup({
         autostart: 'false',
         controlbar: 'bottom',
         width: 640,
         height: {% if source.aspect_ratio == 'hd' %}380{% else %}500{% endif %},
-        image: "{{ source.thumbnail_lg }}",
+        image: "{{ MEDIA_URL }}{{ thumb_lg }}",
         modes: [
 {% if source.original_url %}
             { type: "html5",
@@ -44,6 +46,7 @@
         ]
     });
 </script>
+{% endthumbnail %}
 {% endif %}
 {% endblock javascript %}
 
@@ -63,12 +66,13 @@ Primary Source &mdash; {{ source.encyclopedia_id }}
 
 <p>
 <div id="media" class="{{ source.media_format }} {% if source.aspect_ratio %}{{ source.aspect_ratio }}{% endif %}">
+{% thumbnail source.img_url_local "700x700" as thumb_lg %}
 {% if source.media_format == 'image' %}
-  <img src="{{ source.thumbnail_lg }}" />
+  <img src="{{ MEDIA_URL }}{{ thumb_lg }}" />
   {% if source.original_url %}<br/><a href="{{ source.original_url }}">Download full-size version ({{ source.original_size|filesizeformat }})</a>{% endif %}
 {% endif %}
 {% if source.media_format == 'document' %}
-  <img src="{{ source.thumbnail_lg }}" />
+  <img src="{{ MEDIA_URL }}{{ thumb_lg }}" />
   {% if source.original_url %}<br/><a href="{{ source.original_url }}">Download full PDF ({{ source.original_size|filesizeformat }})</a>{% endif %}
 {% endif %}
 {% if source.media_format == 'video' %}
@@ -76,6 +80,7 @@ Primary Source &mdash; {{ source.encyclopedia_id }}
   {% if source.transcript %}<br/><a href="{{ source.transcript }}" target="_transcript">Download a transcript</a>{% endif %}
 {% endif %}
 {% if source.external_url %}&nbsp;&mdash;&nbsp; <a href="{{ source.external_url }}" class="offsite" target="offsite">{{ source.external_url }}</a>{% endif %}
+{% endthumbnail %}
 </div><!-- #media -->
 </p>
 

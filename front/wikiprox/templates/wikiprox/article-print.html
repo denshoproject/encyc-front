@@ -1,5 +1,5 @@
 {% extends "wikiprox/base-print.html" %}
-{% load wikiprox_tags %}
+{% load thumbnail wikiprox_tags %}
 
 
 {% block title %}{{ page.title }}{% endblock %}
@@ -24,9 +24,9 @@
     </h2>
 {% for source in page.sources %}
     <div class="primarysource-print" style="margin-bottom:32px;">
-{% if source.thumbnail_lg %}
-<img src="{{ source.thumbnail_lg }}" style="width:500px; float:left; padding-right:10px;" />
-{% endif %}
+{% thumbnail source.img_url_local "700x700" as thumb_lg %}
+<img src="{{ MEDIA_URL }}{{ thumb_lg }}" style="width:500px; float:left; padding-right:10px;" />
+{% endthumbnail %}
       <div class="metadata" style="">
 {{ source.caption|safe|linebreaks }}
 {{ source.caption_extended|safe|linebreaks }}

@@ -1,3 +1,6 @@
+{% load thumbnail %}
+{% thumbnail img_url_local "260x260" as thumb_sm %}
+{% thumbnail img_url_local "700x700" as thumb_lg %}
 {% if lightbox %}
 <div class="primarysource"><!-- lightbox -->
   <a href="mediaspace-{{ encyclopedia_id }}"
@@ -12,7 +15,7 @@
                  'controlbar': 'bottom',
                  'width': '{{ xy.0 }}',
                  'height': '{{ xy.1 }}',
-                 'image': '{{ thumb_lg }}',
+                 'image': '{{ MEDIA_URL }}{{ thumb_lg }}',
                  'modes' : [
 {% if original %}
                      { type: 'html5',
@@ -44,8 +47,8 @@
          }"
      data-lightview-caption="{{ caption }} {{ courtesy }} <a class='more' href='{{ href }}'>More info &raquo;</a>"
   >
-    <img src="{{ thumb_sm }}"
-         large="{{ thumb_lg }}"
+    <img src="{{ MEDIA_URL }}{{ thumb_sm }}"
+         large="{{ MEDIA_URL }}{{ thumb_lg }}"
          more="{{ href }}" />
   </a>
   <br/>
@@ -58,7 +61,7 @@
 <div id="mediaspace-{{ encyclopedia_id }}" style="display:none;width:{{ xyms.0 }}px;height:{{ xyms.1 }}px;">This div will end up in the lightbox</div>
 {% else %}
 <div class="primarysource">
-  <a href="{{ href }}"><img src="{{ thumb_sm }}" /></a>
+  <a href="{{ href }}"><img src="{{ MEDIA_URL }}{{ thumb_sm }}" /></a>
   <br/>
   <span class="caption">
     {{ caption }}
@@ -67,3 +70,5 @@
   </span>
 </div>
 {% endif %}{# lightbox #}
+{% endthumbnail %}
+{% endthumbnail %}

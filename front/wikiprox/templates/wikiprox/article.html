@@ -1,5 +1,5 @@
 {% extends "wikiprox/base.html" %}
-{% load wikiprox_tags %}
+{% load thumbnail wikiprox_tags %}
 
 
 {% block title %}{{ page.title }}{% endblock %}
@@ -123,12 +123,14 @@
 
 
 {% if page.sources.0 %}
+  {% thumbnail page.sources.0.img_url_local "260x400" as thumb_sm %}
   <div id="media-pointer" style="text-align:right; background:#fff; padding-left:20px; padding-bottom:10px; margin-left:20px; margin-bottom:20px; float:right;">
     <a href="#primary-sources">
-      <img src="{{ page.sources.0.thumbnail_sm }}" style="width:100px;" title="" alt="" />
+      <img src="{{ MEDIA_URL }}{{ thumb_sm }}" style="width:100px;" title="" alt="" />
       <strong><i class="icon-chevron-down"></i>&nbsp;Media</strong>
     </a>
   </div>
+  {% endthumbnail %}
 {% endif %}
   <strong>
   Category:

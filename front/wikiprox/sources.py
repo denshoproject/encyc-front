@@ -59,15 +59,6 @@ def format_primary_source(source, lightbox=False):
     # video
     if source.media_format == 'video':
         template = 'wikiprox/video.html'
-        if source.thumbnail_sm:
-            thumb_sm = source.thumbnail_sm
-            thumb_lg = source.thumbnail_lg
-        elif source.display:
-            thumb_sm = source.display
-            thumb_lg = source.display
-        else:
-            thumb_sm = 'img/icon-video.png'
-            thumb_lg = 'img/icon-video.png'
         if source.original_url:
             original_url = source.original_url
         else:
@@ -87,53 +78,28 @@ def format_primary_source(source, lightbox=False):
         # mediaspace <div>
         xyms = [xy[0]+10, xy[1]+10]
         specific = {
-            'thumb_sm': thumb_sm,
-            'thumb_lg': thumb_lg,
             'original': original_url,
+            'img_url': source.img_url(),
+            'img_url_local': source.img_url_local(),
             'rtmp_streamer': rtmp_streamer,
             'streaming_url': streaming_url,
             'xy': xy,
             'xyms': xyms,
-            }
+        }
     # document
     elif source.media_format == 'document':
         template = 'wikiprox/document.html'
-        if source.thumbnail_sm:
-            thumb_sm = source.thumbnail_sm
-            thumb_lg = source.thumbnail_lg
-        elif source.display:
-            thumb_sm = source.thumbnail_sm
-            thumb_lg = source.thumbnail_lg
-        elif source.original_url:
-            thumb_sm = source.original_url
-            thumb_lg = source.original_url
-        else:
-            thumb_sm = 'img/icon-document.png'
-            thumb_lg = 'img/icon-document.png'
         specific = {
-            'thumb_sm': thumb_sm,
-            'thumb_lg': thumb_lg,
-            }
+            'img_url': source.img_url(),
+            'img_url_local': source.img_url_local(),
+        }
     # image
     elif source.media_format == 'image':
         template = 'wikiprox/image.html'
-        # img src
-        if source.thumbnail_sm:
-            thumb_sm = source.thumbnail_sm
-            thumb_lg = source.thumbnail_lg
-        elif source.display:
-            thumb_sm = source.display
-            thumb_lg = source.display
-        elif source.original_url:
-            thumb_sm = source.original_url
-            thumb_lg = source.original_url
-        else:
-            thumb_sm = 'img/icon-image.png'
-            thumb_lg = 'img/icon-image.png'
         specific = {
-            'thumb_sm': thumb_sm,
-            'thumb_lg': thumb_lg,
-            }
+            'img_url': source.img_url(),
+            'img_url_local': source.img_url_local(),
+        }
     context = dict(common.items() + specific.items())
     # render
     t = loader.get_template(template)

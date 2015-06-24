@@ -32,6 +32,7 @@ from datetime import datetime
 import json
 import logging
 logger = logging.getLogger(__name__)
+import os
 
 from elasticsearch.exceptions import NotFoundError
 from elasticsearch_dsl import Index
@@ -334,14 +335,7 @@ class Page(DocType):
         
         @returns: list
         """
-        objects = [Source.get(sid) for sid in self.source_ids]
-        # sorl.thumbnail-friendly URL
-        for source in objects:
-            source.img_url = source.display.replace(
-                settings.SOURCES_MEDIA_URL,
-                settings.SOURCES_MEDIA_URL_LOCAL
-            )
-        return objects
+        return [Source.get(sid) for sid in self.source_ids]
     
     def topics(self):
         """List of DDR topics associated with this page.
@@ -438,8 +432,6 @@ class Source(DocType):
     headword = String(index='not_analyzed')
     original_url = String(index='not_analyzed')
     streaming_url = String(index='not_analyzed')
-    thumbnail_sm = String(index='not_analyzed')
-    thumbnail_lg = String(index='not_analyzed')
     external_url = String(index='not_analyzed')
     media_format = String(index='not_analyzed')
     aspect_ratio = String(index='not_analyzed')
@@ -450,6 +442,8 @@ class Source(DocType):
     caption_extended = String()
     transcript = String()
     courtesy = String(index='not_analyzed')
+    filename = String(index='not_analyzed')
+    img_path = String(index='not_analyzed')
     
     class Meta:
         index = settings.DOCSTORE_INDEX
@@ -463,7 +457,13 @@ class Source(DocType):
     
     def absolute_url(self):
         return reverse('wikiprox-source', args=([self.encyclopedia_id]))
-
+    
+    def img_url(self):
+        return os.path.join(settings.SOURCES_MEDIA_URL, self.img_path)
+    
+    def img_url_local(self):
+        return os.path.join(settings.SOURCES_MEDIA_URL_LOCAL, self.img_path)
+    
     def article(self):
         if self.headword:
             try:
@@ -482,6 +482,15 @@ class Source(DocType):
             streaming_url = mwsource['streaming_url'].replace(settings.RTMP_STREAMER, '')
         else:
             streaming_url = ''
+        # fullsize image for thumbnail
+        filename = ''
+        img_path = ''
+        if mwsource.get('display'):
+            filename = os.path.basename(mwsource['display'])
+            img_path = os.path.join(settings.SOURCES_MEDIA_BUCKET, filename)
+        elif mwsource.get('original'):
+            filename = os.path.basename(mwsource['original'])
+            img_path = os.path.join(settings.SOURCES_MEDIA_BUCKET, filename)
         source = Source(
             meta = {'id': mwsource['encyclopedia_id']},
             encyclopedia_id = mwsource['encyclopedia_id'],
@@ -497,8 +506,6 @@ class Source(DocType):
             headword = mwsource['headword'],
             original_url = mwsource['original'],
             streaming_url = streaming_url,
-            thumbnail_sm = mwsource['thumbnail_sm'],
-            thumbnail_lg = mwsource['thumbnail_lg'],
             external_url = mwsource['external_url'],
             media_format = mwsource['media_format'],
             aspect_ratio = mwsource['aspect_ratio'],
@@ -509,6 +516,8 @@ class Source(DocType):
             caption_extended = none_strip(mwsource['caption_extended']),
             transcript = none_strip(mwsource['transcript']),
             courtesy = none_strip(mwsource['courtesy']),
+            filename = filename,
+            img_path = img_path,
         )
         return source
 

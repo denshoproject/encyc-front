@@ -102,8 +102,6 @@ class Source(object):
     external_url = None
     original = None
     display = None
-    thumbnail_lg = None
-    thumbnail_sm = None
     media_format = None
     aspect_ratio = None
     original_size = None

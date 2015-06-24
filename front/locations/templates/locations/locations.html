@@ -12,7 +12,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <!-- <link rel="SHORTCUT ICON" href="{{ MEDIA_URL }}favicon.ico"> -->
+  <!-- <link rel="SHORTCUT ICON" href="{{ STATIC_URL }}favicon.ico"> -->
 
   <script type="text/javascript" src="{{ STATIC_URL }}modernizr-2.5.3.js"></script>
   
@@ -177,8 +177,8 @@
 
   <div id="header">
     <h2>
-    <span id="showtextbox" style="float:right;"><a href="#"><img id="toggle" src="{{ MEDIA_URL }}img/locations-header-toggle.png" alt="open/close" title="open/close" /></a></span>
-    <a href="/"><img id="title" src="{{ MEDIA_URL }}img/locations-header-title.png" alt="Densho Encyclopedia" /></a>
+    <span id="showtextbox" style="float:right;"><a href="#"><img id="toggle" src="{{ STATIC_URL }}img/locations-header-toggle.png" alt="open/close" title="open/close" /></a></span>
+    <a href="/"><img id="title" src="{{ STATIC_URL }}img/locations-header-title.png" alt="Densho Encyclopedia" /></a>
     </h2>
   </div>
 
@@ -193,15 +193,15 @@
     <div id="legend" style="display:block;">
       <h2>
       <a id="legendflip" href="#">
-        <img class="open"   width="10" src="{{ MEDIA_URL }}img/locations-flip-open.png" />
-        <img class="closed" width="10" src="{{ MEDIA_URL }}img/locations-flip-closed.png" />
+        <img class="open"   width="10" src="{{ STATIC_URL }}img/locations-flip-open.png" />
+        <img class="closed" width="10" src="{{ STATIC_URL }}img/locations-flip-closed.png" />
         Facility Types
       </a>
       </h2>
       <ul>
 {% for category in categories %}
         <li>
-          <img src="{{ MEDIA_URL }}img/locations-{{ category.0 }}-selected.png" width="15" /> {{ category.1 }}
+          <img src="{{ STATIC_URL }}img/locations-{{ category.0 }}-selected.png" width="15" /> {{ category.1 }}
         </li>
 {% endfor %}
       </ul>
@@ -302,11 +302,11 @@ $(document).ready(function(){
 
     var styles = new OpenLayers.StyleMap({
         "default": {
-            externalGraphic: "{{ MEDIA_URL }}img/locations-${category}.png",
+            externalGraphic: "{{ STATIC_URL }}img/locations-${category}.png",
             pointRadius: 10
         },
         "select": {
-            externalGraphic: "{{ MEDIA_URL }}img/locations-${category}-selected.png",
+            externalGraphic: "{{ STATIC_URL }}img/locations-${category}-selected.png",
             pointRadius: 30
         }
     });

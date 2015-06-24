@@ -175,8 +175,7 @@ def choose_files(src_files, dest_files):
     """
     chosen = []
     dest_keys = dest_files.keys()
-    #for key in src_files.keys():
-    for key in src_files.keys()[:10]:
+    for key in src_files.keys():
         if (key in dest_keys):
             if (src_files[key]['modified'] > dest_files[key]['modified']):
                 # file in both places, source is newer

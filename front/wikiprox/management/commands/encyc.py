@@ -251,7 +251,9 @@ class Command(BaseCommand):
         )
     
     def handle(self, *args, **options):
-
+        
+        start = datetime.now()
+        
         actions = [
             'config',
             'delete_index', 'create_index', 'reset_index',
@@ -325,3 +327,7 @@ class Command(BaseCommand):
                 logprint('error', 'ConnectionError: check connection to MediaWiki or Elasticsearch.')
             except requests.exceptions.ReadTimeout as e:
                 logprint('error', 'ReadTimeout: %s' % e)
+        
+        end = datetime.now()
+        elapsed = end - start
+        logprint('DONE (elapsed %s)' % elapsed)

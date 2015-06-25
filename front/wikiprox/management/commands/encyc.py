@@ -208,14 +208,14 @@ class Command(BaseCommand):
         )
     
     def handle(self, *args, **options):
-        
-        if not (
-            options['delete'] or options['create'] or options['reset']
-            or options['authors'] or options['articles'] or options['topics']
-        ):
+
+        actions = [
+            'delete', 'create', 'reset', 'authors', 'articles', 'topics'
+        ]
+        selected = [key for key in actions if options[key]]
+        if not selected:
             print('Choose an action. Try "python manage.py encyc --help".')
             sys.exit(1)
-        
         if options['delete'] and not options['confirm']:
             print('*** Do you really want to delete?  All existing records will be deleted!')
             print('*** If you want to proceed, add the --confirm argument.')
@@ -229,23 +229,51 @@ class Command(BaseCommand):
             print('*** If you want to proceed, add the --confirm argument.')
             sys.exit(1)
         
-        try:
-            if   options['reset'] and options['confirm']:
+        if options['reset'] and options['confirm']:
+            try:
                 delete_index()
                 create_index()
-            elif options['delete'] and options['confirm']:
+            except requests.exceptions.ConnectionError:
+                logprint('error', 'ConnectionError: check connection to MediaWiki or Elasticsearch.')
+            except requests.exceptions.ReadTimeout as e:
+                logprint('error', 'ReadTimeout: %s' % e)
+
+        if options['delete'] and options['confirm']:
+            try:
                 delete_index()
-            elif options['create']:
+            except requests.exceptions.ConnectionError:
+                logprint('error', 'ConnectionError: check connection to MediaWiki or Elasticsearch.')
+            except requests.exceptions.ReadTimeout as e:
+                logprint('error', 'ReadTimeout: %s' % e)
+
+        if options['create']:
+            try:
                 create_index()
-            elif options['authors']:
-                authors(report=options['report'], dryrun=options['dryrun'])
-            elif options['articles']:
-                articles(report=options['report'], dryrun=options['dryrun'])
-            elif options['topics']:
+            except requests.exceptions.ConnectionError:
+                logprint('error', 'ConnectionError: check connection to MediaWiki or Elasticsearch.')
+            except requests.exceptions.ReadTimeout as e:
+                logprint('error', 'ReadTimeout: %s' % e)
+
+        if options['topics']:
+            try:
                 topics(report=options['report'], dryrun=options['dryrun'])
-        
-        except requests.exceptions.ConnectionError:
-            logprint('error', 'ConnectionError: check connection to MediaWiki or Elasticsearch.')
-        
-        except requests.exceptions.ReadTimeout as e:
-            logprint('error', 'ReadTimeout: %s' % e)
+            except requests.exceptions.ConnectionError:
+                logprint('error', 'ConnectionError: check connection to MediaWiki or Elasticsearch.')
+            except requests.exceptions.ReadTimeout as e:
+                logprint('error', 'ReadTimeout: %s' % e)
+
+        if options['authors']:
+            try:
+                authors(report=options['report'], dryrun=options['dryrun'])
+            except requests.exceptions.ConnectionError:
+                logprint('error', 'ConnectionError: check connection to MediaWiki or Elasticsearch.')
+            except requests.exceptions.ReadTimeout as e:
+                logprint('error', 'ReadTimeout: %s' % e)
+
+        if options['articles']:
+            try:
+                articles(report=options['report'], dryrun=options['dryrun'])
+            except requests.exceptions.ConnectionError:
+                logprint('error', 'ConnectionError: check connection to MediaWiki or Elasticsearch.')
+            except requests.exceptions.ReadTimeout as e:
+                logprint('error', 'ReadTimeout: %s' % e)

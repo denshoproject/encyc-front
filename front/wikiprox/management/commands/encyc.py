@@ -78,6 +78,7 @@ def create_index():
 def authors(report=False, dryrun=False):
     index = set_hosts_index()
 
+    logprint('debug', '------------------------------------------------------------------------')
     logprint('debug', 'getting mw_authors...')
     mw_authors = Proxy().authors(cached_ok=False)
     logprint('debug', 'getting es_authors...')
@@ -93,7 +94,7 @@ def authors(report=False, dryrun=False):
     
     logprint('debug', 'deleting...')
     for n,title in enumerate(authors_delete):
-        logprint('debug', '------------------------------------------------------------------------')
+        logprint('debug', '--------------------')
         logprint('debug', '%s/%s %s' % (n, len(authors_delete), title))
         author = Author.get(url_title=title)
         if not dryrun:
@@ -101,7 +102,7 @@ def authors(report=False, dryrun=False):
      
     logprint('debug', 'adding...')
     for n,title in enumerate(authors_new):
-        logprint('debug', '------------------------------------------------------------------------')
+        logprint('debug', '--------------------')
         logprint('debug', '%s/%s %s' % (n, len(authors_new), title))
         logprint('debug', 'getting from mediawiki')
         mwauthor = Proxy().page(title)
@@ -120,6 +121,7 @@ def authors(report=False, dryrun=False):
 def articles(report=False, dryrun=False):
     index = set_hosts_index()
     
+    logprint('debug', '------------------------------------------------------------------------')
     # authors need to be refreshed
     logprint('debug', 'getting mw_authors,articles...')
     mw_authors = Proxy().authors(cached_ok=False)
@@ -141,7 +143,7 @@ def articles(report=False, dryrun=False):
     posted = 0
     could_not_post = []
     for n,title in enumerate(articles_update):
-        logprint('debug', '------------------------------------------------------------------------')
+        logprint('debug', '--------------------')
         logprint('debug', '%s/%s %s' % (n+1, len(articles_update), title))
         logprint('debug', 'getting from mediawiki')
         mwpage = Proxy().page(title)
@@ -173,6 +175,7 @@ def articles(report=False, dryrun=False):
 def topics(report=False, dryrun=False):
     index = set_hosts_index()
 
+    logprint('debug', '------------------------------------------------------------------------')
     logprint('debug', 'indexing topics...')
     Elasticsearch.index_topics()
     logprint('debug', 'DONE')
@@ -195,32 +198,32 @@ class Command(BaseCommand):
             help='report number of MediaWiki/Elasticsearch records and number to be indexed/updated.'
         )
         parser.add_argument(
-            '--delete', action='store_const', const=1,
+            '--create-index', action='store_const', const=1,
+            help='Create new index.'
+        )
+        parser.add_argument(
+            '--delete-index', action='store_const', const=1,
             help='Delete index (requires --confirm).'
         )
         parser.add_argument(
-            '--reset', action='store_const', const=1,
+            '--reset-index', action='store_const', const=1,
             help='Delete existing index and create new one (requires --confirm).'
-        )
-        parser.add_argument(
-            '--create', action='store_const', const=1,
-            help='Create new index.'
         )
         parser.add_argument(
             '--confirm', action='store_const', const=1,
             help='Confirm that you really seriously want to delete/create/reset.'
         )
         parser.add_argument(
-            '--authors', action='store_const', const=1,
+            '-t', '--topics', action='store_const', const=1,
+            help='index encyc<->DDR topics.'
+        )
+        parser.add_argument(
+            '-a', '--authors', action='store_const', const=1,
             help='index authors.'
         )
         parser.add_argument(
-            '--articles', action='store_const', const=1,
+            '-A', '--articles', action='store_const', const=1,
             help='index articles.'
-        )
-        parser.add_argument(
-            '--topics', action='store_const', const=1,
-            help='index encyc<->DDR topics.'
         )
     
     def handle(self, *args, **options):

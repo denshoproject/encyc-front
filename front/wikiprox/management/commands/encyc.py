@@ -35,6 +35,18 @@ def logprint(level, msg):
     elif level == 'info': logging.info(msg)
     elif level == 'error': logging.error(msg)
 
+def config():
+    print('manage.py encyc commands will use the following settings:')
+    print('')
+    print('DOCSTORE_HOSTS:         %s' % settings.DOCSTORE_HOSTS)
+    print('DOCSTORE_INDEX:         %s' % settings.DOCSTORE_INDEX)
+    print('MEDIAWIKI_HTML:         %s' % settings.MEDIAWIKI_HTML)
+    print('MEDIAWIKI_API:          %s' % settings.MEDIAWIKI_API)
+    print('MEDIAWIKI_API_USERNAME: %s' % settings.MEDIAWIKI_API_USERNAME)
+    print('MEDIAWIKI_API_PASSWORD: %s' % settings.MEDIAWIKI_API_PASSWORD)
+    print('MEDIAWIKI_API_TIMEOUT:  %s' % settings.MEDIAWIKI_API_TIMEOUT)
+    print('')
+
 def set_hosts_index():
     logprint('debug', 'hosts: %s' % settings.DOCSTORE_HOSTS)
     connections.create_connection(hosts=settings.DOCSTORE_HOSTS)
@@ -175,6 +187,10 @@ class Command(BaseCommand):
             help="perform a trial run with no changes made"
         )
         parser.add_argument(
+            '-c', '--config', action='store_const', const=1,
+            help='Print configuration settings.'
+        )
+        parser.add_argument(
             '-r', '--report', action='store_const', const=1,
             help='report number of MediaWiki/Elasticsearch records and number to be indexed/updated.'
         )
@@ -210,7 +226,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         actions = [
-            'delete', 'create', 'reset', 'authors', 'articles', 'topics'
+            'config', 'delete', 'create', 'reset', 'authors', 'articles', 'topics'
         ]
         selected = [key for key in actions if options[key]]
         if not selected:
@@ -228,6 +244,9 @@ class Command(BaseCommand):
             print('*** Do you really want to reset?  All existing records will be deleted!')
             print('*** If you want to proceed, add the --confirm argument.')
             sys.exit(1)
+        
+        if options['config']:
+            config()
         
         if options['reset'] and options['confirm']:
             try:

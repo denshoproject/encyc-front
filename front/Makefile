@@ -1,4 +1,5 @@
 SHELL = /bin/bash
+DEBIAN_CODENAME := $(shell lsb_release -sc)
 
 PACKAGE_SERVER=tank.densho.org
 
@@ -161,7 +162,16 @@ clean-front: clean-encyc-front
 install-encyc-front:
 	@echo ""
 	@echo "encyc-front --------------------------------------------------------------"
-	apt-get --assume-yes install imagemagick libjpeg62-turbo-dev libxml2 libxslt1.1 libxslt1-dev python-dev python-pip python-virtualenv supervisor zlib1g-dev
+	apt-get --assume-yes install imagemagick libxml2 libxslt1.1 libxslt1-dev python-dev python-pip python-virtualenv supervisor zlib1g-dev
+
+ifeq ($(DEBIAN_CODENAME), wheezy)
+	apt-get --assume-yes install libjpeg8-dev
+endif
+ifeq ($(DEBIAN_CODENAME), jessie)
+	apt-get --assume-yes install libjpeg62-turbo-dev
+endif
+
+# virtualenv
 	test -d $(VIRTUALENV) || virtualenv $(VIRTUALENV)
 	source $(VIRTUALENV)/bin/activate; \
 	pip install -U --download-cache=$(PIP_CACHE_DIR) bpython setuptools

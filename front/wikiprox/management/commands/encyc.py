@@ -229,21 +229,23 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         actions = [
-            'config', 'delete', 'create', 'reset', 'authors', 'articles', 'topics'
+            'config',
+            'delete-index', 'create-index', 'reset-index',
+            'topics', 'authors', 'articles',
         ]
         selected = [key for key in actions if options[key]]
         if not selected:
             print('Choose an action. Try "python manage.py encyc --help".')
             sys.exit(1)
-        if options['delete'] and not options['confirm']:
+        if options['delete-index'] and not options['confirm']:
             print('*** Do you really want to delete?  All existing records will be deleted!')
             print('*** If you want to proceed, add the --confirm argument.')
             sys.exit(1)
-        if options['create'] and not options['confirm']:
+        if options['create-index'] and not options['confirm']:
             print('*** Do you really want to make a new index?  All records will be deleted!')
             print('*** If you want to proceed, add the --confirm argument.')
             sys.exit(1)
-        if options['reset'] and not options['confirm']:
+        if options['reset-index'] and not options['confirm']:
             print('*** Do you really want to reset?  All existing records will be deleted!')
             print('*** If you want to proceed, add the --confirm argument.')
             sys.exit(1)
@@ -251,7 +253,7 @@ class Command(BaseCommand):
         if options['config']:
             config()
         
-        if options['reset'] and options['confirm']:
+        if options['reset-index'] and options['confirm']:
             try:
                 delete_index()
                 create_index()
@@ -260,7 +262,7 @@ class Command(BaseCommand):
             except requests.exceptions.ReadTimeout as e:
                 logprint('error', 'ReadTimeout: %s' % e)
 
-        if options['delete'] and options['confirm']:
+        if options['delete-index'] and options['confirm']:
             try:
                 delete_index()
             except requests.exceptions.ConnectionError:
@@ -268,7 +270,7 @@ class Command(BaseCommand):
             except requests.exceptions.ReadTimeout as e:
                 logprint('error', 'ReadTimeout: %s' % e)
 
-        if options['create']:
+        if options['create-index']:
             try:
                 create_index()
             except requests.exceptions.ConnectionError:

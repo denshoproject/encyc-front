@@ -75,7 +75,7 @@ def create_index():
     index.doc_type(Source)
     logprint('debug', 'DONE')
 
-def authors(report=False, dryrun=False):
+def authors(report=False, dryrun=False, force=False):
     index = set_hosts_index()
 
     logprint('debug', '------------------------------------------------------------------------')
@@ -89,6 +89,10 @@ def authors(report=False, dryrun=False):
     logprint('debug', 'elasticsearch authors: %s' % len(es_authors))
     logprint('debug', 'authors to add: %s' % len(authors_new))
     logprint('debug', 'authors to delete: %s' % len(authors_delete))
+    if force:
+        logprint('debug', 'forcibly update all authors')
+        authors_new = es_authors
+        authors_delete = []
     if report:
         return
     
@@ -106,8 +110,13 @@ def authors(report=False, dryrun=False):
         logprint('debug', '%s/%s %s' % (n, len(authors_new), title))
         logprint('debug', 'getting from mediawiki')
         mwauthor = Proxy().page(title)
+        try:
+            existing_author = Author.get(title)
+            logprint('debug', 'exists in elasticsearch')
+        except:
+            existing_author = None
         logprint('debug', 'creating author')
-        author = Author.from_mw(mwauthor)
+        author = Author.from_mw(mwauthor, author=existing_author)
         if not dryrun:
             logprint('debug', 'saving')
             author.save()
@@ -118,7 +127,7 @@ def authors(report=False, dryrun=False):
     
     logprint('debug', 'DONE')
 
-def articles(report=False, dryrun=False):
+def articles(report=False, dryrun=False, force=False):
     index = set_hosts_index()
     
     logprint('debug', '------------------------------------------------------------------------')
@@ -136,6 +145,10 @@ def articles(report=False, dryrun=False):
     logprint('debug', 'elasticsearch articles: %s' % len(es_articles))
     logprint('debug', 'articles to update: %s' % len(articles_update))
     logprint('debug', 'articles to delete: %s' % len(articles_delete))
+    if force:
+        logprint('debug', 'forcibly update all articles')
+        articles_update = es_articles
+        articles_delete = []
     if report:
         return
     
@@ -147,6 +160,11 @@ def articles(report=False, dryrun=False):
         logprint('debug', '%s/%s %s' % (n+1, len(articles_update), title))
         logprint('debug', 'getting from mediawiki')
         mwpage = Proxy().page(title)
+        try:
+            existing_page = Page.get(title)
+            logprint('debug', 'exists in elasticsearch')
+        except:
+            existing_page = None
         if (mwpage.published or settings.MEDIAWIKI_SHOW_UNPUBLISHED):
             page_sources = [source['encyclopedia_id'] for source in mwpage.sources]
             for mwsource in mwpage.sources:
@@ -155,7 +173,7 @@ def articles(report=False, dryrun=False):
                 if not dryrun:
                     source.save()
             logprint('debug', 'creating page')
-            page = Page.from_mw(mwpage)
+            page = Page.from_mw(mwpage, page=existing_page)
             if not dryrun:
                 logprint('debug', 'saving')
                 page.save()
@@ -172,7 +190,7 @@ def articles(report=False, dryrun=False):
         logprint('debug', 'Could not post these: %s' % could_not_post)
     logprint('debug', 'DONE')
 
-def topics(report=False, dryrun=False):
+def topics(report=False, dryrun=False, force=False):
     index = set_hosts_index()
 
     logprint('debug', '------------------------------------------------------------------------')
@@ -188,6 +206,10 @@ class Command(BaseCommand):
         parser.add_argument(
             '-d', '--dryrun', action='store_const', const=1,
             help="perform a trial run with no changes made"
+        )
+        parser.add_argument(
+            '-f', '--force', action='store_const', const=1,
+            help="Forcibly update records whether they need it or not."
         )
         parser.add_argument(
             '-c', '--config', action='store_const', const=1,
@@ -280,7 +302,7 @@ class Command(BaseCommand):
 
         if options['topics']:
             try:
-                topics(report=options['report'], dryrun=options['dryrun'])
+                topics(report=options['report'], dryrun=options['dryrun'], force=options['force'])
             except requests.exceptions.ConnectionError:
                 logprint('error', 'ConnectionError: check connection to MediaWiki or Elasticsearch.')
             except requests.exceptions.ReadTimeout as e:
@@ -288,7 +310,7 @@ class Command(BaseCommand):
 
         if options['authors']:
             try:
-                authors(report=options['report'], dryrun=options['dryrun'])
+                authors(report=options['report'], dryrun=options['dryrun'], force=options['force'])
             except requests.exceptions.ConnectionError:
                 logprint('error', 'ConnectionError: check connection to MediaWiki or Elasticsearch.')
             except requests.exceptions.ReadTimeout as e:
@@ -296,7 +318,7 @@ class Command(BaseCommand):
 
         if options['articles']:
             try:
-                articles(report=options['report'], dryrun=options['dryrun'])
+                articles(report=options['report'], dryrun=options['dryrun'], force=options['force'])
             except requests.exceptions.ConnectionError:
                 logprint('error', 'ConnectionError: check connection to MediaWiki or Elasticsearch.')
             except requests.exceptions.ReadTimeout as e:

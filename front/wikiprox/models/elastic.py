@@ -177,32 +177,42 @@ class Author(DocType):
             self.body = unicode(remove_status_markers(BeautifulSoup(self.body)))
 
     @staticmethod
-    def from_mw(mwauthor):
+    def from_mw(mwauthor, author=None):
         """Creates an Author object from a models.legacy.Author object.
         """
-        author = Author(
-            meta = {'id': mwauthor.url_title},
-            #status_code = myauthor.status_code,
-            #error = myauthor.error,
-            #is_article = myauthor.is_article,
-            #is_author = myauthor.is_author,
-            #uri = mwauthor.uri,
-            #categories = myauthor.categories,
-            #sources = myauthor.sources,
-            #coordinates = myauthor.coordinates,
-            #authors = myauthor.authors,
-            #next_path = myauthor.next_path,
-            #prev_page = myauthor.prev_page,
-            url_title = mwauthor.url_title,
-            public = mwauthor.public,
-            published = mwauthor.published,
-            modified = mwauthor.lastmod,
-            mw_api_url = mwauthor.uri,
-            title_sort = mwauthor.title_sort,
-            title = none_strip(mwauthor.title),
-            body = none_strip(mwauthor.body),
-        )
-        author.article_titles = [title for title in mwauthor.author_articles]
+        if author:
+            author.public = mwauthor.public
+            author.published = mwauthor.published
+            author.modified = mwauthor.lastmod
+            author.mw_api_url = mwauthor.uri
+            author.title_sort = mwauthor.title_sort
+            author.title = none_strip(mwauthor.title)
+            author.body = none_strip(mwauthor.body)
+            author.article_titles = [title for title in mwauthor.author_articles]
+        else:
+            author = Author(
+                meta = {'id': mwauthor.url_title},
+                #status_code = myauthor.status_code,
+                #error = myauthor.error,
+                #is_article = myauthor.is_article,
+                #is_author = myauthor.is_author,
+                #uri = mwauthor.uri,
+                #categories = myauthor.categories,
+                #sources = myauthor.sources,
+                #coordinates = myauthor.coordinates,
+                #authors = myauthor.authors,
+                #next_path = myauthor.next_path,
+                #prev_page = myauthor.prev_page,
+                url_title = mwauthor.url_title,
+                public = mwauthor.public,
+                published = mwauthor.published,
+                modified = mwauthor.lastmod,
+                mw_api_url = mwauthor.uri,
+                title_sort = mwauthor.title_sort,
+                title = none_strip(mwauthor.title),
+                body = none_strip(mwauthor.body),
+                article_titles = [title for title in mwauthor.author_articles],
+            )
         return author
 
 
@@ -384,34 +394,46 @@ class Page(DocType):
         return ddr._balance(objects, size)
     
     @staticmethod
-    def from_mw(mwpage):
+    def from_mw(mwpage, page=None):
         """Creates an Page object from a models.legacy.Page object.
         """
-        page = Page(
-            meta = {'id': mwpage.url_title},
-            #status_code = mwpage.status_code,
-            #error = mwpage.error,
-            #is_article = mwpage.is_article,
-            #is_author = mwpage.is_author,
-            #uri = mwpage.uri,
-            url_title = mwpage.url_title,
-            public = mwpage.public,
-            published = mwpage.published,
-            modified = mwpage.lastmod,
-            mw_api_url = mwpage.url,
-            title_sort = mwpage.title_sort,
-            title = none_strip(mwpage.title),
-            body = none_strip(mwpage.body),
-            prev_page = mwpage.prev_page,
-            next_page = mwpage.next_page,
-        )
-        for category in mwpage.categories:
-            page.categories.append(category)
-        for coord in mwpage.coordinates:
-            page.coordinates.append(coord)
-        for source in mwpage.sources:
-            page.source_ids.append(source['encyclopedia_id'])
-        page.authors_data = mwpage.authors
+        if page:
+            page.public = mwpage.public
+            page.published = mwpage.published
+            page.modified = mwpage.lastmod
+            page.mw_api_url = mwpage.url
+            page.title_sort = mwpage.title_sort
+            page.title = none_strip(mwpage.title)
+            page.body = none_strip(mwpage.body)
+            page.prev_page = mwpage.prev_page
+            page.next_page = mwpage.next_page
+            page.categories = [category for category in mwpage.categories]
+            page.coordinates = [coord for coord in mwpage.coordinates]
+            page.source_ids = [source['encyclopedia_id'] for source in mwpage.sources]
+            page.authors_data = mwpage.authors
+        else:
+            page = Page(
+                meta = {'id': mwpage.url_title},
+                #status_code = mwpage.status_code,
+                #error = mwpage.error,
+                #is_article = mwpage.is_article,
+                #is_author = mwpage.is_author,
+                #uri = mwpage.uri,
+                url_title = mwpage.url_title,
+                public = mwpage.public,
+                published = mwpage.published,
+                modified = mwpage.lastmod,
+                mw_api_url = mwpage.url,
+                title_sort = mwpage.title_sort,
+                title = none_strip(mwpage.title),
+                body = none_strip(mwpage.body),
+                prev_page = mwpage.prev_page,
+                next_page = mwpage.next_page,
+                categories = [category for category in mwpage.categories],
+                coordinates = [coord for coord in mwpage.coordinates],
+                source_ids = [source['encyclopedia_id'] for source in mwpage.sources],
+                authors_data = mwpage.authors,
+            )
         return page
 
 

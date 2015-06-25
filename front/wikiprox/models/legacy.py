@@ -219,6 +219,7 @@ class Proxy(object):
         @param page: Page title from URL.
         """
         logger.debug(url_title)
+        url_title = url_title.encode('utf_8', errors='xmlcharrefreplace')
         page = Page()
         page.url_title = url_title
         page.uri = reverse('wikiprox-page', args=[url_title])
@@ -228,7 +229,7 @@ class Proxy(object):
         r = requests.get(page.url, auth=auth)
         page.status_code = r.status_code
         logger.debug(page.status_code)
-        pagedata = json.loads(r.text)
+        pagedata = json.loads(r.text.encode('utf_8', errors='xmlcharrefreplace'))
         page.error = pagedata.get('error', None)
         if (page.status_code == 200) and not page.error:
             page.public = False

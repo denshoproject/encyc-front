@@ -330,4 +330,4 @@ class Command(BaseCommand):
         
         end = datetime.now()
         elapsed = end - start
-        logprint('DONE (elapsed %s)' % elapsed)
+        logprint('debug', 'DONE (elapsed %s)' % elapsed)

@@ -151,6 +151,7 @@ class Author(DocType):
                 'title',
                 'title_sort',
                 'published',
+                'modified',
             ])
             response = s.execute()
             data = [
@@ -159,6 +160,7 @@ class Author(DocType):
                     title      = hitvalue(hit, 'title'),
                     title_sort = hitvalue(hit, 'title_sort'),
                     published  = hitvalue(hit, 'published'),
+                    modified   = hitvalue(hit, 'modified'),
                 )
                 for hit in response
                 if hitvalue(hit, 'published')
@@ -287,6 +289,7 @@ class Page(DocType):
                 'title',
                 'title_sort',
                 'published',
+                'modified',
                 'categories',
             ])
             response = s.execute()
@@ -296,6 +299,7 @@ class Page(DocType):
                     title      = hitvalue(hit, 'title'),
                     title_sort = hitvalue(hit, 'title_sort'),
                     published  = hitvalue(hit, 'published'),
+                    modified   = hitvalue(hit, 'modified'),
                     categories = hit.get('categories',[]),
                    )
                 for hit in response
@@ -692,67 +696,61 @@ class Elasticsearch(object):
             settings.DOCSTORE_HOSTS, settings.DOCSTORE_INDEX, 'vocab',
             'topics', json.loads(json_text),
         )
-    
+
     @staticmethod
-    def articles_to_update(mw_authors, mw_articles, es_authors, es_articles):
-        """Returns titles of articles to update and delete
-        
-        >>> mw_authors = Proxy().authors(cached_ok=False)
-        >>> mw_articles = Proxy().articles_lastmod()
-        >>> es_authors = Elasticsearch.authors()
-        >>> es_articles = Elasticsearch.articles()
-        >>> results = Elasticsearch.articles_to_update(mw_authors, mw_articles, es_authors, es_articles)
-        >>> Elasticsearch.index_articles(titles=results['update'])
-        >>> Elasticsearch.delete_articles(titles=results['delete'])
-        
-        @param mw_authors: list Output of wikiprox.models.Proxy.authors_lastmod()
-        @param mw_articles: list Output of wikiprox.models.Proxy.articles_lastmod()
-        @param es_authors: list Output of wikiprox.models.Elasticsearch.authors()
-        @param es_articles: list Output of wikiprox.models.Elasticsearch.articles()
-        @returns: (articles_update,articles_delete)
+    def _new_update_deleted(mw_pages, es_objects):
         """
-        # filter out the authors
-        mw_lastmods = [
-            a for a in mw_articles
-            if a['title'] not in mw_authors
-        ]
-        es_pages = [a for a in es_articles if a.title not in es_authors]
-        
-        mw_titles = [a['title'] for a in mw_lastmods]
-        es_titles = [a.title for a in es_pages]
-        
-        new = [mwtitle for mwtitle in mw_titles if not mwtitle in es_titles]
-        deleted = [estitle for estitle in es_titles if not estitle in mw_titles]
-        
-        mw = {}  # so we don't loop on every es_article
-        for a in mw:
-            mw[a['title']] = a['lastmod']
+        @param mw_pages: dict MediaWiki articles keyed to titles
+        @param es_objects: dict Page or Author objects keyed to titles
+        @returns: tuple containing lists of titles (new+updated, deleted)
+        """
+        new = [title for title in mw_pages.keys() if not title in es_objects.keys()]
+        deleted = [title for title in es_objects.keys() if not title in mw_pages.keys()]
         updated = [
-            a for a in es_articles
-            if (a.title in mw.keys()) and (mw[a.title] > a.lastmod)
+            es.title for es in es_objects.values()
+            if mw_pages.get(es.title) and (mw_pages[es.title]['lastmod'] > es.modified)
         ]
         return (new + updated, deleted)
     
     @staticmethod
-    def authors_to_update(mw_authors, es_authors):
+    def articles_to_update(mw_author_titles, mw_articles, es_articles):
+        """Returns titles of articles to update and delete
+        
+        >>> mw_author_titles = Proxy().authors(cached_ok=False)
+        >>> mw_articles = Proxy().articles_lastmod()
+        >>> es_articles = Page.pages()
+        >>> update,delete = Elasticsearch.articles_to_update(mw_author_titles, mw_articles, es_articles)
+        
+        @param mw_author_titles: list of author page titles
+        @param mw_articles: list of MediaWiki author page dicts.
+        @param es_articles: list of elastic.Page objects.
+        @returns: (update,delete)
+        """
+        return Elasticsearch._new_update_deleted(
+            {a['title']: a for a in mw_articles if a['title'] not in mw_author_titles},
+            {a.title: a for a in es_articles}
+        )
+    
+    @staticmethod
+    def authors_to_update(mw_author_titles, mw_articles, es_authors):
         """Returns titles of authors to add or delete
         
         Does not track updates because it's easy just to update them all.
         
-        >>> mw_authors = Proxy().authors(cached_ok=False)
-        >>> es_authors = Elasticsearch.authors()
-        >>> results = Elasticsearch.articles_to_update(mw_authors, es_authors)
-        >>> Elasticsearch.index_authors(titles=results['update'])
-        >>> Elasticsearch.delete_authors(titles=results['delete'])
+        >>> mw_author_titles = Proxy().authors(cached_ok=False)
+        >>> mw_articles = Proxy().articles_lastmod()
+        >>> es_authors = Author.authors()
+        >>> update,delete = Elasticsearch.authors_to_update(mw_author_titles, mw_articles, es_authors)
         
-        @param mw_authors: list Output of wikiprox.models.Proxy.authors_lastmod()
-        @param es_authors: list Output of wikiprox.models.Elasticsearch.authors()
-        @returns: authors_new,authors_delete
+        @param mw_author_titles: list of author page titles
+        @param mw_articles: list of MediaWiki author page dicts.
+        @param es_authors: list of elastic.Author objects.
+        @returns: (update,delete)
         """
-        es_author_titles = [a.title for a in es_authors]
-        new = [title for title in mw_authors if title not in es_author_titles]
-        delete = [title for title in es_author_titles if title not in mw_authors]
-        return new,delete
+        return Elasticsearch._new_update_deleted(
+            {a['title']: a for a in mw_articles if a['title'] in mw_author_titles},
+            {a.title: a for a in es_authors}
+        )
 
     @staticmethod
     def update_all():

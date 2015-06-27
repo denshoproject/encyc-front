@@ -80,7 +80,8 @@ def authors(report=False, dryrun=False, force=False):
 
     logprint('debug', '------------------------------------------------------------------------')
     logprint('debug', 'getting mw_authors...')
-    mw_authors = Proxy().authors(cached_ok=False)
+    mw_author_titles = Proxy().authors(cached_ok=False)
+    mw_articles = Proxy().articles_lastmod()
     logprint('debug', 'getting es_authors...')
     es_authors = Author.authors()
     if force:
@@ -89,9 +90,9 @@ def authors(report=False, dryrun=False, force=False):
         authors_delete = []
     else:
         logprint('debug', 'determining new,delete...')
-        authors_new,authors_delete = Elasticsearch.authors_to_update(mw_authors, es_authors)
-    logprint('debug', 'mediawiki authors: %s' % len(mw_authors))
-    logprint('debug', 'elasticsearch authors: %s' % len(es_authors))
+        authors_new,authors_delete = Elasticsearch.authors_to_update(
+            mw_author_titles, mw_articles, es_authors)
+    logprint('debug', 'mediawiki authors: %s' % len(mw_author_titles))
     logprint('debug', 'authors to add: %s' % len(authors_new))
     logprint('debug', 'authors to delete: %s' % len(authors_delete))
     if report:
@@ -134,10 +135,9 @@ def articles(report=False, dryrun=False, force=False):
     logprint('debug', '------------------------------------------------------------------------')
     # authors need to be refreshed
     logprint('debug', 'getting mw_authors,articles...')
-    mw_authors = Proxy().authors(cached_ok=False)
+    mw_author_titles = Proxy().authors(cached_ok=False)
     mw_articles = Proxy().articles_lastmod()
-    logprint('debug', 'getting es_authors,articles...')
-    es_authors = Author.authors()
+    logprint('debug', 'getting es_articles...')
     es_articles = Page.pages()
     if force:
         logprint('debug', 'forcibly update all articles')
@@ -146,7 +146,7 @@ def articles(report=False, dryrun=False, force=False):
     else:
         logprint('debug', 'determining new,delete...')
         articles_update,articles_delete = Elasticsearch.articles_to_update(
-            mw_authors, mw_articles, es_authors, es_articles)
+            mw_author_titles, mw_articles, es_articles)
     logprint('debug', 'mediawiki articles: %s' % len(mw_articles))
     logprint('debug', 'elasticsearch articles: %s' % len(es_articles))
     logprint('debug', 'articles to update: %s' % len(articles_update))

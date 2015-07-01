@@ -22,7 +22,7 @@ From the Densho Digital Repository
 </h1>
 
 <p>
-Related topics and primary source items from the <a href="http://ddr.densho.org/" target="_blank">Densho Digital Repository</a>.
+Related topics and primary source items from the <a target="ddr" href="http://ddr.densho.org/">Densho Digital Repository</a>.
 </p>
 
 {% if show_topics_ul %}
@@ -57,7 +57,7 @@ Related topics and primary source items from the <a href="http://ddr.densho.org/
 {% thumbnail object.img_url_local "400x400" as img %}
 <div class="row">
   <div class="span3">
-    <a href="{{ object.absolute_url }}">
+    <a target="ddr" href="{{ object.absolute_url }}">
       <img class="img-responsive img-polaroid" src="{{ MEDIA_URL }}{{ img }}">
     </a>
   </div>
@@ -65,7 +65,7 @@ Related topics and primary source items from the <a href="http://ddr.densho.org/
     <h4>{{ object.title|safe }}</h4>
     {{ object.description|safe|truncatewords_html:50 }}
     <br/>
-    <a class="more" href="{{ object.absolute_url }}">View in DDR &raquo;</a>
+    <a class="more" target="ddr" href="{{ object.absolute_url }}">View in DDR &raquo;</a>
   </div>
 </div>
 {% endthumbnail %}
@@ -76,7 +76,7 @@ Related topics and primary source items from the <a href="http://ddr.densho.org/
   </div>
   <div class="span9">
     <p>
-    <a class="more" href="{{ term.ddr_topic_url }}">See more items for "{{ term.title|safe }}" in the DDR &raquo;</a>
+    <a class="more" target="ddr" href="{{ term.ddr_topic_url }}">See more items for "{{ term.title|safe }}" in the DDR &raquo;</a>
     </p>
   </div>
 </div><!-- .row -->

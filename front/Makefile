@@ -75,10 +75,10 @@ howto-install:
 	@echo ""
 	@echo "    # make syncdb"
 	@echo ""
-	@echo "Adjust configs to fit the local environment. Values in /etc/encyc/local.cfg"
-	@echo "override those in production.cfg::"
+	@echo "Adjust configs to fit the local environment. Values in /etc/encyc/front-local.cfg"
+	@echo "override those in front.cfg::"
 	@echo ""
-	@echo "    # vi /etc/encyc/local.cfg"
+	@echo "    # vi /etc/encyc/front-local.cfg"
 	@echo ""
 	@echo "Restart::"
 	@echo ""
@@ -327,12 +327,12 @@ install-configs:
 	chown root.root $(INSTALLDIR)/front/front/settings.py
 	chmod 644 $(INSTALLDIR)/front/front/settings.py
 	-mkdir /etc/encyc
-	cp $(INSTALLDIR)/debian/conf/production.cfg /etc/encyc/
-	chown root.encyc /etc/encyc/production.cfg
-	chmod 640 /etc/encyc/production.cfg
-	touch /etc/encyc/local.cfg
-	chown root.encyc /etc/encyc/local.cfg
-	chmod 640 /etc/encyc/local.cfg
+	cp $(INSTALLDIR)/debian/conf/front.cfg /etc/encyc/
+	chown root.encyc /etc/encyc/front.cfg
+	chmod 640 /etc/encyc/front.cfg
+	touch /etc/encyc/front-local.cfg
+	chown root.encyc /etc/encyc/front-local.cfg
+	chmod 640 /etc/encyc/front-local.cfg
 # nginx settings
 	cp $(INSTALLDIR)/debian/conf/front.conf /etc/nginx/sites-available
 	chown root.root /etc/nginx/sites-available/front.conf

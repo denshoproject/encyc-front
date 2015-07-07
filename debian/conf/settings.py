@@ -17,8 +17,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 # User-configurable settings are located in the following files.
 # Files appearing *later* in the list override earlier files.
 CONFIG_FILES = [
-    '/etc/encyc/production.cfg',
-    '/etc/encyc/local.cfg'
+    '/etc/encyc/front.cfg',
+    '/etc/encyc/front-local.cfg'
 ]
 config = ConfigParser.ConfigParser()
 configs_read = config.read(CONFIG_FILES)

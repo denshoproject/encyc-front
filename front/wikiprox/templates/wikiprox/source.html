@@ -18,27 +18,27 @@
         height: {% if source.aspect_ratio == 'hd' %}380{% else %}500{% endif %},
         image: "{{ MEDIA_URL }}{{ thumb_lg }}",
         modes: [
-{% if source.original_url %}
+{% if source.streaming_path %}
             { type: "html5",
               config: {
-                file: "{{ source.original_url }}"
+                file: "{{ SOURCES_MEDIA_URL }}{{ source.streaming_path }}"
               }
             },
 {% endif %}
-{% if source.streaming_url %}
+{% if source.rtmp_path %}
             { type: "flash",
               src: "{{ STATIC_URL }}jwplayer-5.9/player.swf",
               config: {
                 provider: "rtmp",
                 streamer: "{{ RTMP_STREAMER }}",
-                file: "{{ source.streaming_url }}"
+                file: "{{ source.rtmp_path }}"
               }
-            }{% if source.streaming_url and source.original_url %},{% endif %}
+            }{% if source.rtmp_path and source.streaming_path %},{% endif %}
 {% endif %}
-{% if source.original_url %}
+{% if source.streaming_path %}
             { type: "download",
               config: {
-                file: "{{ source.original_url }}",
+                file: "{{ SOURCES_MEDIA_URL }}{{ source.streaming_path }}",
                 provider: 'video'
               }
             }
@@ -69,15 +69,15 @@ Primary Source &mdash; {{ source.encyclopedia_id }}
 {% thumbnail source.img_url_local "700x700" as thumb_lg %}
 {% if source.media_format == 'image' %}
   <img src="{{ MEDIA_URL }}{{ thumb_lg }}" />
-  {% if source.original_url %}<br/><a href="{{ source.original_url }}">Download full-size version ({{ source.original_size|filesizeformat }})</a>{% endif %}
+  {% if source.img_path %}<br/><a href="{{ SOURCES_MEDIA_URL }}{{ source.img_path }}">Download full-size version ({{ source.original_size|filesizeformat }})</a>{% endif %}
 {% endif %}
 {% if source.media_format == 'document' %}
   <img src="{{ MEDIA_URL }}{{ thumb_lg }}" />
-  {% if source.original_url %}<br/><a href="{{ source.original_url }}">Download full PDF ({{ source.original_size|filesizeformat }})</a>{% endif %}
+  {% if source.original_path %}<br/><a href="{{ SOURCES_MEDIA_URL }}{{ source.original_path }}">Download full PDF ({{ source.original_size|filesizeformat }})</a>{% endif %}
 {% endif %}
 {% if source.media_format == 'video' %}
   <div id="videocontainer">Loading video player...</div>
-  {% if source.transcript %}<br/><a href="{{ source.transcript }}" target="_transcript">Download a transcript</a>{% endif %}
+  {% if source.transcript_path %}<br/><a href="{{ SOURCES_MEDIA_URL }}{{ source.transcript_path }}" target="_transcript">Download a transcript</a>{% endif %}
 {% endif %}
 {% if source.external_url %}&nbsp;&mdash;&nbsp; <a href="{{ source.external_url }}" class="offsite" target="offsite">{{ source.external_url }}</a>{% endif %}
 {% endthumbnail %}

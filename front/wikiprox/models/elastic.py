@@ -456,8 +456,11 @@ class Source(DocType):
     published = Boolean()
     creative_commons = Boolean()
     headword = String(index='not_analyzed')
-    original_url = String(index='not_analyzed')
-    streaming_url = String(index='not_analyzed')
+    #original_path = String(index='not_analyzed')
+    original_url = String(index='not_analyzed')  # TODO use original_path
+    #streaming_path = String(index='not_analyzed')
+    #rtmp_path = String(index='not_analyzed')
+    streaming_url = String(index='not_analyzed')  # TODO remove
     external_url = String(index='not_analyzed')
     media_format = String(index='not_analyzed')
     aspect_ratio = String(index='not_analyzed')
@@ -466,7 +469,8 @@ class Source(DocType):
     display = String(index='not_analyzed')
     caption = String()
     caption_extended = String()
-    transcript = String()
+    #transcript_path = String(index='not_analyzed')
+    transcript = String()  # TODO remove
     courtesy = String(index='not_analyzed')
     filename = String(index='not_analyzed')
     img_path = String(index='not_analyzed')
@@ -489,6 +493,44 @@ class Source(DocType):
     
     def img_url_local(self):
         return os.path.join(settings.SOURCES_MEDIA_URL_LOCAL, self.img_path)
+    
+    def original_url(self):
+        if self.original_path():
+            return os.path.join(settings.SOURCES_MEDIA_URL, self.original_path)
+    
+    #def streaming_url(self):
+    #    return os.path.join(settings.SOURCES_MEDIA_URL, self.streaming_path)
+    
+    def transcript_url(self):
+        if self.transcript_path():
+            return os.path.join(settings.SOURCES_MEDIA_URL, self.transcript_path())
+    
+    def original_path(self):
+        if self.original_url:
+            return os.path.join(
+                settings.SOURCES_MEDIA_BUCKET,
+                os.path.basename(self.original_url)
+            )
+        return None
+
+    def rtmp_path(self):
+        return self.streaming_url
+    
+    def streaming_path(self):
+        if self.streaming_url:
+            return os.path.join(
+                settings.SOURCES_MEDIA_BUCKET,
+                os.path.basename(self.streaming_url)
+            )
+        return None
+    
+    def transcript_path(self):
+        if self.transcript:
+            return os.path.join(
+                settings.SOURCES_MEDIA_BUCKET,
+                os.path.basename(self.transcript)
+            )
+        return None
     
     def article(self):
         if self.headword:

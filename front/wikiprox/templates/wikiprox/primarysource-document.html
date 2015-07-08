@@ -1,32 +1,30 @@
 {% load thumbnail %}
-{% thumbnail img_url_local "260x400" as thumb_sm %}
-{% thumbnail img_url_local "700x700" as thumb_lg %}
+{% thumbnail source.img_url_local "260x400" as thumb_sm %}
+{% thumbnail source.img_url_local "700x700" as thumb_lg %}
 {% if lightbox %}
 <div class="primarysource"><!-- lightbox -->
   <a href="{{ MEDIA_URL }}{{ thumb_lg }}"
      class="document lightview"
-     data-lightview-caption="{{ caption }} {{ courtesy }} <a class='more' href='{{ href }}'>More info &raquo;</a>">
+     data-lightview-caption="{{ source.caption }} {{ source.courtesy }} <a class='more' href='{{ source.absolute_url }}'>More info &raquo;</a>">
     <img src="{{ MEDIA_URL }}{{ thumb_sm }}"
          large="{{ MEDIA_URL }}{{ thumb_lg }}"
-         more="{{ href }}" />
+         more="{{ source.absolute_url }}" />
   </a>
-  </span>
   <br/>
   <span class="caption">
-    {{ caption }}
-    {{ courtesy }}
-    <a class="more" href="{{ href }}">More info &raquo;</a>
+    {{ source.caption }}
+    {{ source.courtesy }}
+    <a class="more" href="{{ source.absolute_url }}">More info &raquo;</a>
   </span>
 </div>
 {% else %}
 <div class="primarysource">
-  <a href="{{ href }}"><img src="{{ MEDIA_URL }}{{ thumb_sm }}" /></a>
-  </span>
+  <a href="{{ source.absolute_url }}"><img src="{{ MEDIA_URL }}{{ thumb_sm }}" /></a>
   <br/>
   <span class="caption">
-    {{ caption }}
-    {{ courtesy }}
-    <a class="more" href="{{ href }}">More info &raquo;</a>
+    {{ source.caption }}
+    {{ source.courtesy }}
+    <a class="more" href="{{ source.absolute_url }}">More info &raquo;</a>
   </span>
 </div>
 {% endif %}{# lightbox #}

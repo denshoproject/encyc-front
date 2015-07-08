@@ -44,61 +44,26 @@ def published_sources():
     return sources
 
 def format_primary_source(source, lightbox=False):
-    template = 'wikiprox/primarysource-generic.html'
-    # context
-    common = {'encyclopedia_id': source.encyclopedia_id,
-              'media_format': source.media_format,
-              'MEDIA_URL': settings.MEDIA_URL,
-              'STATIC_URL': settings.STATIC_URL,
-              'SOURCE_MEDIA_URL': settings.SOURCES_MEDIA_URL,
-              'RTMP_STREAMER': settings.RTMP_STREAMER,
-              'href': source.absolute_url(),
-              'caption': source.caption,
-              'courtesy': source.courtesy,
-              'lightbox': lightbox,}
-    specific = {}
-    # video
+    template = 'wikiprox/primarysource-%s.html' % source.media_format
+    context = {
+        'MEDIA_URL': settings.MEDIA_URL,
+        'STATIC_URL': settings.STATIC_URL,
+        'SOURCE_MEDIA_URL': settings.SOURCES_MEDIA_URL,
+        'RTMP_STREAMER': settings.RTMP_STREAMER,
+        'lightbox': lightbox,
+        'source': source,
+    }
     if source.media_format == 'video':
-        template = 'wikiprox/primarysource-video.html'
-        if source.original_url:
-            original_url = source.original_url
-        else:
-            original_url = ''
         xy = [640,480]
         if source.aspect_ratio and (source.aspect_ratio == 'hd'):
             xy = [640,360]
-        # remove rtmp_streamer from streaming_url
-        if source.streaming_url and ('rtmp' in source.streaming_url):
-            streaming_url = source.streaming_url.replace(settings.RTMP_STREAMER, '')
-        else:
-            streaming_url = source.streaming_url
         # add 20px to vertical for JWplayer
         xy[1] = xy[1] + 20
         # mediaspace <div>
         xyms = [xy[0]+10, xy[1]+10]
-        specific = {
-            'original': original_url,
-            'img_url': source.img_url(),
-            'img_url_local': source.img_url_local(),
-            'streaming_url': streaming_url,
-            'xy': xy,
-            'xyms': xyms,
-        }
-    # document
-    elif source.media_format == 'document':
-        template = 'wikiprox/primarysource-document.html'
-        specific = {
-            'img_url': source.img_url(),
-            'img_url_local': source.img_url_local(),
-        }
-    # image
-    elif source.media_format == 'image':
-        template = 'wikiprox/primarysource-image.html'
-        specific = {
-            'img_url': source.img_url(),
-            'img_url_local': source.img_url_local(),
-        }
-    context = dict(common.items() + specific.items())
+        # add to context
+        context['xy'] = xy
+        context['xyms'] = xyms
     # render
     t = loader.get_template(template)
     c = Context(context)

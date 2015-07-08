@@ -1,9 +1,9 @@
 {% load thumbnail %}
-{% thumbnail img_url_local "260x260" as thumb_sm %}
-{% thumbnail img_url_local "700x700" as thumb_lg %}
+{% thumbnail source.img_url_local "260x260" as thumb_sm %}
+{% thumbnail source.img_url_local "700x700" as thumb_lg %}
 {% if lightbox %}
 <div class="primarysource"><!-- lightbox -->
-  <a href="mediaspace-{{ encyclopedia_id }}"
+  <a href="mediaspace-{{ source.encyclopedia_id }}"
      class="video lightview"
      data-lightview-type="inline"
      data-lightview-options="
@@ -17,27 +17,27 @@ jwplayer('mediaspace-{{ source.encyclopedia_id }}').setup({
     'height': '{{ xy.1 }}',
     'image': '{{ MEDIA_URL }}{{ thumb_lg }}',
     'modes' : [
-    {% if original %}
+{% if source.streaming_path %}
         { type: 'html5',
           config: {
-            file: '{{ original }}'
+            file: '{{ SOURCES_MEDIA_URL }}{{ source.streaming_path }}'
           }
         },
 {% endif %}
-{% if streaming_url %}
+{% if source.rtmp_path %}
         { type: 'flash',
           src: '{{ STATIC_URL }}jwplayer-5.9/player.swf',
           config: {
             provider: 'rtmp',
             streamer: '{{ RTMP_STREAMER }}',
-            file: '{{ streaming_url }}'
+            file: '{{ source.rtmp_path }}'
           }
-        }{% if streaming_url and original %},{% endif %}
+        }{% if source.rtmp_path and source.streaming_path %},{% endif %}
 {% endif %}
-{% if original %}
+{% if source.streaming_path %}
         { type: 'download',
             config: {
-                'file' : '{{ original }}',
+                'file' : '{{ SOURCES_MEDIA_URL }}{{ source.streaming_path }}',
                 'provider' : 'video'
             }
         }
@@ -45,28 +45,28 @@ jwplayer('mediaspace-{{ source.encyclopedia_id }}').setup({
     ]
 });
          }"
-     data-lightview-caption="{{ caption }} {{ courtesy }} <a class='more' href='{{ href }}'>More info &raquo;</a>"
+     data-lightview-caption="{{ source.caption }} {{ source.courtesy }} <a class='more' href='{{ source.absolute_url }}'>More info &raquo;</a>"
   >
     <img src="{{ MEDIA_URL }}{{ thumb_sm }}"
          large="{{ MEDIA_URL }}{{ thumb_lg }}"
-         more="{{ href }}" />
+         more="{{ source.absolute_url }}" />
   </a>
   <br/>
   <span class="caption">
-    {{ caption }}
-    {{ courtesy }}
-    <a class="more" href="{{ href }}">More info &raquo;</a>
+    {{ source.caption }}
+    {{ source.courtesy }}
+    <a class="more" href="{{ source.absolute_url }}">More info &raquo;</a>
   </span>
 </div>
-<div id="mediaspace-{{ encyclopedia_id }}" style="display:none;width:{{ xyms.0 }}px;height:{{ xyms.1 }}px;">This div will end up in the lightbox</div>
+<div id="mediaspace-{{ source.encyclopedia_id }}" style="display:none;width:{{ xyms.0 }}px;height:{{ xyms.1 }}px;">This div will end up in the lightbox</div>
 {% else %}
 <div class="primarysource">
-  <a href="{{ href }}"><img src="{{ MEDIA_URL }}{{ thumb_sm }}" /></a>
+  <a href="{{ source.absolute_url }}"><img src="{{ MEDIA_URL }}{{ thumb_sm }}" /></a>
   <br/>
   <span class="caption">
-    {{ caption }}
-    {{ courtesy }}
-    <a class="more" href="{{ href }}">More info &raquo;</a>
+    {{ source.caption }}
+    {{ source.courtesy }}
+    <a class="more" href="{{ source.absolute_url }}">More info &raquo;</a>
   </span>
 </div>
 {% endif %}{# lightbox #}

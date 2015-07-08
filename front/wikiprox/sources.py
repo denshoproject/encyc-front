@@ -44,7 +44,7 @@ def published_sources():
     return sources
 
 def format_primary_source(source, lightbox=False):
-    template = 'wikiprox/generic.html'
+    template = 'wikiprox/primarysource-generic.html'
     # context
     common = {'encyclopedia_id': source.encyclopedia_id,
               'media_format': source.media_format,
@@ -59,7 +59,7 @@ def format_primary_source(source, lightbox=False):
     specific = {}
     # video
     if source.media_format == 'video':
-        template = 'wikiprox/video.html'
+        template = 'wikiprox/primarysource-video.html'
         if source.original_url:
             original_url = source.original_url
         else:
@@ -86,14 +86,14 @@ def format_primary_source(source, lightbox=False):
         }
     # document
     elif source.media_format == 'document':
-        template = 'wikiprox/document.html'
+        template = 'wikiprox/primarysource-document.html'
         specific = {
             'img_url': source.img_url(),
             'img_url_local': source.img_url_local(),
         }
     # image
     elif source.media_format == 'image':
-        template = 'wikiprox/image.html'
+        template = 'wikiprox/primarysource-image.html'
         specific = {
             'img_url': source.img_url(),
             'img_url_local': source.img_url_local(),

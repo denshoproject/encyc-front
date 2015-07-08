@@ -11,40 +11,40 @@
 {% if source.media_format == 'video' %}
 {% thumbnail source.img_url_local "700x700" as thumb_lg %}
 <script type="text/javascript">
-    jwplayer("videocontainer").setup({
-        autostart: 'false',
-        controlbar: 'bottom',
-        width: 640,
-        height: {% if source.aspect_ratio == 'hd' %}380{% else %}500{% endif %},
-        image: "{{ MEDIA_URL }}{{ thumb_lg }}",
-        modes: [
+jwplayer("videocontainer").setup({
+    autostart: 'false',
+    controlbar: 'bottom',
+    width: 640,
+    height: {% if source.aspect_ratio == 'hd' %}380{% else %}500{% endif %},
+    image: "{{ MEDIA_URL }}{{ thumb_lg }}",
+    modes: [
 {% if source.streaming_path %}
-            { type: "html5",
-              config: {
-                file: "{{ SOURCES_MEDIA_URL }}{{ source.streaming_path }}"
-              }
-            },
+        { type: "html5",
+          config: {
+            file: "{{ SOURCES_MEDIA_URL }}{{ source.streaming_path }}"
+          }
+        },
 {% endif %}
 {% if source.rtmp_path %}
-            { type: "flash",
-              src: "{{ STATIC_URL }}jwplayer-5.9/player.swf",
-              config: {
-                provider: "rtmp",
-                streamer: "{{ RTMP_STREAMER }}",
-                file: "{{ source.rtmp_path }}"
-              }
-            }{% if source.rtmp_path and source.streaming_path %},{% endif %}
+        { type: "flash",
+          src: "{{ STATIC_URL }}jwplayer-5.9/player.swf",
+          config: {
+            provider: "rtmp",
+            streamer: "{{ RTMP_STREAMER }}",
+            file: "{{ source.rtmp_path }}"
+          }
+        }{% if source.rtmp_path and source.streaming_path %},{% endif %}
 {% endif %}
 {% if source.streaming_path %}
-            { type: "download",
-              config: {
-                file: "{{ SOURCES_MEDIA_URL }}{{ source.streaming_path }}",
-                provider: 'video'
-              }
-            }
+        { type: "download",
+          config: {
+            file: "{{ SOURCES_MEDIA_URL }}{{ source.streaming_path }}",
+            provider: 'video'
+          }
+        }
 {% endif %}
-        ]
-    });
+    ]
+});
 </script>
 {% endthumbnail %}
 {% endif %}

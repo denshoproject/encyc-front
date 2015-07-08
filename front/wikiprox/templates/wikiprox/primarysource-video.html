@@ -9,41 +9,41 @@
      data-lightview-options="
          keyboard: { esc: false },
          afterUpdate: function(element, position) {
-             //jwplayer callback script
-             jwplayer('mediaspace-{{ encyclopedia_id }}').setup({
-                 'autostart': 'false',
-                 'controlbar': 'bottom',
-                 'width': '{{ xy.0 }}',
-                 'height': '{{ xy.1 }}',
-                 'image': '{{ MEDIA_URL }}{{ thumb_lg }}',
-                 'modes' : [
-{% if original %}
-                     { type: 'html5',
-                       config: {
-                         file: '{{ original }}'
-                       }
-                     },
+//jwplayer callback script
+jwplayer('mediaspace-{{ source.encyclopedia_id }}').setup({
+    'autostart': 'false',
+    'controlbar': 'bottom',
+    'width': '{{ xy.0 }}',
+    'height': '{{ xy.1 }}',
+    'image': '{{ MEDIA_URL }}{{ thumb_lg }}',
+    'modes' : [
+    {% if original %}
+        { type: 'html5',
+          config: {
+            file: '{{ original }}'
+          }
+        },
 {% endif %}
 {% if streaming_url %}
-                     { type: 'flash',
-                       src: '{{ STATIC_URL }}jwplayer-5.9/player.swf',
-                       config: {
-                         provider: 'rtmp',
-                         streamer: '{{ RTMP_STREAMER }}',
-                         file: '{{ streaming_url }}'
-                       }
-                     }{% if streaming_url and original %},{% endif %}
+        { type: 'flash',
+          src: '{{ STATIC_URL }}jwplayer-5.9/player.swf',
+          config: {
+            provider: 'rtmp',
+            streamer: '{{ RTMP_STREAMER }}',
+            file: '{{ streaming_url }}'
+          }
+        }{% if streaming_url and original %},{% endif %}
 {% endif %}
 {% if original %}
-                     { type: 'download',
-                         config: {
-                             'file' : '{{ original }}',
-                             'provider' : 'video'
-                         }
-                     }
+        { type: 'download',
+            config: {
+                'file' : '{{ original }}',
+                'provider' : 'video'
+            }
+        }
 {% endif %}
-                 ]
-             });
+    ]
+});
          }"
      data-lightview-caption="{{ caption }} {{ courtesy }} <a class='more' href='{{ href }}'>More info &raquo;</a>"
   >

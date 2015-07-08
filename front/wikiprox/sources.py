@@ -48,7 +48,7 @@ def format_primary_source(source, lightbox=False):
     context = {
         'MEDIA_URL': settings.MEDIA_URL,
         'STATIC_URL': settings.STATIC_URL,
-        'SOURCE_MEDIA_URL': settings.SOURCES_MEDIA_URL,
+        'SOURCES_MEDIA_URL': settings.SOURCES_MEDIA_URL,
         'RTMP_STREAMER': settings.RTMP_STREAMER,
         'lightbox': lightbox,
         'source': source,

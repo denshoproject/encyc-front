@@ -494,10 +494,6 @@ class Source(DocType):
     def img_url_local(self):
         return os.path.join(settings.SOURCES_MEDIA_URL_LOCAL, self.img_path)
     
-    def original_url(self):
-        if self.original_path():
-            return os.path.join(settings.SOURCES_MEDIA_URL, self.original_path)
-    
     #def streaming_url(self):
     #    return os.path.join(settings.SOURCES_MEDIA_URL, self.streaming_path)
     

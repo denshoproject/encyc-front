@@ -83,10 +83,20 @@ def api_logout():
     headers = {'content-type': 'application/json'}
     r = requests.post(url, headers=headers, timeout=TIMEOUT)
 
+def _all_pages(r_text):
+    pages = []
+    response = json.loads(r_text)
+    if response and response['query'] and response['query']['pages']:
+        for id in response['query']['pages']:
+            page = response['query']['pages'][id]
+            page['timestamp'] = page['revisions'][0]['timestamp']
+            page.pop('revisions')
+            pages.append(page)
+    return pages
+    
 def all_pages():
     """Returns a list of all pages, with timestamp of latest revision.
     """
-    pages = []
     cache_key = make_cache_key('wikiprox:encyclopedia:all_pages')
     cached = cache.get(cache_key)
     if cached:
@@ -100,33 +110,35 @@ def all_pages():
         url = '%s?action=query&generator=allpages&prop=revisions&rvprop=timestamp&gaplimit=5000&format=json' % (settings.MEDIAWIKI_API)
         r = requests.get(url, headers={'content-type':'application/json'}, cookies=cookies, timeout=TIMEOUT)
         if r.status_code == 200:
-            response = json.loads(r.text)
-            if response and response['query'] and response['query']['pages']:
-                for id in response['query']['pages']:
-                    page = response['query']['pages'][id]
-                    page['timestamp'] = page['revisions'][0]['timestamp']
-                    pages.append(page)
+            pages = _all_pages(r.text)
         api_logout()
         cache.set(cache_key, json.dumps(pages), settings.CACHE_TIMEOUT)
     return pages
 
+def _articles_a_z(published_pages, author_pages, nonarticle_titles):
+    author_titles = [page['title'] for page in author_pages]
+    pages = []
+    for page in published_pages:
+        if ('Category' not in page['title']) \
+        and (page['title'] not in author_titles) \
+        and (page['title'] not in nonarticle_titles) \
+        and (page['title'] not in pages):
+            pages.append(page)
+    return pages
+    
 def articles_a_z():
     """Returns a list of published article titles arranged A-Z.
     """
-    titles = []
     cache_key = make_cache_key('wikiprox:encyclopedia:articles_a_z')
     cached = cache.get(cache_key)
     if cached:
         titles = json.loads(cached)
     else:
-        authors = [page['title'] for page in published_authors()]
-        NON_ARTICLE_PAGES.extend(category_authors())
-        for page in category_members('Published', namespace_id=namespaces_reversed()['Default']):
-            if (page['title'] not in NON_ARTICLE_PAGES) \
-                   and ('Category' not in page['title']) \
-                   and (page['title'] not in titles) \
-                   and (page['title'] not in authors):
-                titles.append(page)
+        titles = _articles_a_z(
+            category_members('Published', namespace_id=namespaces_reversed()['Default']),
+            published_authors(),
+            NON_ARTICLE_PAGES
+        )
         cache.set(cache_key, json.dumps(titles), settings.CACHE_TIMEOUT)
     return titles
 
@@ -144,6 +156,7 @@ def articles_by_category():
         cat_titles = [page['title'] for page in category_article_types()]
         for category in cat_titles:
             category = category.replace('Category:','')
+            # TODO fix this, this is bad
             titles = [
                 page
                 for page in category_members(
@@ -180,6 +193,21 @@ def article_prev(title):
 def author_articles(title):
     return what_links_here(title)
 
+def _category_members(r_text):
+    pages = []
+    response = json.loads(r_text)
+    if response and response['query'] and response['query']['categorymembers']:
+        for page in response['query']['categorymembers']:
+            page['sortkey'] = page['sortkeyprefix']
+            page.pop('sortkeyprefix')
+            if page['title'] and not page['sortkey']:
+                page['sortkey'] = page['title']
+            if page['sortkey']:
+                page['sortkey'] = page['sortkey'].lower()
+            pages.append(page)
+        pages = sorted(pages, key=itemgetter('sortkey'))
+    return pages
+
 def category_members(category_name, namespace_id=None):
     """Returns titles of pages with specified Category: tag.
     
@@ -188,7 +216,6 @@ def category_members(category_name, namespace_id=None):
     This is so certain views (e.g. Contents A-Z can grab the first letter
     of the title (or sortkey) to use for grouping purposes.
     """
-    pages = []
     cache_key = make_cache_key('wikiprox:encyclopedia:category_members:%s:%s' % (category_name, namespace_id))
     cached = cache.get(cache_key)
     if cached:
@@ -201,17 +228,7 @@ def category_members(category_name, namespace_id=None):
             url = '%s&gcmnamespace=%s' % (url, namespace_id)
         r = requests.get(url, headers={'content-type':'application/json'}, cookies=cookies, timeout=TIMEOUT)
         if r.status_code == 200:
-            response = json.loads(r.text)
-            if response and response['query'] and response['query']['categorymembers']:
-                for page in response['query']['categorymembers']:
-                    page['sortkey'] = page['sortkeyprefix']
-                    page.pop('sortkeyprefix')
-                    if page['title'] and not page['sortkey']:
-                        page['sortkey'] = page['title']
-                    if page['sortkey']:
-                        page['sortkey'] = page['sortkey'].lower()
-                    pages.append(page)
-                pages = sorted(pages, key=itemgetter('sortkey'))
+            pages = _category_members(r.text)
         api_logout()
         cache.set(cache_key, json.dumps(pages), settings.CACHE_TIMEOUT)
     return pages
@@ -239,10 +256,25 @@ def is_author(title):
             return True
     return False
 
+def _namespaces(r_text):
+    namespaces = {}
+    response = json.loads(r_text)
+    if response and response['query'] and response['query']['namespaces']:
+        for n in response['query']['namespaces']:
+            ns = response['query']['namespaces'][n]
+            nsid = ns['id']
+            if ns.get('canonical',None):
+                nsname = ns['canonical']
+            else:
+                nsname = ns['content']
+            if not nsname:
+                nsname = u'Default'
+            namespaces[nsid] = nsname
+    return namespaces
+
 def namespaces():
     """Returns dict of namespaces and their codes.
     """
-    namespaces = {}
     cache_key = make_cache_key('wikiprox:encyclopedia:namespaces')
     cached = cache.get(cache_key)
     if cached:
@@ -251,18 +283,7 @@ def namespaces():
         url = '%s?action=query&meta=siteinfo&siprop=namespaces|namespacealiases&format=json' % (settings.MEDIAWIKI_API)
         r = requests.get(url, headers={'content-type':'application/json'}, timeout=TIMEOUT)
         if r.status_code == 200:
-            response = json.loads(r.text)
-            if response and response['query'] and response['query']['namespaces']:
-                for n in response['query']['namespaces']:
-                    ns = response['query']['namespaces'][n]
-                    nsid = ns['id']
-                    if ns.get('canonical',None):
-                        nsname = ns['canonical']
-                    else:
-                        nsname = ns['content']
-                    if not nsname:
-                        nsname = u'Default'
-                    namespaces[nsid] = nsname
+            namespaces = _namespaces(r.text)
         cache.set(cache_key, json.dumps(namespaces), settings.CACHE_TIMEOUT)
     return namespaces
 
@@ -270,44 +291,59 @@ def namespaces_reversed():
     """Returns dict of namespaces and their codes, organized by name.
     """
     nspaces = {}
-    for key,val in namespaces().iteritems():
+    namespaces_codes = namespaces()
+    for key,val in namespaces_codes.iteritems():
         nspaces[val] = key
     return nspaces
 
+def _page_categories(whitelist, r_text):
+    categories = []
+    article_categories = [c['title'] for c in whitelist]
+    response = json.loads(r_text)
+    ids = []
+    if response and response['query'] and response['query']['pages']:
+        ids = [id for id in response['query']['pages'].keys()]
+    for id in ids:
+        for cat in response['query']['pages'][id]['categories']:
+            category = cat['title']
+            if article_categories and (category in article_categories):
+                categories.append(category.replace('Category:', ''))
+    return categories
+    
 def page_categories(title, whitelist=[]):
     """Returns list of article subcategories the page belongs to.
     """
-    categories = []
-    article_categories = []
     cache_key = make_cache_key('wikiprox:encyclopedia:page_categories:%s' % title)
     cached = cache.get(cache_key)
     if cached:
         categories = json.loads(cached)
     else:
-        if not whitelist:
-            whitelist = category_article_types()
-        article_categories = [c['title'] for c in whitelist]
-        #
         url = '%s?format=json&action=query&prop=categories&titles=%s' % (settings.MEDIAWIKI_API, title)
         r = requests.get(url, headers={'content-type':'application/json'}, timeout=TIMEOUT)
         if r.status_code == 200:
-            response = json.loads(r.text)
-            ids = []
-            if response and response['query'] and response['query']['pages']:
-                ids = [id for id in response['query']['pages'].keys()]
-            for id in ids:
-                for cat in response['query']['pages'][id]['categories']:
-                    category = cat['title']
-                    if article_categories and (category in article_categories):
-                        categories.append(category.replace('Category:', ''))
+            if not whitelist:
+                whitelist = category_article_types()
+            categories = _page_categories(whitelist, r.text)
         cache.set(cache_key, json.dumps(categories), settings.CACHE_TIMEOUT)
     return categories
 
+def _published_pages(allpages, all_published_pages):
+    # published_article_ids
+    pids = [page['pageid'] for page in all_published_pages]
+    pages = []
+    for page in allpages:
+        if page['pageid'] in pids:
+            if page.get('revisions') \
+            and page['revisions'][0].get('timestamp') \
+            and not page.get('timestamp'):
+                page['timestamp'] = page['revisions'][0]['timestamp']
+            pages.append(page)
+    return pages
+    
 def published_pages(cached_ok=True):
     """Returns a list of *published* articles (pages), with timestamp of latest revision.
     @param cached_ok: boolean Whether cached results are OK.
     """
-    pages = []
     cache_key = make_cache_key('wikiprox:encyclopedia:published_pages')
     cached = cache.get(cache_key)
     if cached and cached_ok:
@@ -315,20 +351,24 @@ def published_pages(cached_ok=True):
         for page in pages:
             page['timestamp'] = datetime.strptime(page['timestamp'], mediawiki.TS_FORMAT_ZONED)
     else:
-        # published_article_ids
-        pids = [
-            page['pageid']
-            for page in category_members(
-                'Published',
-                namespace_id=namespaces_reversed()['Default']
-            )
-        ]
-        for page in all_pages():
-            if page['pageid'] in pids:
-                page['timestamp'] = page['revisions'][0]['timestamp']
-                pages.append(page)
+        pages = _published_pages(
+            all_pages(),
+            category_members('Published', namespace_id=namespaces_reversed()['Default'])
+        )
         cache.set(cache_key, json.dumps(pages), settings.CACHE_TIMEOUT)
     return pages
+
+def _published_authors(publishedpages, categoryauthors):
+    titles = []
+    for page in publishedpages:
+        if page['title'] not in titles:
+            titles.append(page['title'])
+    authors = [
+        page
+        for page in categoryauthors
+        if page['title'] in titles
+    ]
+    return authors
 
 def published_authors(cached_ok=True):
     """Returns a list of *published* authors (pages), with timestamp of latest revision.
@@ -337,41 +377,38 @@ def published_authors(cached_ok=True):
     cache_key = make_cache_key('wikiprox:encyclopedia:published_authors')
     cached = cache.get(cache_key)
     if cached and cached_ok:
-        published_authors = json.loads(cached)
+        authors = json.loads(cached)
     else:
-        titles = []
-        [
-            titles.append(page['title'])
-            for page in published_pages() if page['title'] not in titles
-        ]
-        published_authors = [
-            page
-            for page in category_authors()
-            if page['title'] in titles
-        ]
-        cache.set(cache_key, json.dumps(published_authors), settings.CACHE_TIMEOUT)
-    return published_authors
+        authors = _published_authors(
+            published_pages(),
+            category_authors()
+        )
+        cache.set(cache_key, json.dumps(authors), settings.CACHE_TIMEOUT)
+    return authors
 
+def _whatlinkshere(publishedpages, r_text):
+    titles = []
+    published = [page['title'] for page in publishedpages]
+    response = json.loads(r_text)
+    if response and response['query'] and response['query']['backlinks']:
+        titles = [
+            backlink['title']
+            for backlink in response['query']['backlinks']
+            if backlink['title'] in published
+        ]
+    return titles
+    
 def what_links_here(title):
     """Returns titles of published pages that link to this one.
     """
-    titles = []
     cache_key = make_cache_key('wikiprox:encyclopedia:what_links_here:%s' % title)
     cached = cache.get(cache_key)
     if cached:
         titles = json.loads(cached)
     else:
-        published = [page['title'] for page in published_pages()]
-        #
         url = '%s?format=json&action=query&list=backlinks&bltitle=%s&bllimit=5000' % (settings.MEDIAWIKI_API, title)
         r = requests.get(url, headers={'content-type':'application/json'}, timeout=TIMEOUT)
         if r.status_code == 200:
-            response = json.loads(r.text)
-            if response and response['query'] and response['query']['backlinks']:
-                titles = [
-                    backlink['title']
-                    for backlink in response['query']['backlinks']
-                    if backlink['title'] in published
-                ]
+            titles = _whatlinkshere(published_pages(), r.text)
         cache.set(cache_key, json.dumps(titles), settings.CACHE_TIMEOUT)
     return titles

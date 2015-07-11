@@ -7,6 +7,7 @@
 
 
 Django==1.8                        # MIT      y
+django-nose
 django-redis==3.8.3                # BSD      y
 djangorestframework==3.1.1         # BSD      y
 elasticsearch==1.4.0               # Apache   y

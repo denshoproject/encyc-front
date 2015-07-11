@@ -156,6 +156,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     #
+    'django_nose',
     'rest_framework',
     'sorl.thumbnail',
     #
@@ -265,3 +266,5 @@ TIME_ZONE = 'America/Los_Angeles'
 LANGUAGE_CODE = 'en-us'
 USE_I18N = False
 USE_L10N = False
+
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'

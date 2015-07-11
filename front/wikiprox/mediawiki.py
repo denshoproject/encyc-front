@@ -86,8 +86,7 @@ def parse_mediawiki_text(text, primary_sources, public=False, printed=False):
     soup = remove_primary_sources(soup, primary_sources)
     html = unicode(soup)
     html = rewrite_mediawiki_urls(html)
-    for tag in ['html','body']:
-        html = html.replace('<%s>' % tag, '').replace('</%s>' % tag, '')
+    html = rm_tags(html)
     return html
 
 def remove_staticpage_titles(soup):
@@ -395,3 +394,10 @@ def find_author_info(text):
                     logging.error('ValueError: too many values to unpack')
                 authors['parsed'].append(name)
     return authors
+
+def rm_tags(html, tags=['html', 'body']):
+    """Remove simple tags (e.g. no attributes)from HTML.
+    """
+    for tag in tags:
+        html = html.replace('<%s>' % tag, '').replace('</%s>' % tag, '')
+    return html

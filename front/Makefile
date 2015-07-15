@@ -91,6 +91,10 @@ howto-install:
 	@echo "    SHELL=/bin/bash"
 	@echo "    */30 *  * * *   encyc   /usr/local/src/env/front/bin/python /usr/local/src/encyc-front/front/manage.py encyc --topics --authors --articles"
 	@echo ""
+	@echo "    # encyc-front: get primary-source images from dango"
+	@echo "    SHELL=/bin/bash"
+	@echo "    */60 *  * * *   encyc   /usr/local/src/env/front/bin/python /usr/local/src/encyc-front/front/bin/sync-psms.py"
+	@echo ""
 
 
 

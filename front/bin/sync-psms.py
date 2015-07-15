@@ -37,6 +37,12 @@ script user to generate keys and set up passwordless SSH.
     encyc $ ssh encyc@SOURCE
     encyc $ ssh encyc@DESTINATION
 
+Add this to `/etc/crontab`:
+
+    # encyc-front: get primary-source images from dango
+    SHELL=/bin/bash
+    */60 *  * * *   encyc   /usr/local/src/env/front/bin/python /usr/local/src/encyc-front/front/bin/sync-psms.py
+
 """
 
 import argparse

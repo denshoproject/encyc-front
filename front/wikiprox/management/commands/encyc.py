@@ -2,8 +2,9 @@
 
 Add this to `/etc/crontab`:
 
+    # encyc-front: get topics,authors,articles updates from dango
     SHELL=/bin/bash
-    MIN *     * * *   encyc     cd /usr/local/src/encyc-front/front && /usr/local/src/env/front/bin/python manage.py encyc
+    */30 *  * * *   encyc   /usr/local/src/env/front/bin/python /usr/local/src/encyc-front/front/manage.py encyc --topics --authors --articles
 
 """
 

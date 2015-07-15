@@ -84,6 +84,13 @@ howto-install:
 	@echo ""
 	@echo "    # make restart"
 	@echo "    # make status"
+	@echo ""
+	@echo "If you need automatic updates, add the following to /etc/crontab.::"
+	@echo ""
+	@echo "    # encyc-front: get topics,authors,articles updates from dango"
+	@echo "    SHELL=/bin/bash"
+	@echo "    */30 *  * * *   encyc   /usr/local/src/env/front/bin/python /usr/local/src/encyc-front/front/manage.py encyc --topics --authors --articles"
+	@echo ""
 
 
 

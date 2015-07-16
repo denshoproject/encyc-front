@@ -355,6 +355,9 @@ def published_pages(cached_ok=True):
             all_pages(),
             category_members('Published', namespace_id=namespaces_reversed()['Default'])
         )
+        for page in pages:
+            if not isinstance(page['timestamp'], basestring):
+                page['timestamp'] = datetime.strftime(page['timestamp'], mediawiki.TS_FORMAT_ZONED)
         cache.set(cache_key, json.dumps(pages), settings.CACHE_TIMEOUT)
     return pages
 

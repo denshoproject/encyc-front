@@ -535,6 +535,42 @@ class Source(DocType):
             except NotFoundError:
                 page = None
         return page
+    
+    @staticmethod
+    def sources():
+        """Returns list of published light Source objects.
+        
+        @returns: list
+        """
+        KEY = 'encyc-front:sources'
+        TIMEOUT = 60*5
+        data = cache.get(KEY)
+        if not data:
+            s = Search(doc_type='sources')[0:MAX_SIZE]
+            s = s.sort('encyclopedia_id')
+            s = s.fields([
+                'encyclopedia_id',
+                'published',
+                'modified',
+                'headword',
+                'media_format',
+                'img_path',
+            ])
+            response = s.execute()
+            data = [
+                Source(
+                    encyclopedia_id = hitvalue(hit, 'encyclopedia_id'),
+                    published = hitvalue(hit, 'published'),
+                    modified = hitvalue(hit, 'modified'),
+                    headword = hitvalue(hit, 'headword'),
+                    media_format = hitvalue(hit, 'media_format'),
+                    img_path = hitvalue(hit, 'img_path'),
+                   )
+                for hit in response
+                if hitvalue(hit, 'published')
+            ]
+            cache.set(KEY, data, TIMEOUT)
+        return data
 
     @staticmethod
     def from_mw(mwsource):

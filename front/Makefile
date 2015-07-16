@@ -173,7 +173,7 @@ clean-front: clean-encyc-front
 install-encyc-front:
 	@echo ""
 	@echo "encyc-front --------------------------------------------------------------"
-	apt-get --assume-yes install imagemagick libxml2 libxslt1.1 libxslt1-dev python-dev python-pip python-virtualenv supervisor zlib1g-dev
+	apt-get --assume-yes install imagemagick libxml2 libxslt1.1 libxslt1-dev python-dev python-pip python-virtualenv sqlite3 supervisor zlib1g-dev
 
 ifeq ($(DEBIAN_CODENAME), wheezy)
 	apt-get --assume-yes install libjpeg8-dev

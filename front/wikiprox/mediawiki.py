@@ -300,6 +300,19 @@ def remove_primary_sources(soup, sources):
 def find_databoxcamps_coordinates(text):
     """Given the raw wikitext, search for coordinates with Databox-Camps.
     
+    <div id="databox-Camps">
+    <p>
+    SoSUID: w-tule;
+    DenshoName: Tule Lake;
+    USGName: Tule Lake Relocation Center;
+    ...
+    GISLat: 41.8833;    <<<
+    GISLng: -121.3667;  <<<
+    GISTGNId: 2012922;
+    ...
+    </p>
+    </div>
+
     NOTE: We have some major assumptions here:
     - That there will be only one lng/lat pair in the Databox-Camps.
     - That the lng/lat pair will appear within the Databox-Camps.

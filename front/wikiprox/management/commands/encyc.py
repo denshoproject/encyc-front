@@ -172,7 +172,7 @@ def articles(report=False, dryrun=False, force=False):
             page_sources = [source['encyclopedia_id'] for source in mwpage.sources]
             for mwsource in mwpage.sources:
                 logprint('debug', '- source %s' % mwsource['encyclopedia_id'])
-                source = Source.from_mw(mwsource)
+                source = Source.from_mw(mwsource, title)
                 if not dryrun:
                     source.save()
             logprint('debug', 'creating page')

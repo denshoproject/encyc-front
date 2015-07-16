@@ -573,8 +573,12 @@ class Source(DocType):
         return data
 
     @staticmethod
-    def from_mw(mwsource):
+    def from_mw(mwsource, url_title):
         """Creates an Source object from a models.legacy.Source object.
+        
+        @param mwsource: wikiprox.models.legacy.Source
+        @param url_title: str url_title of associated Page
+        @returns: wikiprox.models.elastic.Source
         """
         # source.streaming_url has to be relative to RTMP_STREAMER
         # TODO this should really happen when it's coming in from MediaWiki.
@@ -603,7 +607,7 @@ class Source(DocType):
             modified = mwsource['modified'],
             published = mwsource['published'],
             creative_commons = mwsource['creative_commons'],
-            headword = mwsource['headword'],
+            headword = url_title,
             original_url = mwsource['original'],
             streaming_url = streaming_url,
             external_url = mwsource['external_url'],

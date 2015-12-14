@@ -86,7 +86,7 @@ howto-install:
 
 
 
-install: install-prep install-daemons install-front install-static install-configs
+install: install-prep install-front install-static install-configs
 
 update: update-front
 
@@ -323,6 +323,13 @@ install-configs:
 	touch /etc/encyc/local.cfg
 	chown root.encyc /etc/encyc/local.cfg
 	chmod 640 /etc/encyc/local.cfg
+
+uninstall-configs:
+	-rm $(INSTALLDIR)/front/settings.py
+
+install-daemon-configs:
+	@echo ""
+	@echo "installing daemon configs ---------------------------------------------"
 # nginx settings
 	cp $(INSTALLDIR)/debian/conf/front.conf /etc/nginx/sites-available
 	chown root.root /etc/nginx/sites-available/front.conf
@@ -334,11 +341,10 @@ install-configs:
 	chown root.root /etc/supervisor/conf.d/gunicorn_front.conf
 	chmod 644 /etc/supervisor/conf.d/gunicorn_front.conf
 
-uninstall-configs:
+uninstall-daemon-configs:
 	-rm /etc/nginx/sites-available/front.conf
 	-rm /etc/nginx/sites-enabled/front.conf
 	-rm /etc/supervisor/conf.d/gunicorn_front.conf
-	-rm $(INSTALLDIR)/front/settings.py
 
 
 reload: reload-nginx reload-supervisor

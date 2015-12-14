@@ -1,6 +1,6 @@
 SHELL = /bin/bash
 
-PACKAGE_SERVER=tank.densho.org
+PACKAGE_SERVER=ddr.densho.org/static/encycfront
 
 PIP_CACHE_DIR=/usr/local/src/pip-cache
 VIRTUALENV=/usr/local/src/env/front
@@ -219,7 +219,7 @@ clean-pip:
 
 
 
-install-static: install-bootstrap install-jquery install-jwplayer install-lightview install-modernizr install-swfobject install-openlayers
+install-static: get-assets install-bootstrap install-jquery install-jwplayer install-lightview install-modernizr install-swfobject install-openlayers
 
 get-assets:
 	@echo ""

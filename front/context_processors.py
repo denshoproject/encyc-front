@@ -1,6 +1,9 @@
 """
 See http://www.b-list.org/weblog/2006/jun/14/django-tips-template-context-processors/
 """
+from datetime import datetime
+import os
+
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
@@ -10,6 +13,12 @@ def sitewide(request):
     """
     return {
         #'request': request,
+        'debug': settings.DEBUG,
+        'time': datetime.now().isoformat(),
+        'pid': os.getpid(),
+        'host': os.uname()[1],
+        'docstore_hosts': settings.DOCSTORE_HOSTS,
+        'docstore_index': settings.DOCSTORE_INDEX,
         'MEDIA_URL': settings.MEDIA_URL,
         'STATIC_URL': settings.STATIC_URL,
         'MEDIAWIKI_DEFAULT_PAGE': settings.MEDIAWIKI_DEFAULT_PAGE,

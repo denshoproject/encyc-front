@@ -27,7 +27,7 @@ script user to generate keys and set up passwordless SSH.
     root # su - encyc
     
     # Generate keys but DO NOT enter passwords!
-    encyc $ ssh-keygen
+    encyc $ ssh-keygen -t rsa -b 4096 -C "encyc@front"
     
     # copy keys to remote systems.
     encyc $ ssh-copy-id encyc@SOURCE

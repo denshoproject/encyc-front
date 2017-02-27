@@ -33,6 +33,7 @@ def _term_documents(term_id, size):
         if (r.status_code not in [200]):
             raise requests.exceptions.ConnectionError(
                 'Error %s' % (r.status_code))
+        objects = []
         if ('json' in r.headers['content-type']):
             data = json.loads(r.text)
             if isinstance(data, dict):

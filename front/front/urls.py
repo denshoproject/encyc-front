@@ -1,4 +1,4 @@
-from django.conf.urls import patterns, include, url
+from django.conf.urls import include, url
 from django.views.generic import TemplateView
 
 #from django.contrib import admin
@@ -10,8 +10,7 @@ sitemaps = {
     'sources': SourceSitemap,
 }
 
-urlpatterns = patterns(
-    '',
+urlpatterns = [
     #url(r'^admin/', include(admin.site.urls)),
     #url(r'^api/0.1/urls-titles/$', 'wikiprox.views.api_contents', name='wikiprox-api-contents'),
     url(r"^api/0.1/articles/(?P<url_title>[\w\W]+)/$", 'wikiprox.api.article', name='wikiprox-api-page'),
@@ -63,4 +62,4 @@ urlpatterns = patterns(
     url(r"^(?P<url_title>[\w\W]+)/$", 'wikiprox.views.article', name='wikiprox-page'),
     #
     url(r"^$", 'wikiprox.views.index', name='wikiprox-index'),
-)
+]

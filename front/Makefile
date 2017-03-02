@@ -189,7 +189,7 @@ endif
 # virtualenv
 	test -d $(VIRTUALENV) || virtualenv $(VIRTUALENV)
 	source $(VIRTUALENV)/bin/activate; \
-	pip install -U --download-cache=$(PIP_CACHE_DIR) bpython setuptools
+	pip install -U --download-cache=$(PIP_CACHE_DIR) bpython curtsies greenlet pygments setuptools six packaging appdirs
 	source $(VIRTUALENV)/bin/activate; \
 	pip install -U --download-cache=$(PIP_CACHE_DIR) -r $(INSTALLDIR)/front/requirements/production.txt
 # log dir

@@ -54,12 +54,15 @@ Related topics and primary source items from the <a target="ddr" href="http://dd
 </div><!-- .row -->
 
 {% for object in term.objects %}
-{% thumbnail object.img_url_local "400x400" as img %}
 <div class="row">
   <div class="span3">
+{% if object.img_url_local %}
+{% thumbnail object.img_url_local "400x400" as img %}
     <a target="ddr" href="{{ object.absolute_url }}">
       <img class="img-responsive img-polaroid" src="{{ MEDIA_URL }}{{ img }}">
     </a>
+{% endthumbnail %}
+{% endif %}{# object.img_url_local #}
   </div>
   <div class="span9">
     <h4>{{ object.title|safe }}</h4>
@@ -68,7 +71,6 @@ Related topics and primary source items from the <a target="ddr" href="http://dd
     <a class="more" target="ddr" href="{{ object.absolute_url }}">View in DDR &raquo;</a>
   </div>
 </div>
-{% endthumbnail %}
 {% endfor %}
 <div class="row">
   <div class="span3">

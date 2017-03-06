@@ -23,8 +23,11 @@ def _term_documents(term_id, size):
     if cached:
         objects = json.loads(cached)
     else:
-        url = '%s/facet/topics/%s/objects/?limit=%s&%s=1' % (
-            settings.DDR_API, term_id, size, settings.DDR_MEDIA_URL_LOCAL_MARKER
+        url = '{api}/facet/topics/{term_id}/objects/?limit={limit}&{local}=1'.format(
+            api=settings.DDR_API,
+            term_id=term_id,
+            limit=size,
+            local=settings.DDR_MEDIA_URL_LOCAL_MARKER
         )
         r = requests.get(
             url,
@@ -36,15 +39,16 @@ def _term_documents(term_id, size):
         objects = []
         if ('json' in r.headers['content-type']):
             data = json.loads(r.text)
-            if isinstance(data, dict):
-                objects = data['results']
+            if isinstance(data, dict) and data.get('objects'):
+                objects = data['objects']
             elif isinstance(data, list):
                 objects = data
         # add img_url_local
         for o in objects:
-            o['img_url_local'] = os.path.join(
-                settings.DDR_MEDIA_URL_LOCAL, o['img_path']
-            )
+            if o.get('links',{}).get('html'):
+                o['absolute_url'] = o['links']['html']
+            if o.get('links',{}).get('thumb'):
+                o['img_url_local'] = o['links']['thumb']
         cache.set(cache_key, json.dumps(objects), settings.CACHE_TIMEOUT)
     return objects
 

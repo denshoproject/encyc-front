@@ -1,5 +1,3 @@
-
-
 Installation
 ------------
 
@@ -7,31 +5,30 @@ Create an application user.::
 
     $ adduser encyc
 
-For some reason, setting up a virtualenv inside the `Makefile` doesn't work, so install `virtualenv`, set up a virtual env, and then activate it.::
-
-    $ apt-get install python-virtualenv
-    $ test -d /usr/local/src/env/front || virtualenv /usr/local/src/env/front
-    $ source /usr/local/src/env/front/bin/activate
-
-Clone the `encyc-front` source code, go to the install directory, and run the installer.  On a fresh Debian install this may take 10-15 minutes.::
+Clone the `encyc-front` source code, go to the install directory, and run the installer (you may have to use "sudo").  On a fresh Debian install this may take 10-15 minutes.::
 
     $ git clone https://github.com/densho/encyc-front /usr/local/src/encyc-front
-    $ cd /usr/local/src/encyc-front/front
+    $ cd /usr/local/src/encyc-front/
     $ make install
 
 Edit the settings file, adding passwords and checking the locations of network resources.::
 
-    $ vi /usr/local/src/encyc-front/front/settings.py
+    $ vi /etc/encyc/front-local.cfg
 
     # Update the following values:
-    SECRET_KEY
-    EMAIL_*
-    STATIC_*
-    MEDIA_*
-    WIKIPROX_MEDIAWIKI_API_PASSWORD = 'TODO'  # MediaWiki bot account
-    DANGO_HTPASSWD_USER = 'TODO'              # HTTP Auth username
-    DANGO_HTPASSWD_PWD  = 'TODO'              # HTTP Auth password
-    DOCSTORE_INDEX = 'encyc-dev'
+    [debug]
+    debug=1
+     
+    [elasticsearch]
+    hosts=192.168.56.1:9200
+    index=encyc-dev
+     
+    [ddr]
+    api_url=http://ddr.densho.org/api/0.2
+    media_url=http://ddr.densho.org/media/
+    media_url_local=http://ddr.densho.org/media/
+    topics_src_url=http://partner.densho.org/vocab/api/0.2/topics.json
+    topics_base=http://ddr.densho.org/browse/topics
 
 Restart the application and check status.::
 
@@ -50,8 +47,9 @@ The application needs to be able to connect directly to the source MediaWiki.  I
 
 Switch to the application user, activate the `virtualenv`, and run the Django shell.::
 
+    $ cd /usr/local/src/encyc-front/front
     $ su encyc
-    $ source  /usr/local/src/env/front/bin/activate
+    $ source  ../venv/front/bin/activate
     $ python manage.py shell
 
 If this is a fresh install, or if you want to start over, delete the Elasticsearch index and create a new one.::

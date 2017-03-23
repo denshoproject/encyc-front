@@ -24,16 +24,16 @@
 
 {% block javascript %}
 <script src="https://www.google.com/jsapi" type="text/javascript"></script>
-<script type="text/javascript">
-  google.load('search', '1', {language : 'en', style : google.loader.themes.MINIMALIST});
-  google.setOnLoadCallback(function() {
-    var customSearchOptions = {};
-    customSearchOptions['adoptions'] = {'layout': 'noTop'};
-    var customSearchControl = new google.search.CustomSearchControl(
-      '{{ GOOGLE_CUSTOM_SEARCH_PASSWORD }}', customSearchOptions);
-    customSearchControl.setResultSetSize(google.search.Search.FILTERED_CSE_RESULTSET);
-    customSearchControl.setLinkTarget(google.search.Search.LINK_TARGET_SELF);
-    customSearchControl.draw('cse');
-  }, true);
+<script>
+  (function() {
+    var cx = '{{ GOOGLE_CUSTOM_SEARCH_PASSWORD }}';
+    var gcse = document.createElement('script');
+    gcse.type = 'text/javascript';
+    gcse.async = true;
+    gcse.src = 'https://cse.google.com/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(gcse, s);
+  })();
 </script>
+<gcse:search></gcse:search>
 {% endblock javascript %}

@@ -24,12 +24,14 @@ lxml==3.4.3                        # BSD      y
 python-dateutil==2.4.2             # BSD      y
 requests==2.6.0                    # Apache2  y
 
-# bpython and dependencies
-appdirs==1.4.2
 bpython==0.16
-curtsies==0.2.11
-greenlet==0.4.12
-packaging==16.8
-pygments==2.2.0
-pyparsing
-six==1.10.0
+## bpython and dependencies
+#appdirs==1.4.2
+#blessings
+#bpython==0.16
+#curtsies==0.2.11
+#greenlet==0.4.12
+#packaging==16.8
+#pygments==2.2.0
+#pyparsing
+#six==1.10.0

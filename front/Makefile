@@ -4,8 +4,8 @@ DEBIAN_CODENAME := $(shell lsb_release -sc)
 PACKAGE_SERVER=ddr.densho.org/static/encycfront
 
 PIP_CACHE_DIR=/usr/local/src/pip-cache
-VIRTUALENV=/usr/local/src/env/front
 INSTALLDIR=/usr/local/src/encyc-front
+VIRTUALENV=$(INSTALLDIR)/venv/front
 MEDIA_BASE=/var/www/html/front
 MEDIA_ROOT=$(MEDIA_BASE)/media
 STATIC_ROOT=$(MEDIA_BASE)/static
@@ -55,8 +55,8 @@ howto-install:
 	@echo ""
 	@echo "    # apt-get install make"
 	@echo "    # adduser encyc"
-	@echo "    # git clone git@github.com:densho/encyc-front.git /usr/local/src/encyc-front"
-	@echo "    # cd /usr/local/src/encyc-front/front"
+	@echo "    # git clone git@github.com:densho/encyc-front.git $(INSTALLDIR)"
+	@echo "    # cd $(INSTALLDIR)/front"
 	@echo ""
 	@echo "If not running the master branch, switch to it now::"
 	@echo ""
@@ -68,8 +68,8 @@ howto-install:
 	@echo ""
 	@echo "Run Django shell once to initialize environment variables."
 	@echo ""
-	@echo "    # source /usr/local/src/env/front/bin/activate"
-	@echo "    # cd /usr/local/src/encyc-front/front && python manage.py shell"
+	@echo "    # source $(VIRTUALENV)/bin/activate"
+	@echo "    # cd $(INSTALLDIR)/front && python manage.py shell"
 	@echo ""
 	@echo "Initial database setup."
 	@echo ""
@@ -93,11 +93,11 @@ howto-install:
 	@echo ""
 	@echo "    # encyc-front: get topics,authors,articles updates from dango"
 	@echo "    SHELL=/bin/bash"
-	@echo "    */30 *  * * *   encyc   /usr/local/src/env/front/bin/python /usr/local/src/encyc-front/front/manage.py encyc --topics --authors --articles"
+	@echo "    */30 *  * * *   encyc   $(VIRTUALENV)/bin/python $(INSTALLDIR)/front/manage.py encyc --topics --authors --articles"
 	@echo ""
 	@echo "    # encyc-front: get primary-source images from dango"
 	@echo "    SHELL=/bin/bash"
-	@echo "    */60 *  * * *   encyc   /usr/local/src/env/front/bin/python /usr/local/src/encyc-front/front/bin/sync-psms.py"
+	@echo "    */60 *  * * *   encyc   $(VIRTUALENV)/bin/python $(INSTALLDIR)/front/bin/sync-psms.py"
 	@echo ""
 
 
@@ -236,7 +236,7 @@ restart-front:
 	/etc/init.d/supervisor restart front
 
 clean-encyc-front:
-	-rm -Rf $(INSTALLDIR)/front/env/
+	-rm -Rf $(VIRTUALENV)
 	-rm -Rf $(INSTALLDIR)/front/src
 
 clean-pip:

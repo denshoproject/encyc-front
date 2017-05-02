@@ -31,6 +31,8 @@ DEBUG = config.get('debug', 'debug')
 TEMPLATE_DEBUG = DEBUG
 THUMBNAIL_DEBUG = config.get('debug', 'thumbnail')
 
+LOG_LEVEL = config.get('debug', 'log_level')
+
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = [
@@ -233,7 +235,7 @@ LOGGING = {
             'formatter': 'simple',
         },
         'file': {
-            'level': 'DEBUG',
+            'level': LOG_LEVEL,
             'class': 'logging.handlers.TimedRotatingFileHandler',
             'filename': '/var/log/encyc/front.log',
             'when': 'D',
@@ -257,7 +259,7 @@ LOGGING = {
     },
     # This is the only way I found to write log entries from the whole DDR stack.
     'root': {
-        'level': 'DEBUG',
+        'level': LOG_LEVEL,
         'handlers': ['file'],
     },
 }

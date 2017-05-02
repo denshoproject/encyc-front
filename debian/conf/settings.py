@@ -27,9 +27,9 @@ if not configs_read:
 
 # ----------------------------------------------------------------------
 
-DEBUG = config.get('debug', 'debug')
+DEBUG = config.getboolean('debug', 'debug')
 TEMPLATE_DEBUG = DEBUG
-THUMBNAIL_DEBUG = config.get('debug', 'thumbnail')
+THUMBNAIL_DEBUG = config.getboolean('debug', 'thumbnail')
 
 LOG_LEVEL = config.get('debug', 'log_level')
 

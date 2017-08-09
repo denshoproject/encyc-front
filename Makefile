@@ -1,17 +1,40 @@
+PROJECT=encyc
+APP=encycfront
+USER=encyc
+
 SHELL = /bin/bash
 DEBIAN_CODENAME := $(shell lsb_release -sc)
+DEBIAN_RELEASE := $(shell lsb_release -sr)
+VERSION := $(shell cat VERSION)
 
+GIT_SOURCE_URL=https://github.com/densho/encyc-front
 PACKAGE_SERVER=ddr.densho.org/static/encycfront
 
-PIP_CACHE_DIR=/usr/local/src/pip-cache
-INSTALLDIR=/usr/local/src/encyc-front
+INSTALL_BASE=/opt
+INSTALLDIR=$(INSTALL_BASE)/encyc-front
+DOWNLOADS_DIR=/tmp/$(APP)-install
+REQUIREMENTS=$(INSTALLDIR)/requirements.txt
+PIP_CACHE_DIR=$(INSTALL_BASE)/pip-cache
+
 VIRTUALENV=$(INSTALLDIR)/venv/front
+SETTINGS=$(INSTALLDIR)/front/front/settings.py
+
+CONF_BASE=/etc/encyc
+CONF_PRODUCTION=$(CONF_BASE)/front.cfg
+CONF_LOCAL=$(CONF_BASE)/front-local.cfg
+CONF_DJANGO=$(INSTALLDIR)/front/front/settings.py
+
 MEDIA_BASE=/var/www/html/front
 MEDIA_ROOT=$(MEDIA_BASE)/media
 STATIC_ROOT=$(MEDIA_BASE)/static
 
-ELASTICSEARCH=elasticsearch-1.0.1.deb
+ELASTICSEARCH=elasticsearch-2.4.4.deb
 # wget https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.0.1.deb
+
+SUPERVISOR_GUNICORN_CONF=/etc/supervisor/conf.d/$(APP).conf
+SUPERVISOR_CONF=/etc/supervisor/supervisord.conf
+NGINX_CONF=/etc/nginx/sites-available/$(APP).conf
+NGINX_CONF_LINK=/etc/nginx/sites-enabled/$(APP).conf
 
 MODERNIZR=modernizr-2.5.3
 BOOTSTRAP=bootstrap-2.3.1
@@ -27,6 +50,16 @@ OPENLAYERS=OpenLayers-2.12
 # lightview-3.2.2
 # wget https://swfobject.googlecode.com/files/swfobject_2_2.zip
 ASSETS=encyc-front-assets.tgz
+
+FPM_BRANCH := $(shell git rev-parse --abbrev-ref HEAD | tr -d _ | tr -d -)
+FPM_ARCH=amd64
+FPM_NAME=$(APP)-$(FPM_BRANCH)
+FPM_FILE=$(FPM_NAME)_$(VERSION)_$(FPM_ARCH).deb
+FPM_VENDOR=Densho.org
+FPM_MAINTAINER=<geoffrey.jost@densho.org>
+FPM_DESCRIPTION=Densho Encyclopedia Resource Guide site
+FPM_BASE=opt/encyc-front
+
 
 .PHONY: help
 
@@ -158,26 +191,39 @@ install-elasticsearch:
 	apt-get --assume-yes install openjdk-7-jre
 	wget -nc -P /tmp/downloads http://$(PACKAGE_SERVER)/$(ELASTICSEARCH)
 	gdebi --non-interactive /tmp/downloads/$(ELASTICSEARCH)
-	cp $(INSTALLDIR)/debian/conf/elasticsearch.yml /etc/elasticsearch/
+	cp $(INSTALLDIR)/conf/elasticsearch.yml /etc/elasticsearch/
 	chown root.root /etc/elasticsearch/elasticsearch.yml
 	chmod 644 /etc/elasticsearch/elasticsearch.yml
 	@echo "${bldgrn}search engine (re)start${txtrst}"
 	/etc/init.d/elasticsearch restart
 
+install-virtualenv:
+	@echo ""
+	@echo "install-virtualenv -----------------------------------------------------"
+	apt-get --assume-yes install python-pip python-virtualenv
+	test -d $(VIRTUALENV) || virtualenv --distribute --setuptools $(VIRTUALENV)
 
-install-front: install-encyc-front
+install-setuptools: install-virtualenv
+	@echo ""
+	@echo "install-setuptools -----------------------------------------------------"
+	apt-get --assume-yes install python-dev
+	source $(VIRTUALENV)/bin/activate; \
+	pip install -U setuptools
 
-update-front: update-encyc-front install-configs
 
-uninstall-front: uninstall-encyc-front
+install-app: install-virtualenv install-setuptools install-encyc-front
 
-clean-front: clean-encyc-front
+update-app: update-encyc-front install-configs
+
+uninstall-app: uninstall-encyc-front
+
+clean-app: clean-encyc-front
 
 
 install-encyc-front:
 	@echo ""
 	@echo "encyc-front --------------------------------------------------------------"
-	apt-get --assume-yes install imagemagick libxml2 libxslt1.1 libxslt1-dev python-dev python-pip python-virtualenv sqlite3 supervisor zlib1g-dev
+	apt-get --assume-yes install imagemagick libxml2 libxslt1.1 libxslt1-dev python-dev sqlite3 supervisor zlib1g-dev
 
 ifeq ($(DEBIAN_CODENAME), wheezy)
 	apt-get --assume-yes install libjpeg8-dev
@@ -187,9 +233,6 @@ ifeq ($(DEBIAN_CODENAME), jessie)
 endif
 
 # virtualenv
-	test -d $(VIRTUALENV) || virtualenv $(VIRTUALENV)
-	source $(VIRTUALENV)/bin/activate; \
-	pip install -U --download-cache=$(PIP_CACHE_DIR) setuptools
 	source $(VIRTUALENV)/bin/activate; \
 	pip install -U --download-cache=$(PIP_CACHE_DIR) -r $(INSTALLDIR)/front/requirements/production.txt
 # log dir
@@ -338,11 +381,11 @@ install-configs:
 	@echo ""
 	@echo "installing configs ----------------------------------------------------"
 # web app settings
-	cp $(INSTALLDIR)/debian/conf/settings.py $(INSTALLDIR)/front/front/
+	cp $(INSTALLDIR)/conf/settings.py $(INSTALLDIR)/front/front/
 	chown root.root $(INSTALLDIR)/front/front/settings.py
 	chmod 644 $(INSTALLDIR)/front/front/settings.py
 	-mkdir /etc/encyc
-	cp $(INSTALLDIR)/debian/conf/front.cfg /etc/encyc/
+	cp $(INSTALLDIR)/conf/front.cfg /etc/encyc/
 	chown root.encyc /etc/encyc/front.cfg
 	chmod 640 /etc/encyc/front.cfg
 	touch /etc/encyc/front-local.cfg
@@ -356,15 +399,15 @@ install-daemon-configs:
 	@echo ""
 	@echo "installing daemon configs ---------------------------------------------"
 # nginx settings
-	cp $(INSTALLDIR)/debian/conf/front.conf /etc/nginx/sites-available
+	cp $(INSTALLDIR)/conf/nginx.conf /etc/nginx/sites-available/front.conf
 	chown root.root /etc/nginx/sites-available/front.conf
 	chmod 644 /etc/nginx/sites-available/front.conf
 	-ln -s /etc/nginx/sites-available/front.conf /etc/nginx/sites-enabled/front.conf
 	-rm /etc/nginx/sites-enabled/default
 # supervisord
-	cp $(INSTALLDIR)/debian/conf/gunicorn_front.conf /etc/supervisor/conf.d/
-	chown root.root /etc/supervisor/conf.d/gunicorn_front.conf
-	chmod 644 /etc/supervisor/conf.d/gunicorn_front.conf
+	cp $(INSTALLDIR)/conf/supervisor.conf /etc/supervisor/conf.d/front.conf
+	chown root.root /etc/supervisor/conf.d/front.conf
+	chmod 644 /etc/supervisor/conf.d/front.conf
 
 uninstall-daemon-configs:
 	-rm /etc/nginx/sites-available/front.conf
@@ -406,3 +449,52 @@ status:
 git-status:
 	@echo "------------------------------------------------------------------------"
 	cd $(INSTALLDIR) && git status
+
+
+# http://fpm.readthedocs.io/en/latest/
+# https://stackoverflow.com/questions/32094205/set-a-custom-install-directory-when-making-a-deb-package-with-fpm
+# https://brejoc.com/tag/fpm/
+deb:
+	@echo ""
+	@echo "FPM packaging ----------------------------------------------------------"
+	-rm -Rf $(FPM_FILE)
+	virtualenv --relocatable $(VIRTUALENV)  # Make venv relocatable
+	fpm   \
+	--verbose   \
+	--input-type dir   \
+	--output-type deb   \
+	--name $(FPM_NAME)   \
+	--version $(VERSION)   \
+	--package $(FPM_FILE)   \
+	--url "$(GIT_SOURCE_URL)"   \
+	--vendor "$(FPM_VENDOR)"   \
+	--maintainer "$(FPM_MAINTAINER)"   \
+	--description "$(FPM_DESCRIPTION)"   \
+	--depends "imagemagick"   \
+	--depends "libxml2"   \
+	--depends "libxslt1.1"   \
+	--depends "libxslt1-dev"   \
+	--depends "python-dev"   \
+	--depends "python-pip"   \
+	--depends "python-virtualenv"   \
+	--depends "sqlite3"   \
+	--depends "zlib1g-dev"   \
+	--depends "libjpeg62-turbo-dev"   \
+	--depends "nginx"   \
+	--depends "redis-server"   \
+	--depends "supervisor"   \
+	--chdir $(INSTALLDIR)   \
+	conf/front.cfg=etc/encyc/front.cfg   \
+	conf/supervisor.conf=etc/supervisor/conf.d/front.conf   \
+	conf/nginx.conf=etc/nginx/sites-available/front.conf   \
+	conf=$(FPM_BASE)   \
+	COPYRIGHT=$(FPM_BASE)   \
+	front=$(FPM_BASE)   \
+	.git=$(FPM_BASE)   \
+	.gitignore=$(FPM_BASE)   \
+	INSTALL=$(FPM_BASE)   \
+	LICENSE=$(FPM_BASE)   \
+	Makefile=$(FPM_BASE)   \
+	README.rst=$(FPM_BASE)   \
+	venv=$(FPM_BASE)   \
+	VERSION=$(FPM_BASE)

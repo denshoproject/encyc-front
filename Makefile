@@ -57,7 +57,7 @@ FPM_NAME=$(APP)-$(FPM_BRANCH)
 FPM_FILE=$(FPM_NAME)_$(VERSION)_$(FPM_ARCH).deb
 FPM_VENDOR=Densho.org
 FPM_MAINTAINER=<geoffrey.jost@densho.org>
-FPM_DESCRIPTION=Densho Encyclopedia Resource Guide site
+FPM_DESCRIPTION=Densho Encyclopedia site
 FPM_BASE=opt/encyc-front
 
 

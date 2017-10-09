@@ -485,8 +485,6 @@ deb:
 	--depends "supervisor"   \
 	--chdir $(INSTALLDIR)   \
 	conf/front.cfg=etc/encyc/front.cfg   \
-	conf/supervisor.conf=etc/supervisor/conf.d/front.conf   \
-	conf/nginx.conf=etc/nginx/sites-available/front.conf   \
 	conf=$(FPM_BASE)   \
 	COPYRIGHT=$(FPM_BASE)   \
 	front=$(FPM_BASE)   \

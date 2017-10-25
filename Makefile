@@ -135,7 +135,7 @@ howto-install:
 
 
 
-install: install-prep install-front install-static install-configs
+install: install-prep install-app install-static install-configs
 
 update: update-front
 

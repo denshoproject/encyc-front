@@ -52,7 +52,6 @@ def article(request, url_title, format=None):
         'url_title': page.url_title,
         'url': reverse('wikiprox-api-page', args=([page.url_title]), request=request),
         'absolute_url': reverse('wikiprox-page', args=([page.url_title]), request=request),
-        'published_encyc': page.published_encyc,
         'modified': page.modified,
         'title_sort': page.title_sort,
         'prev_page': reverse('wikiprox-api-page', args=([page.prev_page]), request=request),

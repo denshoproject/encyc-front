@@ -656,7 +656,7 @@ class Citation(object):
     
     def __init__(self, page, request):
         self.uri = page.absolute_url()
-        self.href = 'http://%s%s' % (request.META['HTTP_HOST'], self.uri)
+        self.href = 'https://%s%s' % (request.META['HTTP_HOST'], self.uri)
         if getattr(page, 'title', None):
             self.title = page.title
         elif getattr(page, 'caption', None):
@@ -760,7 +760,7 @@ class Elasticsearch(object):
     def index_topics(json_text=None, url=settings.DDR_TOPICS_SRC_URL):
         """Upload topics.json; used for Encyc->DDR links on article pages.
         
-        url = 'http://partner.densho.org/vocab/api/0.2/topics.json'
+        url = 'https://partner.densho.org/vocab/api/0.2/topics.json'
         models.Elasticsearch.index_topics(url)
         
         @param json_text: unicode Raw topics.json file text.

@@ -24,11 +24,11 @@ Edit the settings file, adding passwords and checking the locations of network r
     index=encyc-dev
      
     [ddr]
-    api_url=http://ddr.densho.org/api/0.2
-    media_url=http://ddr.densho.org/media/
-    media_url_local=http://ddr.densho.org/media/
-    topics_src_url=http://partner.densho.org/vocab/api/0.2/topics.json
-    topics_base=http://ddr.densho.org/browse/topics
+    api_url=https://ddr.densho.org/api/0.2
+    media_url=https://ddr.densho.org/media/
+    media_url_local=https://ddr.densho.org/media/
+    topics_src_url=https://partner.densho.org/vocab/api/0.2/topics.json
+    topics_base=https://ddr.densho.org/browse/topics
 
 Restart the application and check status.::
 

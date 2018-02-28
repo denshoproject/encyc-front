@@ -349,7 +349,10 @@ class Page(DocType):
         
         @returns: list
         """
-        return [Source.get(sid) for sid in self.source_ids]
+        try:
+            return [Source.get(sid) for sid in self.source_ids]
+        except NotFoundError:
+            return []
     
     def topics(self):
         """List of DDR topics associated with this page.

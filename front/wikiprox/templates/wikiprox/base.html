@@ -30,6 +30,12 @@
 	<a href="/about/">About</a> | 
 	<a href="/about/#contact">Contact</a>
 	
+  <p class="muted">
+  Rendered at {{ time }} by {{ pid }} on {{ host }}<br/>
+  v{{ version }} {{ packages }} {{ git_commit }} {{ git_branch }}
+  {{ docstore_hosts }}/{{ docstore_index }}
+  </p>
+
 </div>
 
 {% if lastmod %}<p class="lastmod">Last updated {{ lastmod }}</p>{% endif %}

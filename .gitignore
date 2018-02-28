@@ -1,8 +1,10 @@
+*.deb
 *.pyc
 *~
-front/settings.py
+build/
+debs/
+front/front/settings.py
+media/
 pip-log.txt
-build
-env
-media
+tmp/
 venv/

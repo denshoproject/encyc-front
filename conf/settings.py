@@ -10,9 +10,14 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 
 import ConfigParser
 import os
+import subprocess
+import sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+
+with open(os.path.join(BASE_DIR, '..', 'VERSION'), 'r') as f:
+    VERSION = f.read().strip()
 
 # User-configurable settings are located in the following files.
 # Files appearing *later* in the list override earlier files.
@@ -28,8 +33,59 @@ if not configs_read:
 # ----------------------------------------------------------------------
 
 DEBUG = config.getboolean('debug', 'debug')
+GITPKG_DEBUG = config.getboolean('debug', 'gitpkg_debug')
 TEMPLATE_DEBUG = DEBUG
 THUMBNAIL_DEBUG = config.getboolean('debug', 'thumbnail')
+
+if GITPKG_DEBUG:
+    # report Git branch and commit
+    # This branch is the one with the leading '* '.
+    #try:
+    GIT_BRANCH = [
+        b.decode().replace('*','').strip()
+        for b in subprocess.check_output(['git', 'branch']).splitlines()
+        if '*' in b.decode()
+       ][0]
+    #except:
+    #    GIT_BRANCH = 'unknown'
+    #try:
+        # $ git log --pretty=oneline
+        # a21740293f... COMMIT MESSAGE
+    
+    GIT_COMMIT = subprocess.check_output([
+        'git','log','--pretty=oneline','-1'
+       ]).decode().strip().split(' ')[0]
+    #except:
+    #    GIT_COMMIT = 'unknown'
+     
+    def package_debs(package, apt_cache_dir='/var/cache/apt/archives'):
+        """
+        @param package: str Package name
+        @param apt_cache_dir: str Absolute path
+        @returns: list of .deb files matching package and version
+        """
+        cmd = 'dpkg --status %s' % package
+        try:
+            dpkg_raw = subprocess.check_output(cmd.split(' ')).decode()
+        except subprocess.CalledProcessError:
+            return ''
+        data = {}
+        for line in dpkg_raw.splitlines():
+            if line and isinstance(line, basestring) and (':' in line):
+                key,val = line.split(':', 1)
+                data[key.strip().lower()] = val.strip()
+        pkg_paths = [
+            path for path in os.listdir(apt_cache_dir)
+            if (package in path) and data.get('version') and (data['version'] in path)
+        ]
+        return pkg_paths
+    
+    PACKAGES = package_debs('encycrg-%s' % GIT_BRANCH)
+
+else:
+    GIT_BRANCH = []
+    GIT_COMMIT = ''
+    PACKAGES = []
 
 LOG_LEVEL = config.get('debug', 'log_level')
 

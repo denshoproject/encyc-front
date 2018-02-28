@@ -225,6 +225,7 @@ class Page(DocType):
     url_title = String(index='not_analyzed')  # Elasticsearch id
     public = Boolean()
     published = Boolean()
+    published_encyc = Boolean()
     modified = Date()
     mw_api_url = String(index='not_analyzed')
     title_sort = String(index='not_analyzed')
@@ -282,7 +283,7 @@ class Page(DocType):
         TIMEOUT = 60*5
         data = cache.get(KEY)
         if not data:
-            s = Search(doc_type='articles')[0:MAX_SIZE]
+            s = Search(doc_type='articles').filter('term', published_encyc=True)[0:MAX_SIZE]
             s = s.sort('title_sort')
             s = s.fields([
                 'url_title',

@@ -89,6 +89,8 @@ def article(request, url_title='index', printed=False, template_name='wikiprox/p
             return HttpResponseRedirect(reverse('wikiprox-author', args=[alt_title]))
         raise Http404
     
+    if not page.published_encyc:
+        assert False
     if (not page.published) and (not settings.MEDIAWIKI_SHOW_UNPUBLISHED):
         template_name = 'wikiprox/unpublished.html'
     elif printed:

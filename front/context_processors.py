@@ -22,6 +22,7 @@ def sitewide(request):
         'version': settings.VERSION,
         'packages': settings.PACKAGES,
         'docstore_hosts': settings.DOCSTORE_HOSTS[0]['host'],
+        'docstore_hosts': settings.DOCSTORE_HOSTS,
         'docstore_index': settings.DOCSTORE_INDEX,
         'MEDIA_URL': settings.MEDIA_URL,
         'STATIC_URL': settings.STATIC_URL,

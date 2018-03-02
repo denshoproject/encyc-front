@@ -199,7 +199,7 @@ def rewrite_newpage_links(soup):
     """Rewrites new-page links
     
     Called by parse_mediawiki_text.
-    ex: http://.../mediawiki/index.php?title=Nisei&amp;action=edit&amp;redlink=1
+    ex: https://.../mediawiki/index.php?title=Nisei&amp;action=edit&amp;redlink=1
     
     @param soup: BeautifulSoup object
     @returns: soup
@@ -214,7 +214,7 @@ def rewrite_prevnext_links(soup):
     """Rewrites previous/next links
     
     Called by parse_mediawiki_text.
-    ex: http://.../mediawiki/index.php?title=Category:Pages_Needing_Primary_Sources&pagefrom=Mary+Oyama+Mittwer
+    ex: https://.../mediawiki/index.php?title=Category:Pages_Needing_Primary_Sources&pagefrom=Mary+Oyama+Mittwer
     
     @param soup: BeautifulSoup object
     @returns: soup

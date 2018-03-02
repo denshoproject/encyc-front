@@ -5,7 +5,7 @@ from rest_framework.response import Response
 
 
 def http_host(request):
-    return 'http://%s' % request.META['HTTP_HOST']
+    return 'https://%s' % request.META['HTTP_HOST']
 
 def makeurl(request, uri):
     return '%s%s' % (http_host(request), uri)

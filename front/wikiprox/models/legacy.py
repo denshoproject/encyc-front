@@ -583,7 +583,7 @@ class Elasticsearch(object):
     def index_topics(self, json_text=None, url=settings.DDR_TOPICS_SRC_URL):
         """Upload topics.json; used for Encyc->DDR links on article pages.
         
-        url = 'http://partner.densho.org/vocab/api/0.2/topics.json'
+        url = 'https://partner.densho.org/vocab/api/0.2/topics.json'
         models.Elasticsearch().index_topics(url)
         
         @param json_text: unicode Raw topics.json file text.

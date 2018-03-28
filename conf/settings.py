@@ -158,6 +158,9 @@ EMAIL_HOST_PASSWORD = config.get('email', 'host_password')
 EMAIL_SUBJECT_PREFIX = '[front] '
 SERVER_EMAIL = 'front@densho.org'
 
+THROTTLE_ANON = config.get('front', 'throttle_anon')
+THROTTLE_USER = config.get('front', 'throttle_user')
+
 # ----------------------------------------------------------------------
 
 STAGE = False
@@ -222,6 +225,21 @@ INSTALLED_APPS = (
     'locations',
     'wikiprox',
 )
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ],
+    'PAGE_SIZE': 20,
+    'DEFAULT_THROTTLE_CLASSES': (
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle'
+    ),
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': THROTTLE_ANON,
+        'user': THROTTLE_USER,
+    },
+}
 
 # sorl-thumbnail
 THUMBNAIL_KVSTORE = 'sorl.thumbnail.kvstores.cached_db_kvstore.KVStore'

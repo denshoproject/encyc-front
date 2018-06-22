@@ -226,7 +226,6 @@ class Page(DocType):
     public = Boolean()
     published = Boolean()
     published_encyc = Boolean()
-    published_rg = Boolean()
     modified = Date()
     mw_api_url = String(index='not_analyzed')
     title_sort = String(index='not_analyzed')

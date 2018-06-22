@@ -97,6 +97,32 @@
   </style>
 
   {% block css %}{% endblock css %}
+
+
+<!-- cookie consent courtesy https://cookieconsent.insites.com/ -->
+<link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.css" />
+<script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.js"></script>
+<script>
+window.addEventListener("load", function(){
+window.cookieconsent.initialise({
+  "palette": {
+    "popup": {
+      "background": "#5c5823"
+    },
+    "button": {
+      "background": "transparent",
+      "border": "#ffffff",
+      "text": "#ffffff"
+    }
+  },
+  "content": {
+    "message": "Densho uses cookies to ensure you get the best experience on our website.",
+    "link": "More about our privacy policy",
+    "href": "https://encyclopedia.densho.org/about/#tosprivacy"
+  }
+})});
+</script>
+  
 </head>
 <body>
 

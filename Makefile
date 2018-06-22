@@ -1,13 +1,18 @@
 PROJECT=encyc
 APP=encycfront
 USER=encyc
-
 SHELL = /bin/bash
-DEBIAN_CODENAME := $(shell lsb_release -sc)
-DEBIAN_RELEASE := $(shell lsb_release -sr)
-VERSION := $(shell cat VERSION)
 
+APP_VERSION := $(shell cat VERSION)
 GIT_SOURCE_URL=https://github.com/densho/encyc-front
+
+# Release name e.g. jessie
+DEBIAN_CODENAME := $(shell lsb_release -sc)
+# Release numbers e.g. 8.10
+DEBIAN_RELEASE := $(shell lsb_release -sr)
+# Sortable major version tag e.g. deb8
+DEBIAN_RELEASE_TAG = deb$(shell lsb_release -sr | cut -c1)
+
 PACKAGE_SERVER=ddr.densho.org/static/encycfront
 
 INSTALL_BASE=/opt
@@ -27,6 +32,14 @@ CONF_DJANGO=$(INSTALLDIR)/front/front/settings.py
 MEDIA_BASE=/var/www/html/front
 MEDIA_ROOT=$(MEDIA_BASE)/media
 STATIC_ROOT=$(MEDIA_BASE)/static
+
+OPENJDK_PKG=
+ifeq ($(DEBIAN_RELEASE), jessie)
+	OPENJDK_PKG=openjdk-7-jre
+endif
+ifeq ($(DEBIAN_CODENAME), stretch)
+	OPENJDK_PKG=openjdk-8-jre
+endif
 
 ELASTICSEARCH=elasticsearch-2.4.4.deb
 # wget https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.0.1.deb
@@ -51,14 +64,20 @@ OPENLAYERS=OpenLayers-2.12
 # wget https://swfobject.googlecode.com/files/swfobject_2_2.zip
 ASSETS=encyc-front-assets.tgz
 
-FPM_BRANCH := $(shell git rev-parse --abbrev-ref HEAD | tr -d _ | tr -d -)
-FPM_ARCH=amd64
-FPM_NAME=$(APP)-$(FPM_BRANCH)
-FPM_FILE=$(FPM_NAME)_$(VERSION)_$(FPM_ARCH).deb
-FPM_VENDOR=Densho.org
-FPM_MAINTAINER=<geoffrey.jost@densho.org>
-FPM_DESCRIPTION=Densho Encyclopedia site
-FPM_BASE=opt/encyc-front
+DEB_BRANCH := $(shell git rev-parse --abbrev-ref HEAD | tr -d _ | tr -d -)
+DEB_ARCH=amd64
+DEB_NAME_JESSIE=$(APP)-$(DEB_BRANCH)
+DEB_NAME_STRETCH=$(APP)-$(DEB_BRANCH)
+# Application version, separator (~), Debian release tag e.g. deb8
+# Release tag used because sortable and follows Debian project usage.
+DEB_VERSION_JESSIE=$(APP_VERSION)~deb8
+DEB_VERSION_STRETCH=$(APP_VERSION)~deb9
+DEB_FILE_JESSIE=$(DEB_NAME_JESSIE)_$(DEB_VERSION_JESSIE)_$(DEB_ARCH).deb
+DEB_FILE_STRETCH=$(DEB_NAME_STRETCH)_$(DEB_VERSION_STRETCH)_$(DEB_ARCH).deb
+DEB_VENDOR=Densho.org
+DEB_MAINTAINER=<geoffrey.jost@densho.org>
+DEB_DESCRIPTION=Densho Encyclopedia site
+DEB_BASE=opt/encyc-front
 
 
 .PHONY: help
@@ -184,18 +203,31 @@ install-redis:
 	@echo "Redis ------------------------------------------------------------------"
 	apt-get --assume-yes install redis-server
 
-install-elasticsearch:
+get-elasticsearch:
+	-wget -nc -P $(DOWNLOADS_DIR) http://$(PACKAGE_SERVER)/$(ELASTICSEARCH)
+
+install-elasticsearch: install-core
 	@echo ""
 	@echo "Elasticsearch ----------------------------------------------------------"
 # Elasticsearch is configured/restarted here so it's online by the time script is done.
-	apt-get --assume-yes install openjdk-7-jre
-	wget -nc -P /tmp/downloads http://$(PACKAGE_SERVER)/$(ELASTICSEARCH)
-	gdebi --non-interactive /tmp/downloads/$(ELASTICSEARCH)
-	cp $(INSTALLDIR)/conf/elasticsearch.yml /etc/elasticsearch/
-	chown root.root /etc/elasticsearch/elasticsearch.yml
-	chmod 644 /etc/elasticsearch/elasticsearch.yml
-	@echo "${bldgrn}search engine (re)start${txtrst}"
-	/etc/init.d/elasticsearch restart
+	apt-get --assume-yes install $(OPENJDK_PKG)
+	-gdebi --non-interactive /tmp/downloads/$(ELASTICSEARCH)
+#cp $(INSTALL_BASE)/ddr-public/conf/elasticsearch.yml /etc/elasticsearch/
+#chown root.root /etc/elasticsearch/elasticsearch.yml
+#chmod 644 /etc/elasticsearch/elasticsearch.yml
+# 	@echo "${bldgrn}search engine (re)start${txtrst}"
+	-service elasticsearch stop
+	-systemctl disable elasticsearch.service
+
+enable-elasticsearch:
+	systemctl enable elasticsearch.service
+
+disable-elasticsearch:
+	systemctl disable elasticsearch.service
+
+remove-elasticsearch:
+	apt-get --assume-yes remove $(OPENJDK_PKG) elasticsearch
+
 
 install-virtualenv:
 	@echo ""
@@ -454,22 +486,27 @@ git-status:
 # http://fpm.readthedocs.io/en/latest/
 # https://stackoverflow.com/questions/32094205/set-a-custom-install-directory-when-making-a-deb-package-with-fpm
 # https://brejoc.com/tag/fpm/
-deb:
+deb: deb-jessie deb-stretch
+
+# deb-jessie and deb-stretch are identical EXCEPT:
+# jessie: --depends openjdk-7-jre
+# stretch: --depends openjdk-8-jre
+deb-jessie:
 	@echo ""
-	@echo "FPM packaging ----------------------------------------------------------"
-	-rm -Rf $(FPM_FILE)
+	@echo "DEB packaging (jessie) -------------------------------------------------"
+	-rm -Rf $(DEB_FILE_JESSIE)
 	virtualenv --relocatable $(VIRTUALENV)  # Make venv relocatable
 	fpm   \
 	--verbose   \
 	--input-type dir   \
 	--output-type deb   \
-	--name $(FPM_NAME)   \
-	--version $(VERSION)   \
-	--package $(FPM_FILE)   \
+	--name $(DEB_NAME_JESSIE)   \
+	--version $(DEB_VERSION_JESSIE)   \
+	--package $(DEB_FILE_JESSIE)   \
 	--url "$(GIT_SOURCE_URL)"   \
-	--vendor "$(FPM_VENDOR)"   \
-	--maintainer "$(FPM_MAINTAINER)"   \
-	--description "$(FPM_DESCRIPTION)"   \
+	--vendor "$(DEB_VENDOR)"   \
+	--maintainer "$(DEB_MAINTAINER)"   \
+	--description "$(DEB_DESCRIPTION)"   \
 	--depends "imagemagick"   \
 	--depends "libxml2"   \
 	--depends "libxslt1.1"   \
@@ -485,14 +522,60 @@ deb:
 	--depends "supervisor"   \
 	--chdir $(INSTALLDIR)   \
 	conf/front.cfg=etc/encyc/front.cfg   \
-	conf=$(FPM_BASE)   \
-	COPYRIGHT=$(FPM_BASE)   \
-	front=$(FPM_BASE)   \
-	.git=$(FPM_BASE)   \
-	.gitignore=$(FPM_BASE)   \
-	INSTALL=$(FPM_BASE)   \
-	LICENSE=$(FPM_BASE)   \
-	Makefile=$(FPM_BASE)   \
-	README.rst=$(FPM_BASE)   \
-	venv=$(FPM_BASE)   \
-	VERSION=$(FPM_BASE)
+	conf=$(DEB_BASE)   \
+	COPYRIGHT=$(DEB_BASE)   \
+	front=$(DEB_BASE)   \
+	.git=$(DEB_BASE)   \
+	.gitignore=$(DEB_BASE)   \
+	INSTALL=$(DEB_BASE)   \
+	LICENSE=$(DEB_BASE)   \
+	Makefile=$(DEB_BASE)   \
+	README.rst=$(DEB_BASE)   \
+	venv=$(DEB_BASE)   \
+	VERSION=$(DEB_BASE)
+
+# deb-jessie and deb-stretch are identical EXCEPT:
+# jessie: --depends openjdk-7-jre
+# stretch: --depends openjdk-8-jre
+deb-stretch:
+	@echo ""
+	@echo "DEB packaging (stretch) ------------------------------------------------"
+	-rm -Rf $(DEB_FILE_STRETCH)
+	virtualenv --relocatable $(VIRTUALENV)  # Make venv relocatable
+	fpm   \
+	--verbose   \
+	--input-type dir   \
+	--output-type deb   \
+	--name $(DEB_NAME_STRETCH)   \
+	--version $(DEB_VERSION_STRETCH)   \
+	--package $(DEB_FILE_STRETCH)   \
+	--url "$(GIT_SOURCE_URL)"   \
+	--vendor "$(DEB_VENDOR)"   \
+	--maintainer "$(DEB_MAINTAINER)"   \
+	--description "$(DEB_DESCRIPTION)"   \
+	--depends "imagemagick"   \
+	--depends "libxml2"   \
+	--depends "libxslt1.1"   \
+	--depends "libxslt1-dev"   \
+	--depends "python-dev"   \
+	--depends "python-pip"   \
+	--depends "python-virtualenv"   \
+	--depends "sqlite3"   \
+	--depends "zlib1g-dev"   \
+	--depends "libjpeg62-turbo-dev"   \
+	--depends "nginx"   \
+	--depends "redis-server"   \
+	--depends "supervisor"   \
+	--chdir $(INSTALLDIR)   \
+	conf/front.cfg=etc/encyc/front.cfg   \
+	conf=$(DEB_BASE)   \
+	COPYRIGHT=$(DEB_BASE)   \
+	front=$(DEB_BASE)   \
+	.git=$(DEB_BASE)   \
+	.gitignore=$(DEB_BASE)   \
+	INSTALL=$(DEB_BASE)   \
+	LICENSE=$(DEB_BASE)   \
+	Makefile=$(DEB_BASE)   \
+	README.rst=$(DEB_BASE)   \
+	venv=$(DEB_BASE)   \
+	VERSION=$(DEB_BASE)

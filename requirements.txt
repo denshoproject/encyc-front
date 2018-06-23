@@ -10,7 +10,7 @@
                                    # LICENSE  Python3
 beautifulsoup4==4.6.0              # MIT      y
 django_nose
-django>=1.10,<1.11                 # MIT      y
+django>=1.11,<2.0                  # MIT      y
 django-redis==4.9.0                # BSD      y
 djangorestframework==3.4.0         # BSD      y
 elasticsearch==1.4.0               # Apache   y

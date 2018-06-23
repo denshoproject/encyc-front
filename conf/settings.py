@@ -180,14 +180,18 @@ DATABASES = {
     }
 }
 
+REDIS_HOST = '127.0.0.1'
+REDIS_PORT = '6379'
+REDIS_DB_CACHE = 0
+REDIS_DB_SORL = 3
+
 CACHES = {
     "default": {
-        #"BACKEND": "redis_cache.cache.RedisCache",
-        #"LOCATION": "127.0.0.1:6379:0",
-        #"OPTIONS": {
-        #    "CLIENT_CLASS": "redis_cache.client.DefaultClient",
-        #}
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "%s:%s:%s" % (REDIS_HOST, REDIS_PORT, REDIS_DB_CACHE),
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
     }
 }
 

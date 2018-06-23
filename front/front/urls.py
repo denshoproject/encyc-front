@@ -35,18 +35,18 @@ urlpatterns = [
     url(r'^api/0.1/$', front_api.index, name='front-api-index'),
     
     url(r'^crossdomain\.xml$', TemplateView.as_view(template_name='crossdomain.xml')),
-    url(r'^qr/$', TemplateView.as_view(template_name='qr.html'), name='qr'),
-    url(r'^robots\.txt$', TemplateView.as_view(template_name='robots.txt')),
+    url(r'^qr/$', TemplateView.as_view(template_name='front/qr.html'), name='qr'),
+    url(r'^robots\.txt$', TemplateView.as_view(template_name='front/robots.txt')),
     url(r'^sitemap\.xml$', sitemap_views.sitemap, {'sitemaps': sitemaps}),
     #
     url(r'^videotest/$', TemplateView.as_view(template_name='wikiprox/LVplusJWPlayer.html')),
     #
-    url(r'^about/editorsmessage/embed/$', TemplateView.as_view(template_name='editorsmessage-lightbox.html'), name='editorsmessageembed'),
-    url(r'^about/editorsmessage/$', TemplateView.as_view(template_name='editorsmessage.html'), name='editorsmessage'),
-    url(r'^about/$', TemplateView.as_view(template_name='about.html'), name='about'),
-    url(r'^history/$', TemplateView.as_view(template_name='history.html')),
-    url(r'^search/$', TemplateView.as_view(template_name='search.html')),
-    url(r'^terminology/$', TemplateView.as_view(template_name='terminology.html')),
+    url(r'^about/editorsmessage/embed/$', TemplateView.as_view(template_name='front/editorsmessage-lightbox.html'), name='editorsmessageembed'),
+    url(r'^about/editorsmessage/$', TemplateView.as_view(template_name='front/editorsmessage.html'), name='editorsmessage'),
+    url(r'^about/$', TemplateView.as_view(template_name='front/about.html'), name='about'),
+    url(r'^history/$', TemplateView.as_view(template_name='front/history.html')),
+    url(r'^search/$', TemplateView.as_view(template_name='front/search.html')),
+    url(r'^terminology/$', TemplateView.as_view(template_name='front/terminology.html')),
     #
     url(r'^timeline/$', events_views.events, name='events-events'),
     #
@@ -56,7 +56,7 @@ urlpatterns = [
     url(r'^map/$', locations_views.locations, name='locations-index'),
     #
     # temp cite functionality patch 2013-03-26 gf
-    url(r'^citehelp/$', TemplateView.as_view(template_name='citehelp.html'), name='citehelp'),
+    url(r'^citehelp/$', TemplateView.as_view(template_name='front/citehelp.html'), name='citehelp'),
     #
     url(r'^authors/$', wiki_views.authors, name='wikiprox-authors'),
     url(r'^categories/$', wiki_views.categories, name='wikiprox-categories'),

@@ -15,7 +15,7 @@ from wikiprox.models import NotFoundError
 
 
 @require_http_methods(['GET',])
-def index(request, template_name='index.html'):
+def index(request, template_name='front/index.html'):
     return render(request, template_name, {})
 
 def categories(request, template_name='wikiprox/categories.html'):

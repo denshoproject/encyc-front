@@ -231,6 +231,7 @@ INSTALLED_APPS = (
     'rest_framework',
     'sorl.thumbnail',
     #
+    'front',
     'events',
     'locations',
     'wikiprox',

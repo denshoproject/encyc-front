@@ -532,6 +532,7 @@ deb-jessie:
 	Makefile=$(DEB_BASE)   \
 	README.rst=$(DEB_BASE)   \
 	venv=$(DEB_BASE)   \
+	venv/front/lib/python2.7/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
 	VERSION=$(DEB_BASE)
 
 # deb-jessie and deb-stretch are identical EXCEPT:
@@ -578,4 +579,5 @@ deb-stretch:
 	Makefile=$(DEB_BASE)   \
 	README.rst=$(DEB_BASE)   \
 	venv=$(DEB_BASE)   \
+	venv/front/lib/python2.7/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
 	VERSION=$(DEB_BASE)

@@ -46,12 +46,11 @@ def ddrobject( page, obj ):
     """DDR object in sidebar
     """
     t = template.loader.get_template('wikiprox/ddr-object.html')
-    c = template.Context({
+    return t.render({
         'page': page,
         'object': obj,
         'MEDIA_URL': settings.MEDIA_URL,
         'DDR_MEDIA_URL': settings.DDR_MEDIA_URL,
     })
-    return t.render(c).strip()
 
 register.simple_tag(ddrobject)

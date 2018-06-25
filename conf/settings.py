@@ -34,7 +34,6 @@ if not configs_read:
 
 DEBUG = config.getboolean('debug', 'debug')
 GITPKG_DEBUG = config.getboolean('debug', 'gitpkg_debug')
-TEMPLATE_DEBUG = DEBUG
 THUMBNAIL_DEBUG = config.getboolean('debug', 'thumbnail')
 
 if GITPKG_DEBUG:
@@ -181,14 +180,18 @@ DATABASES = {
     }
 }
 
+REDIS_HOST = '127.0.0.1'
+REDIS_PORT = '6379'
+REDIS_DB_CACHE = 0
+REDIS_DB_SORL = 3
+
 CACHES = {
     "default": {
-#        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
-        "BACKEND": "redis_cache.cache.RedisCache",
-        "LOCATION": "127.0.0.1:6379:0",
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "%s:%s:%s" % (REDIS_HOST, REDIS_PORT, REDIS_DB_CACHE),
         "OPTIONS": {
-            "CLIENT_CLASS": "redis_cache.client.DefaultClient",
-        }
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
     }
 }
 
@@ -202,15 +205,27 @@ CACHE_TIMEOUT = 60 * 5
 STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 MEDIA_ROOT = '/var/www/html/front/media/'
 
-TEMPLATE_DIRS = (
-    os.path.join(BASE_DIR, 'templates/'),
-    os.path.join(BASE_DIR, 'wikiprox/templates/'),
-)
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                #'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+                'wikiprox.context_processors.sitewide',
+            ],
+        },
+    },
+]
 
 INSTALLED_APPS = (
     #'django.contrib.admin',
-    #'django.contrib.auth',
-    #'django.contrib.contenttypes',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
     #'django.contrib.sessions',
     'django.contrib.sitemaps',
     'django.contrib.sites',
@@ -221,6 +236,7 @@ INSTALLED_APPS = (
     'rest_framework',
     'sorl.thumbnail',
     #
+    'front',
     'events',
     'locations',
     'wikiprox',
@@ -258,17 +274,6 @@ THUMBNAIL_URL_TIMEOUT = 60  # 1min
 ##    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 #)
 
-TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-#     'django.template.loaders.eggs.Loader',
-)
-
-TEMPLATE_CONTEXT_PROCESSORS = (
-    'django.core.context_processors.request',
-    'context_processors.sitewide',
-)
-
 MIDDLEWARE_CLASSES = (
     'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -301,7 +306,7 @@ LOGGING = {
     'handlers': {
         'null': {
             'level': 'DEBUG',
-            'class': 'django.utils.log.NullHandler',
+            'class': 'logging.NullHandler',
         },
         'console':{
             'level': 'DEBUG',

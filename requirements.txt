@@ -1,0 +1,27 @@
+# Third-party libs and Django apps used by front
+# Install using pip: http://pip.openplans.org/
+# File format: http://pip.openplans.org/requirement-format.html
+
+# Non-Python dependencies
+# sudo apt-get install imagemagick libjpeg8-dev python2.7 redis-server supervisor
+# sudo apt-get install libxml2 libxslt1.1 libxslt1-dev python-dev
+
+
+                                   # LICENSE  Python3
+beautifulsoup4==4.6.0              # MIT      y
+django_nose
+django>=1.11,<2.0                  # MIT      y
+django-redis==4.9.0                # BSD      y
+djangorestframework>=3.6.0,<3.7    # BSD      y
+coreapi==2.3.3                     # BSD      y
+coreapi-cli==1.0.9                 # BSD      y
+elasticsearch==1.4.0               # Apache   y
+elasticsearch-dsl==0.0.4           # Apache   y
+gunicorn==19.8.1                   # MIT      y
+lxml==4.2.2                        # BSD      y
+pykml==0.1.3                       # BSD      ???
+redis==2.10.6                      # MIT      y
+requests==2.19.1                   # Apache2  y
+sorl-thumbnail==12.4.1             # BSD      y
+
+bpython

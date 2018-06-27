@@ -266,7 +266,7 @@ endif
 
 # virtualenv
 	source $(VIRTUALENV)/bin/activate; \
-	pip install -U --download-cache=$(PIP_CACHE_DIR) -r $(INSTALLDIR)/front/requirements/production.txt
+	pip install -U --download-cache=$(PIP_CACHE_DIR) -r $(INSTALLDIR)/requirements.txt
 # log dir
 	-mkdir /var/log/encyc
 	chown -R encyc.root /var/log/encyc
@@ -298,12 +298,12 @@ update-encyc-front:
 	@echo "encyc-front --------------------------------------------------------------"
 	git fetch && git pull
 	source $(VIRTUALENV)/bin/activate; \
-	pip install -U --download-cache=$(PIP_CACHE_DIR) -r $(INSTALLDIR)/front/requirements/production.txt
+	pip install -U --download-cache=$(PIP_CACHE_DIR) -r $(INSTALLDIR)/requirements.txt
 
 uninstall-encyc-front:
 	cd $(INSTALLDIR)/front
 	source $(VIRTUALENV)/bin/activate; \
-	-pip uninstall -r $(INSTALLDIR)/front/requirements/production.txt
+	-pip uninstall -r $(INSTALLDIR)/requirements.txt
 	-rm /usr/local/lib/python2.7/dist-packages/front-*
 	-rm -Rf /usr/local/lib/python2.7/dist-packages/front
 
@@ -532,6 +532,7 @@ deb-jessie:
 	Makefile=$(DEB_BASE)   \
 	README.rst=$(DEB_BASE)   \
 	venv=$(DEB_BASE)   \
+	venv/front/lib/python2.7/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
 	VERSION=$(DEB_BASE)
 
 # deb-jessie and deb-stretch are identical EXCEPT:
@@ -578,4 +579,5 @@ deb-stretch:
 	Makefile=$(DEB_BASE)   \
 	README.rst=$(DEB_BASE)   \
 	venv=$(DEB_BASE)   \
+	venv/front/lib/python2.7/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
 	VERSION=$(DEB_BASE)

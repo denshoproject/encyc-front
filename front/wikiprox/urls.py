@@ -4,13 +4,12 @@ from django.http import HttpResponseRedirect
 
 from wikiprox import views
 
-urlpatterns = patterns(
-    '',
+urlpatterns = [
     url(r"^index.php/(?P<page>[\w\W]+)/$", views.page, name='wikiprox-page'),
     url(r"^(?P<page>[\w\W]+)/$", views.page, name='wikiprox-page'),
     #
     url(r'^$', lambda x: HttpResponseRedirect('/wiki/%s' % settings.MEDIAWIKI_DEFAULT_PAGE)),
-)
+]
 
 # problematic page titles
 # period, comma, hyphen, parentheses, slash, single-quote/apostrophe

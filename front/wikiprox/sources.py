@@ -7,7 +7,7 @@ import requests
 from django.conf import settings
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
-from django.template import loader, Context
+from django.template import loader
 
 from wikiprox import make_cache_key
 
@@ -65,9 +65,7 @@ def format_primary_source(source, lightbox=False):
         context['xy'] = xy
         context['xyms'] = xyms
     # render
-    t = loader.get_template(template)
-    c = Context(context)
-    return t.render(c)
+    return loader.get_template(template).render(context)
 
 def replace_source_urls(sources, request):
     """rewrite sources URLs to point to stage domain:port

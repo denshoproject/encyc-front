@@ -50,8 +50,8 @@ urlpatterns = [
     #
     url(r'^timeline/$', events_views.events, name='events-events'),
     #
-    url(r'^locations-(?P<category>[\w]+).kml$', locations_views.locations_kml, name='locations-kml-category'),
-    url(r'^locations.kml$', locations_views.locations_kml, name='locations-kml'),
+    #url(r'^locations-(?P<category>[\w]+).kml$', locations_views.locations_kml, name='locations-kml-category'),
+    #url(r'^locations.kml$', locations_views.locations_kml, name='locations-kml'),
     url(r'^map/(?P<category>[\w]+)/$', locations_views.locations, name='locations-category'),
     url(r'^map/$', locations_views.locations, name='locations-index'),
     #

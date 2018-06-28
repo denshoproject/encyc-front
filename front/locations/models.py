@@ -13,25 +13,25 @@ from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.db import models
 
-from locations import backend as loc
+#from locations import backend as loc
 
 
 
-def index_locations():
-    """
-    @param title: str
-    """
-    try:
-        locations = loc.locations()
-        categories = loc.categories(locations)
-        timeout = False
-    except requests.exceptions.Timeout:
-        locations = []
-        categories = []
-        timeout = True
-
-    for category in categories:
-        pass
+#def index_locations():
+#    """
+#    @param title: str
+#    """
+#    try:
+#        locations = loc.locations()
+#        categories = loc.categories(locations)
+#        timeout = False
+#    except requests.exceptions.Timeout:
+#        locations = []
+#        categories = []
+#        timeout = True
+# 
+#    for category in categories:
+#        pass
 
 
             

@@ -4,7 +4,7 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import render
 
-from locations import backend as loc
+#from locations import backend as loc
 
 
 def locations(request, category=None, template_name='locations/locations.html'):
@@ -22,11 +22,11 @@ def locations(request, category=None, template_name='locations/locations.html'):
         'timeout': timeout,
     })
 
-def locations_kml(request, category=None):
-    try:
-        locations = loc.locations()
-    except requests.exceptions.Timeout:
-        return HttpResponse(status=408)
-    locations = loc.filter_by_category(locations, category)
-    kml = loc.kml(locations)
-    return HttpResponse(kml, content_type="text/xml")
+#def locations_kml(request, category=None):
+#    try:
+#        locations = loc.locations()
+#    except requests.exceptions.Timeout:
+#        return HttpResponse(status=408)
+#    locations = loc.filter_by_category(locations, category)
+#    kml = loc.kml(locations)
+#    return HttpResponse(kml, content_type="text/xml")

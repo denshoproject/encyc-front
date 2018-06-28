@@ -38,7 +38,7 @@ class MediaWikiFunctions(TestCase):
     """Test various MediaWiki functions.
     """
     pagedata = sample_data.pagedata_Amache_20120829
-    soup = BeautifulSoup(pagedata['parse']['text']['*'].replace('<p><br />\n</p>',''))
+    soup = BeautifulSoup(pagedata['parse']['text']['*'].replace('<p><br />\n</p>',''), 'html.parser')
 
     def test_page_is_published(self):
         self.assertEqual(True, mw.page_is_published(self.pagedata))

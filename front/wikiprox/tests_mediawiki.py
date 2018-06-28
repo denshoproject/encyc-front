@@ -7,7 +7,7 @@ import mediawiki
 def _runsoup(function, text):
     """Load text into BeautifulSoup, run function on it, dump to HTML, return result
     """
-    soup0 = BeautifulSoup(text)
+    soup0 = BeautifulSoup(text, 'html.parser')
     soup1 = function(soup0)
     return mediawiki.rm_tags(unicode(soup1))
 
@@ -182,7 +182,7 @@ def test_remove_primary_sources():
         {'encyclopedia_id': 'en-denshopd-i37-00239-1'},
         {'encyclopedia_id': 'en-denshovh-ffrank-01-0025-1'},
     ]
-    soup0 = BeautifulSoup(RM_PRIMARY_SOURCES_in0)
+    soup0 = BeautifulSoup(RM_PRIMARY_SOURCES_in0, 'html.parser')
     soup0 = mediawiki.remove_primary_sources(soup0, sources0)
     result0 = mediawiki.rm_tags(unicode(soup0))
     assert result0 == RM_PRIMARY_SOURCES_out0

@@ -73,7 +73,7 @@ def parse_mediawiki_text(text, primary_sources, public=False, printed=False):
     @param printed: Boolean
     @returns: html, list of primary sources
     """
-    soup = BeautifulSoup(text.replace('<p><br />\n</p>',''))
+    soup = BeautifulSoup(text.replace('<p><br />\n</p>','', 'html.parser')
     soup = remove_staticpage_titles(soup)
     soup = remove_comments(soup)
     soup = remove_edit_links(soup)
@@ -382,7 +382,10 @@ def find_author_info(text):
     @returns: dict of authors
     """
     authors = {'display':[], 'parsed':[],}
-    soup = BeautifulSoup(text.replace('<p><br />\n</p>',''))
+    soup = BeautifulSoup(
+        text.replace('<p><br />\n</p>',''),
+        'html.parser'
+    )
     for byline in soup.find_all('div', id='authorByline'):
         for a in byline.find_all('a'):
             if hasattr(a,'contents') and a.contents:

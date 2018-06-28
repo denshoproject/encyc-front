@@ -177,7 +177,7 @@ apt-upgrade:
 	apt-get --assume-yes upgrade
 
 install-core:
-	apt-get --assume-yes install bzip2 curl gdebi-core git-core logrotate ntp p7zip-full wget
+	apt-get --assume-yes install bzip2 curl gdebi-core git-core logrotate ntp p7zip-full wget python3
 
 git-config:
 	git config --global alias.st status
@@ -233,14 +233,14 @@ install-virtualenv:
 	@echo ""
 	@echo "install-virtualenv -----------------------------------------------------"
 	apt-get --assume-yes install python-pip python-virtualenv
-	test -d $(VIRTUALENV) || virtualenv --distribute --setuptools $(VIRTUALENV)
+	test -d $(VIRTUALENV) || virtualenv --python=python3 --distribute --setuptools $(VIRTUALENV)
 
 install-setuptools: install-virtualenv
 	@echo ""
 	@echo "install-setuptools -----------------------------------------------------"
 	apt-get --assume-yes install python-dev
 	source $(VIRTUALENV)/bin/activate; \
-	pip install -U setuptools
+	pip3 install -U setuptools
 
 
 install-app: install-virtualenv install-setuptools install-encyc-front
@@ -266,7 +266,7 @@ endif
 
 # virtualenv
 	source $(VIRTUALENV)/bin/activate; \
-	pip install -U --download-cache=$(PIP_CACHE_DIR) -r $(INSTALLDIR)/requirements.txt
+	pip3 install -U --download-cache=$(PIP_CACHE_DIR) -r $(INSTALLDIR)/requirements.txt
 # log dir
 	-mkdir /var/log/encyc
 	chown -R encyc.root /var/log/encyc
@@ -298,14 +298,14 @@ update-encyc-front:
 	@echo "encyc-front --------------------------------------------------------------"
 	git fetch && git pull
 	source $(VIRTUALENV)/bin/activate; \
-	pip install -U --download-cache=$(PIP_CACHE_DIR) -r $(INSTALLDIR)/requirements.txt
+	pip3 install -U --download-cache=$(PIP_CACHE_DIR) -r $(INSTALLDIR)/requirements.txt
 
 uninstall-encyc-front:
 	cd $(INSTALLDIR)/front
 	source $(VIRTUALENV)/bin/activate; \
-	-pip uninstall -r $(INSTALLDIR)/requirements.txt
-	-rm /usr/local/lib/python2.7/dist-packages/front-*
-	-rm -Rf /usr/local/lib/python2.7/dist-packages/front
+	-pip3 uninstall -r $(INSTALLDIR)/requirements.txt
+	-rm /usr/local/lib/python3.4/dist-packages/front-*
+	-rm -Rf /usr/local/lib/python3.4/dist-packages/front
 
 restart-front:
 	/etc/init.d/supervisor restart front
@@ -495,7 +495,7 @@ deb-jessie:
 	@echo ""
 	@echo "DEB packaging (jessie) -------------------------------------------------"
 	-rm -Rf $(DEB_FILE_JESSIE)
-	virtualenv --relocatable $(VIRTUALENV)  # Make venv relocatable
+	virtualenv --python=python3 --relocatable $(VIRTUALENV)  # Make venv relocatable
 	fpm   \
 	--verbose   \
 	--input-type dir   \
@@ -511,6 +511,7 @@ deb-jessie:
 	--depends "libxml2"   \
 	--depends "libxslt1.1"   \
 	--depends "libxslt1-dev"   \
+	--depends "python3"   \
 	--depends "python-dev"   \
 	--depends "python-pip"   \
 	--depends "python-virtualenv"   \
@@ -532,7 +533,7 @@ deb-jessie:
 	Makefile=$(DEB_BASE)   \
 	README.rst=$(DEB_BASE)   \
 	venv=$(DEB_BASE)   \
-	venv/front/lib/python2.7/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
+	venv/front/lib/python3.4/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
 	VERSION=$(DEB_BASE)
 
 # deb-jessie and deb-stretch are identical EXCEPT:
@@ -542,7 +543,7 @@ deb-stretch:
 	@echo ""
 	@echo "DEB packaging (stretch) ------------------------------------------------"
 	-rm -Rf $(DEB_FILE_STRETCH)
-	virtualenv --relocatable $(VIRTUALENV)  # Make venv relocatable
+	virtualenv --python=python3 --relocatable $(VIRTUALENV)  # Make venv relocatable
 	fpm   \
 	--verbose   \
 	--input-type dir   \
@@ -558,6 +559,7 @@ deb-stretch:
 	--depends "libxml2"   \
 	--depends "libxslt1.1"   \
 	--depends "libxslt1-dev"   \
+	--depends "python3"   \
 	--depends "python-dev"   \
 	--depends "python-pip"   \
 	--depends "python-virtualenv"   \
@@ -579,5 +581,5 @@ deb-stretch:
 	Makefile=$(DEB_BASE)   \
 	README.rst=$(DEB_BASE)   \
 	venv=$(DEB_BASE)   \
-	venv/front/lib/python2.7/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
+	venv/front/lib/python3.4/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
 	VERSION=$(DEB_BASE)

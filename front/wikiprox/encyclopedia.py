@@ -3,7 +3,7 @@ import json
 import logging
 logger = logging.getLogger(__name__)
 from operator import itemgetter
-from urlparse import urlparse
+from urllib.parse import urlparse
 
 from bs4 import BeautifulSoup
 import requests

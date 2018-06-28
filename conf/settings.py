@@ -8,7 +8,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.6/ref/settings/
 """
 
-import ConfigParser
+import configparser
 import os
 import subprocess
 import sys
@@ -25,7 +25,7 @@ CONFIG_FILES = [
     '/etc/encyc/front.cfg',
     '/etc/encyc/front-local.cfg'
 ]
-config = ConfigParser.ConfigParser()
+config = configparser.ConfigParser()
 configs_read = config.read(CONFIG_FILES)
 if not configs_read:
     raise Exception('No config file!')

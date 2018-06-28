@@ -46,7 +46,7 @@ Add this to `/etc/crontab`:
 """
 
 import argparse
-import ConfigParser
+import configparser
 from datetime import datetime
 import os
 import subprocess
@@ -245,7 +245,7 @@ def main():
     )
     args = parser.parse_args()
     
-    config = ConfigParser.ConfigParser()
+    config = configparser.ConfigParser()
     configs_read = config.read(CONFIG_FILES)
     if not configs_read:
         raise Exception('No config file!')

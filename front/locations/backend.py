@@ -1,8 +1,6 @@
 from datetime import datetime
 import json
 
-from lxml import etree
-from pykml.factory import KML_ElementMaker as KML
 import requests
 
 from django.conf import settings
@@ -53,37 +51,3 @@ def filter_by_category(locations, category=None):
                 filtered.append(l)
         return filtered
     return locations
-
-def kml(locations):
-    """KML file for the locations
-    """
-    # create document
-    document = KML.kml(KML.Document(KML.name("Layer example")))
-    # bullets
-    for layer_code,layer_name in categories(locations):
-        style = KML.Style(
-            KML.IconStyle(
-                KML.scale(1.0),
-                KML.Icon(
-                    KML.href('%slocations/%s.png' % (settings.MEDIA_URL, layer_code)),
-                ),
-                id='icon-%s' % layer_code
-            ),
-            id=layer_code
-        )
-        document.append(style)
-    # locations
-    folder = KML.Folder()
-    for location in locations:
-        placemark = KML.Placemark(
-            KML.name(location['title']),
-            KML.description('<![CDATA[ %s ]]>' % location['description']),
-            KML.styleUrl('#%s' % location['category']),
-            KML.Point(
-                KML.coordinates(','.join([location['lng'],location['lat']]))
-                ),
-            )
-        folder.append(placemark)
-    document.append(folder)
-    # rettsugo!
-    return etree.tostring(document)

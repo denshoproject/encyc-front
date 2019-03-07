@@ -9,7 +9,7 @@ def _runsoup(function, text):
     """
     soup0 = BeautifulSoup(text, 'html.parser')
     soup1 = function(soup0)
-    return mediawiki.rm_tags(unicode(soup1))
+    return mediawiki.rm_tags(str(soup1))
 
 
 def test_page_data_url():
@@ -184,7 +184,7 @@ def test_remove_primary_sources():
     ]
     soup0 = BeautifulSoup(RM_PRIMARY_SOURCES_in0, 'html.parser')
     soup0 = mediawiki.remove_primary_sources(soup0, sources0)
-    result0 = mediawiki.rm_tags(unicode(soup0))
+    result0 = mediawiki.rm_tags(str(soup0))
     assert result0 == RM_PRIMARY_SOURCES_out0
 
 

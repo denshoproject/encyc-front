@@ -10,7 +10,7 @@ class Item(object):
     location = ''
     timestamp = None
     
-    def unicode(self):
+    def str(self):
         self.title
     
     def get_absolute_url(self):

@@ -50,12 +50,12 @@ class MediaWikiFunctions(TestCase):
 
     def test_remove_staticpage_titles(self):
         soup = mw.remove_staticpage_titles(self.soup)
-        html = unicode(soup)
+        html = str(soup)
         self.assertEqual(-1, html.find('<h1>'))
 
     def test_remove_edit_links(self):
         soup = mw.remove_edit_links(self.soup)
-        html = unicode(soup)
+        html = str(soup)
         self.assertEqual(-1, html.find('editsection'))
     
     def test_wrap_sections(self):
@@ -63,17 +63,17 @@ class MediaWikiFunctions(TestCase):
 
     def test_remove_status_markers(self):
         soup = mw.remove_status_markers(self.soup)
-        html = unicode(soup)
+        html = str(soup)
         self.assertEqual(-1, html.find('class="alert'))
 
     def test_rewrite_mediawiki_urls(self):
         soup = mw.rewrite_mediawiki_urls(self.soup)
-        html = unicode(soup)
+        html = str(soup)
         self.assertEqual(-1, html.find('/mediawiki/index.php'))
 
     def test_rewrite_newpage_links(self):
         soup = mw.rewrite_newpage_links(self.soup)
-        html = unicode(soup)
+        html = str(soup)
         self.assertEqual(-1, html.find('&action=edit'))
         self.assertEqual(-1, html.find('&redlink=1'))
     
@@ -90,7 +90,7 @@ class MediaWikiFunctions(TestCase):
         images = self.pagedata['parse']['images']
         primary_sources = mw.find_primary_sources(images)
         soup = mw.remove_primary_sources(self.soup, primary_sources)
-        html = unicode(soup)
+        html = str(soup)
         self.assertEqual(-1, html.find('class="image"'))
     
     def test_find_databoxcamps_coordinates(self):

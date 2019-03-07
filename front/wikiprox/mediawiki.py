@@ -84,7 +84,7 @@ def parse_mediawiki_text(text, primary_sources, public=False, printed=False):
     if not printed:
         soup = add_top_links(soup)
     soup = remove_primary_sources(soup, primary_sources)
-    html = unicode(soup)
+    html = str(soup)
     html = rewrite_mediawiki_urls(html)
     html = rm_tags(html)
     return html

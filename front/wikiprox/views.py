@@ -9,9 +9,7 @@ from django.shortcuts import redirect, render
 from django.views.decorators.http import require_http_methods
 
 from wikiprox import ddr
-from wikiprox.models import Elasticsearch as Backend
-from wikiprox.models import Page, Source, Author, Citation
-from wikiprox.models import NotFoundError
+from wikiprox.models import elastic as models
 
 
 @require_http_methods(['GET',])
@@ -20,24 +18,24 @@ def index(request, template_name='front/index.html'):
 
 def categories(request, template_name='wikiprox/categories.html'):
     return render(request, template_name, {
-        'articles_by_category': Page.pages_by_category(),
+        'articles_by_category': models.Page.pages_by_category(),
     })
 
 def contents(request, template_name='wikiprox/contents.html'):
     return render(request,  template_name, {
-        'articles': Page.pages(),
+        'articles': models.Page.pages(),
     })
 
 def authors(request, template_name='wikiprox/authors.html'):
     return render(request, template_name, {
-        'authors': Author.authors(num_columns=4),
+        'authors': models.Author.authors(num_columns=4),
     })
 
 def author(request, url_title, template_name='wikiprox/author.html'):
     try:
-        author = Author.get(url_title)
+        author = models.Author.get(url_title)
         author.scrub()
-    except NotFoundError:
+    except models.NotFoundError:
         raise Http404
     return render(request, template_name, {
         'author': author,
@@ -49,19 +47,19 @@ def article(request, url_title='index', printed=False, template_name='wikiprox/p
     """
     alt_title = url_title.replace('_', ' ')
     try:
-        page = Page.get(url_title)
+        page = models.Page.get(url_title)
         page.scrub()
-    except NotFoundError:
+    except models.NotFoundError:
         page = None
     if not page:
         try:
-            page = Page.get(alt_title)
+            page = models.Page.get(alt_title)
             page.scrub()
-        except NotFoundError:
+        except models.NotFoundError:
             page = None
     if not page:
         # might be an author
-        author_titles = [author.title for author in Author.authors()]
+        author_titles = [author.title for author in models.Author.authors()]
         if url_title in author_titles:
             return HttpResponseRedirect(reverse('wikiprox-author', args=[url_title]))
         elif alt_title in author_titles:
@@ -106,8 +104,8 @@ def article(request, url_title='index', printed=False, template_name='wikiprox/p
 @require_http_methods(['GET',])
 def source(request, encyclopedia_id, template_name='wikiprox/source.html'):
     try:
-        source = Source.get(encyclopedia_id)
-    except NotFoundError:
+        source = models.Source.get(encyclopedia_id)
+    except models.NotFoundError:
         raise Http404
     return render(request, template_name, {
         'source': source,
@@ -119,12 +117,12 @@ def source(request, encyclopedia_id, template_name='wikiprox/source.html'):
 @require_http_methods(['GET',])
 def page_cite(request, url_title, template_name='wikiprox/cite.html'):
     try:
-        page = Page.get(url_title)
-    except NotFoundError:
+        page = models.Page.get(url_title)
+    except models.NotFoundError:
         raise Http404
     if (not page.published) and (not settings.MEDIAWIKI_SHOW_UNPUBLISHED):
         raise Http404
-    citation = Citation(page, request)
+    citation = models.Citation(page, request)
     return render(request, template_name, {
         'citation': citation,
     })
@@ -133,9 +131,9 @@ def page_cite(request, url_title, template_name='wikiprox/cite.html'):
 def source_cite(request, encyclopedia_id, template_name='wikiprox/cite.html'):
     try:
         source = Source.get(encyclopedia_id)
-    except NotFoundError:
+    except models.NotFoundError:
         raise Http404
-    citation = Citation(source, request)
+    citation = models.Citation(source, request)
     return render(request, template_name, {
         'citation': citation,
     })
@@ -145,8 +143,8 @@ def related_ddr(request, url_title='index', template_name='wikiprox/related-ddr.
     """List of topic terms and DDR objects relating to page
     """
     try:
-        page = Page.get(url_title)
-    except NotFoundError:
+        page = models.Page.get(url_title)
+    except models.NotFoundError:
         raise Http404
     # show small number of objects, distributed among topics
     TOTAL_OBJECTS = 10

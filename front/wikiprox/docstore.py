@@ -9,14 +9,14 @@ INDEX = 'encyc-dev'
 #docstore.delete_index(HOSTS, INDEX)
 #docstore.create_index(HOSTS, INDEX)
 
-from wikiprox import models
-models.Elasticsearch.update_all()
+from wikiprox.models import elastic
+elastic.Elasticsearch.update_all()
 
 IMPORTANT: To get links with DDR, make sure you upload vocab topics to this ES database.
 
 path = '/var/www/media/ddr/ddr/vocab/topics.json'
-from wikiprox import models
-models.Elasticsearch.index_topics(path)
+from wikiprox.models import elastic
+elastic.Elasticsearch.index_topics(path)
 
 ------------------------------------------------------------------------
 """

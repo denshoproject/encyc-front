@@ -63,7 +63,7 @@ def _balance(results, size):
     limit = min([size, len(results.keys())])
     round1 = []
     while(len(round1) < limit):
-        for tid in results.iterkeys():
+        for tid in results.keys():
             doc = None
             if results[tid]:
                 doc = results[tid].pop()

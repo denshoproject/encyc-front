@@ -295,7 +295,7 @@ class Proxy(object):
         source.uri = reverse('wikiprox-source', args=[encyclopedia_id])
         source.title = encyclopedia_id
         data = sources.source(encyclopedia_id)
-        for key,val in data.iteritems():
+        for key,val in data.items():
             setattr(source, key, val)
         source.psms_id = int(data['id'])
         source.original_size = int(data['original_size'])
@@ -429,7 +429,7 @@ class Elasticsearch(object):
             url_title
         )
         author = Author()
-        for key,val in results['_source'].iteritems():
+        for key,val in results['_source'].items():
             setattr(author, key, val)
         return author
 
@@ -441,7 +441,7 @@ class Elasticsearch(object):
         if not results:
             return None
         page = Page()
-        for key,val in results['_source'].iteritems():
+        for key,val in results['_source'].items():
             setattr(page, key, val)
         # remove page elements for internal editorial use only
         categories = [
@@ -458,7 +458,7 @@ class Elasticsearch(object):
         #)
         #for doc in results['docs']:
         #    source = Source()
-        #    for key,val in doc['_source'].iteritems():
+        #    for key,val in doc['_source'].items():
         #        setattr(source, key, val)
         #    sources.append(source)
         #page.sources = sources
@@ -507,7 +507,7 @@ class Elasticsearch(object):
             encyclopedia_id
         )
         source = Source()
-        for key,val in results['_source'].iteritems():
+        for key,val in results['_source'].items():
             setattr(source, key, val)
         return source
 

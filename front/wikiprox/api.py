@@ -121,7 +121,7 @@ def category(request, category, format=None):
     """DOCUMENTATION GOES HERE.
     """
     #categories = models.Backend().categories()
-    #articles_by_category = [(key,val) for key,val in categories.iteritems()]
+    #articles_by_category = [(key,val) for key,val in categories.items()]
     assert False
     data = {}
     return Response(data)

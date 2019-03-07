@@ -365,7 +365,7 @@ class Page(DocType):
         for t in Elasticsearch.topics_by_url().get(self.absolute_url(), []):
             term = {
                 key: val
-                for key,val in t.iteritems()
+                for key,val in t.items()
             }
             term.pop('encyc_urls')
             term['ddr_topic_url'] = '%s/%s/' % (

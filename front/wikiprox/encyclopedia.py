@@ -292,7 +292,7 @@ def namespaces_reversed():
     """
     nspaces = {}
     namespaces_codes = namespaces()
-    for key,val in namespaces_codes.iteritems():
+    for key,val in namespaces_codes.items():
         nspaces[val] = key
     return nspaces
 

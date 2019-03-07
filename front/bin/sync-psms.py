@@ -105,7 +105,7 @@ def separate_files_dirs(raw):
         info = parse_rsync_line(line)
         if info and (isinstance(info, dict)):
             files.append(info)
-        elif info and (isinstance(info, basestring)):
+        elif info and (isinstance(info, str)):
             dirs.append(info)
     return files,dirs
 

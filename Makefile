@@ -6,6 +6,8 @@ SHELL = /bin/bash
 APP_VERSION := $(shell cat VERSION)
 GIT_SOURCE_URL=https://github.com/densho/encyc-front
 
+PYTHON_VERSION=python3.5
+
 # Release name e.g. jessie
 DEBIAN_CODENAME := $(shell lsb_release -sc)
 # Release numbers e.g. 8.10
@@ -304,8 +306,8 @@ uninstall-encyc-front:
 	cd $(INSTALLDIR)/front
 	source $(VIRTUALENV)/bin/activate; \
 	-pip3 uninstall -r $(INSTALLDIR)/requirements.txt
-	-rm /usr/local/lib/python3.4/dist-packages/front-*
-	-rm -Rf /usr/local/lib/python3.4/dist-packages/front
+	-rm /usr/local/lib/$(PYTHON_VERSION)/dist-packages/front-*
+	-rm -Rf /usr/local/lib/$(PYTHON_VERSION)/dist-packages/front
 
 restart-front:
 	/etc/init.d/supervisor restart front
@@ -533,7 +535,7 @@ deb-jessie:
 	Makefile=$(DEB_BASE)   \
 	README.rst=$(DEB_BASE)   \
 	venv=$(DEB_BASE)   \
-	venv/front/lib/python3.4/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
+	venv/front/lib/$(PYTHON_VERSION)/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
 	VERSION=$(DEB_BASE)
 
 # deb-jessie and deb-stretch are identical EXCEPT:
@@ -581,5 +583,5 @@ deb-stretch:
 	Makefile=$(DEB_BASE)   \
 	README.rst=$(DEB_BASE)   \
 	venv=$(DEB_BASE)   \
-	venv/front/lib/python3.4/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
+	venv/front/lib/$(PYTHON_VERSION)/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
 	VERSION=$(DEB_BASE)

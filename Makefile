@@ -265,7 +265,7 @@ endif
 
 # virtualenv
 	source $(VIRTUALENV)/bin/activate; \
-	pip install -U --download-cache=$(PIP_CACHE_DIR) -r $(INSTALLDIR)/requirements.txt
+	pip install -U -r $(INSTALLDIR)/requirements.txt
 # log dir
 	-mkdir /var/log/encyc
 	chown -R encyc.root /var/log/encyc
@@ -297,7 +297,7 @@ update-encyc-front:
 	@echo "encyc-front --------------------------------------------------------------"
 	git fetch && git pull
 	source $(VIRTUALENV)/bin/activate; \
-	pip install -U --download-cache=$(PIP_CACHE_DIR) -r $(INSTALLDIR)/requirements.txt
+	pip install -U -r $(INSTALLDIR)/requirements.txt
 
 uninstall-encyc-front:
 	cd $(INSTALLDIR)/front
@@ -485,54 +485,7 @@ git-status:
 # http://fpm.readthedocs.io/en/latest/
 # https://stackoverflow.com/questions/32094205/set-a-custom-install-directory-when-making-a-deb-package-with-fpm
 # https://brejoc.com/tag/fpm/
-deb: deb-jessie deb-stretch
-
-# deb-jessie and deb-stretch are identical EXCEPT:
-# jessie: --depends openjdk-7-jre
-# stretch: --depends openjdk-8-jre
-deb-jessie:
-	@echo ""
-	@echo "DEB packaging (jessie) -------------------------------------------------"
-	-rm -Rf $(DEB_FILE_JESSIE)
-	virtualenv --relocatable $(VIRTUALENV)  # Make venv relocatable
-	fpm   \
-	--verbose   \
-	--input-type dir   \
-	--output-type deb   \
-	--name $(DEB_NAME_JESSIE)   \
-	--version $(DEB_VERSION_JESSIE)   \
-	--package $(DEB_FILE_JESSIE)   \
-	--url "$(GIT_SOURCE_URL)"   \
-	--vendor "$(DEB_VENDOR)"   \
-	--maintainer "$(DEB_MAINTAINER)"   \
-	--description "$(DEB_DESCRIPTION)"   \
-	--depends "imagemagick"   \
-	--depends "libxml2"   \
-	--depends "libxslt1.1"   \
-	--depends "libxslt1-dev"   \
-	--depends "python-dev"   \
-	--depends "python-pip"   \
-	--depends "python-virtualenv"   \
-	--depends "sqlite3"   \
-	--depends "zlib1g-dev"   \
-	--depends "libjpeg62-turbo-dev"   \
-	--depends "nginx"   \
-	--depends "redis-server"   \
-	--depends "supervisor"   \
-	--chdir $(INSTALLDIR)   \
-	conf/front.cfg=etc/encyc/front.cfg   \
-	conf=$(DEB_BASE)   \
-	COPYRIGHT=$(DEB_BASE)   \
-	front=$(DEB_BASE)   \
-	.git=$(DEB_BASE)   \
-	.gitignore=$(DEB_BASE)   \
-	INSTALL=$(DEB_BASE)   \
-	LICENSE=$(DEB_BASE)   \
-	Makefile=$(DEB_BASE)   \
-	README.rst=$(DEB_BASE)   \
-	venv=$(DEB_BASE)   \
-	venv/front/lib/python2.7/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
-	VERSION=$(DEB_BASE)
+deb: deb-stretch
 
 # deb-jessie and deb-stretch are identical EXCEPT:
 # jessie: --depends openjdk-7-jre

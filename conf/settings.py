@@ -79,7 +79,7 @@ if GITPKG_DEBUG:
         ]
         return pkg_paths
     
-    PACKAGES = package_debs('encycrg-%s' % GIT_BRANCH)
+    PACKAGES = package_debs('front-%s' % GIT_BRANCH)
 
 else:
     GIT_BRANCH = []

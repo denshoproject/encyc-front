@@ -310,6 +310,14 @@ uninstall-encyc-front:
 restart-front:
 	/etc/init.d/supervisor restart front
 
+shell:
+	source $(VIRTUALENV)/bin/activate; \
+	python front/manage.py shell
+
+runserver:
+	source $(VIRTUALENV)/bin/activate; \
+	python front/manage.py runserver 0.0.0.0:8080
+
 clean-encyc-front:
 	-rm -Rf $(VIRTUALENV)
 	-rm -Rf $(INSTALLDIR)/front/src

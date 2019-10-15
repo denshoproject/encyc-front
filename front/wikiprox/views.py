@@ -1,4 +1,5 @@
 import json
+import os
 
 import requests
 
@@ -111,6 +112,12 @@ def source(request, encyclopedia_id, template_name='wikiprox/source.html'):
         raise Http404
     return render(request, template_name, {
         'source': source,
+        # TODO this belongs in model
+        'document_download_url': os.path.join(
+            settings.SOURCES_MEDIA_URL,
+            'encyc-psms',
+            os.path.basename(source.original_path)
+        ),
         'RTMP_STREAMER': settings.RTMP_STREAMER,
         'MEDIA_URL': settings.MEDIA_URL,
         'SOURCES_MEDIA_URL': settings.SOURCES_MEDIA_URL,

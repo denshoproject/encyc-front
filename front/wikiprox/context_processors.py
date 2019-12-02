@@ -28,4 +28,5 @@ def sitewide(request):
         'STATIC_URL': settings.STATIC_URL,
         'MEDIAWIKI_DEFAULT_PAGE': settings.MEDIAWIKI_DEFAULT_PAGE,
         'GOOGLE_CUSTOM_SEARCH_PASSWORD': settings.GOOGLE_CUSTOM_SEARCH_PASSWORD,
+        'site_msg_text': settings.SITE_MSG_TEXT,
         }

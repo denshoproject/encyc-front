@@ -126,7 +126,17 @@ window.cookieconsent.initialise({
 </head>
 <body>
 
-
+{% if site_msg_text %}
+  <div id="site-message">
+    <div style="background-color: #fba355;">
+      <div id="inner-site-message" class="alert alert-error" style="margin-bottom:0px;">
+        <button type="button" class="close" data-dismiss="alert" style="color:#000;display:block;opacity: unset;margin-top: 4px;">&times;</button>
+        {{ site_msg_text | safe }}
+      </div>
+    </div>
+  </div>
+{% endif %}{# site_msg_text #}
+    
 	<div class="navbar navbar-static-top">
 	  <div class="navbar-inner">
 	    <div class="container">

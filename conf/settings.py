@@ -160,6 +160,8 @@ SERVER_EMAIL = 'front@densho.org'
 THROTTLE_ANON = config.get('front', 'throttle_anon')
 THROTTLE_USER = config.get('front', 'throttle_user')
 
+SITE_MSG_TEXT = config.get('front', 'site_msg_text')
+
 # ----------------------------------------------------------------------
 
 STAGE = False

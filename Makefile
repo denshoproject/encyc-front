@@ -420,9 +420,6 @@ install-configs:
 	@echo ""
 	@echo "installing configs ----------------------------------------------------"
 # web app settings
-	cp $(INSTALLDIR)/conf/settings.py $(INSTALLDIR)/front/front/
-	chown root.root $(INSTALLDIR)/front/front/settings.py
-	chmod 644 $(INSTALLDIR)/front/front/settings.py
 	-mkdir /etc/encyc
 	cp $(INSTALLDIR)/conf/front.cfg /etc/encyc/
 	chown root.encyc /etc/encyc/front.cfg

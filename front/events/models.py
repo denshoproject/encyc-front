@@ -5,10 +5,7 @@ logger = logging.getLogger(__name__)
 from urllib2 import urlparse
 
 from elasticsearch.exceptions import NotFoundError
-from elasticsearch_dsl import Index
-from elasticsearch_dsl import DocType, String, Date, Nested, Boolean, analysis
-from elasticsearch_dsl import Search
-from elasticsearch_dsl.connections import connections
+import elasticsearch_dsl as dsl
 import requests
 
 from django.conf import settings
@@ -34,22 +31,21 @@ def hitvalue(hit, field):
     return value
 
 
-class Event(DocType):
+class Event(dsl.Document):
     """
     IMPORTANT: uses Elasticsearch-DSL, not the Django ORM.
     """
-    id = String(index='not_analyzed')  # Elasticsearch id
-    published = Boolean()
-    title = String()
-    description = String()
-    start_date = Date()
-    end_date = Date()
-    article_title = String(index='not_analyzed')
-    resource_uri = String(index='not_analyzed')
+    id = dsl.Keyword()  # Elasticsearch id
+    published = dsl.Boolean()
+    title = dsl.Text()
+    description = dsl.Text()
+    start_date = dsl.Date()
+    end_date = dsl.Date()
+    article_title = dsl.Keyword()
+    resource_uri = dsl.Keyword()
     
-    class Meta:
-        index = settings.DOCSTORE_INDEX
-        doc_type = 'events'
+    class Index:
+        name = 'encycevents'
     
     def __repr__(self):
         cutoff = 30
@@ -59,11 +55,26 @@ class Event(DocType):
             str(self.start_date.day),
         ])
         if self.title:
-            return "<Event '%s: %s'>" % (ymd, self.title)
+            return "<%s.%s '%s: %s'>" % (
+                self.__module__,
+                self.__class__.__name__,
+                ymd,
+                self.title
+            )
         elif len(self.description) > cutoff:
-            return "<Event '%s: %s...'>" % (ymd, self.description[:cutoff])
+            return "<%s.%s '%s: %s...'>" % (
+                self.__module__,
+                self.__class__.__name__,
+                ymd,
+                self.description[:cutoff]
+            )
         else:
-            return "<Event '%s: %s'>" % (ymd, self.description)
+            return "<%s.%s '%s: %s'>" % (
+                self.__module__,
+                self.__class__.__name__,
+                ymd,
+                self.description
+            )
     
     def __str__(self):
         return self.__repr__()

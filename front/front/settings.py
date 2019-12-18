@@ -99,14 +99,9 @@ STATIC_URL = config.get('media', 'static_url')
 MEDIA_URL = config.get('media', 'media_url')
 MEDIA_URL_LOCAL = config.get('media', 'media_url_local')
 
-# elasticsearch
-DOCSTORE_HOSTS = []
-for node in config.get('elasticsearch', 'hosts').strip().split(','):
-    host,port = node.strip().split(':')
-    DOCSTORE_HOSTS.append(
-        {'host':host, 'port':port}
-    )
-DOCSTORE_INDEX = config.get('elasticsearch', 'index')
+#elasticsearch
+DOCSTORE_HOST = config.get('elasticsearch','docstore_host')
+DOCSTORE_TIMEOUT = int(config.get('elasticsearch','docstore_timeout'))
 
 # mediawiki
 MEDIAWIKI_HTML = 'http://dango.densho.org:9066/mediawiki/index.php'

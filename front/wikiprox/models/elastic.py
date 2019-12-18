@@ -28,10 +28,6 @@ if not settings.DEBUG:
 
 MAX_SIZE = 10000
 
-# set default hosts and index
-connections.create_connection(hosts=settings.DOCSTORE_HOSTS)
-index = Index(settings.DOCSTORE_INDEX)
-
 
 def _columnizer(things, cols):
     columns = []

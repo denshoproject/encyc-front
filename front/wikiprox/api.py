@@ -6,8 +6,8 @@ from rest_framework.reverse import reverse
 from rest_framework.response import Response
 
 from wikiprox.models import Elasticsearch as Backend
-from wikiprox.models import Page, Source, Author
-from wikiprox.models import MAX_SIZE, NotFoundError
+from wikiprox.models.elastic import Page, Source, Author
+from wikiprox.models.elastic import MAX_SIZE, NotFoundError
 
 
 @api_view(['GET'])

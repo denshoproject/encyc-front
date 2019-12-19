@@ -56,6 +56,12 @@ def none_strip(text):
         text = ''
     return text.strip()
 
+def _set_attr(obj, hit, fieldname):
+    """Assign a SearchResults Hit value if present
+    """
+    if hasattr(hit, fieldname):
+        setattr(obj, fieldname, getattr(hit, fieldname))
+
 
 class Author(repo_models.Author):
 
@@ -93,7 +99,31 @@ class Author(repo_models.Author):
             fields_nested=[],
             fields_agg={},
         )
-        return searcher.execute(docstore.MAX_SIZE, 0)
+        objects = sorted([
+            Author.from_hit(hit)
+            for hit in searcher.execute(docstore.MAX_SIZE, 0).objects
+        ])
+        if num_columns:
+            return _columnizer(objects, num_columns)
+        return objects
+
+    @staticmethod
+    def from_hit(hit):
+        """Creates an Author object from a elasticsearch_dsl.response.hit.Hit.
+        """
+        obj = Author(
+            meta={'id': hit.url_title}
+        )
+        _set_attr(obj, hit, 'url_title')
+        _set_attr(obj, hit, 'public')
+        _set_attr(obj, hit, 'published')
+        _set_attr(obj, hit, 'modified')
+        _set_attr(obj, hit, 'mw_api_url')
+        _set_attr(obj, hit, 'title_sort')
+        _set_attr(obj, hit, 'title')
+        _set_attr(obj, hit, 'body')
+        _set_attr(obj, hit, 'article_titles')
+        return obj
 
     def scrub(self):
         """Removes internal editorial markers.
@@ -185,7 +215,34 @@ class Page(repo_models.Page):
             fields_nested=[],
             fields_agg={},
         )
-        return searcher.execute(docstore.MAX_SIZE, 0)
+        return sorted([
+            Page.from_hit(hit)
+            for hit in searcher.execute(docstore.MAX_SIZE, 0).objects
+        ])
+    
+    @staticmethod
+    def from_hit(hit):
+        """Creates a Page object from a elasticsearch_dsl.response.hit.Hit.
+        """
+        obj = Page(
+            meta={'id': hit.url_title}
+        )
+        _set_attr(obj, hit, 'url_title')
+        _set_attr(obj, hit, 'public')
+        _set_attr(obj, hit, 'published')
+        _set_attr(obj, hit, 'published_encyc')
+        _set_attr(obj, hit, 'published_rg')
+        _set_attr(obj, hit, 'modified')
+        _set_attr(obj, hit, 'mw_api_url')
+        _set_attr(obj, hit, 'title_sort')
+        _set_attr(obj, hit, 'title')
+        _set_attr(obj, hit, 'description')
+        _set_attr(obj, hit, 'body')
+        _set_attr(obj, hit, 'authors_data')
+        _set_attr(obj, hit, 'categories')
+        _set_attr(obj, hit, 'coordinates')
+        _set_attr(obj, hit, 'source_ids')
+        return obj
     
     @staticmethod
     def pages_by_category():
@@ -396,8 +453,54 @@ class Source(repo_models.Source):
             fields_nested=[],
             fields_agg={},
         )
-        return searcher.execute(docstore.MAX_SIZE, 0)
-
+        return sorted([
+            Source.from_hit(hit)
+            for hit in searcher.execute(docstore.MAX_SIZE, 0).objects
+        ])
+    
+    @staticmethod
+    def from_hit(hit):
+        """Creates a Source object from a elasticsearch_dsl.response.hit.Hit.
+        """
+        obj = Source(
+            meta={'id': hit.encyclopedia_id}
+        )
+        _set_attr(obj, hit, 'encyclopedia_id')
+        _set_attr(obj, hit, 'densho_id')
+        _set_attr(obj, hit, 'psms_id')
+        _set_attr(obj, hit, 'psms_api')
+        _set_attr(obj, hit, 'institution_id')
+        _set_attr(obj, hit, 'collection_name')
+        _set_attr(obj, hit, 'created')
+        _set_attr(obj, hit, 'modified')
+        _set_attr(obj, hit, 'published')
+        _set_attr(obj, hit, 'creative_commons')
+        _set_attr(obj, hit, 'headword')
+        _set_attr(obj, hit, 'original')
+        _set_attr(obj, hit, 'original_size')
+        _set_attr(obj, hit, 'original_url')
+        _set_attr(obj, hit, 'original_path')
+        _set_attr(obj, hit, 'original_path_abs')
+        _set_attr(obj, hit, 'display')
+        _set_attr(obj, hit, 'display_size')
+        _set_attr(obj, hit, 'display_url')
+        _set_attr(obj, hit, 'display_path')
+        _set_attr(obj, hit, 'display_path_abs')
+        #_set_attr(obj, hit, 'streaming_path')
+        #_set_attr(obj, hit, 'rtmp_path')
+        _set_attr(obj, hit, 'streaming_url')
+        _set_attr(obj, hit, 'external_url')
+        _set_attr(obj, hit, 'media_format')
+        _set_attr(obj, hit, 'aspect_ratio')
+        _set_attr(obj, hit, 'caption')
+        _set_attr(obj, hit, 'caption_extended')
+        #_set_attr(obj, hit, 'transcript_path')
+        _set_attr(obj, hit, 'transcript')
+        _set_attr(obj, hit, 'courtesy')
+        _set_attr(obj, hit, 'filename')
+        _set_attr(obj, hit, 'img_path')
+        return obj
+    
     @staticmethod
     def from_mw(mwsource, url_title):
         """Creates an Source object from a models.legacy.Source object.

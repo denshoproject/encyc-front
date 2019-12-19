@@ -36,6 +36,17 @@ class Author(dsl.Document):
             self.url_title
         )
 
+    def __str__(self):
+        return self.title
+    
+    def __eq__(self, other):
+        """Enable Pythonic sorting"""
+        return self.title_sort == other.title_sort
+    
+    def __lt__(self, other):
+        """Enable Pythonic sorting"""
+        return self.title_sort < other.title_sort
+
 
 class AuthorData(dsl.InnerDoc):
     display = dsl.Keyword(multi=True)
@@ -105,6 +116,17 @@ class Page(dsl.Document):
             self.url_title
         )
 
+    def __str__(self):
+        return self.title
+    
+    def __eq__(self, other):
+        """Enable Pythonic sorting"""
+        return self.title_sort == other.title_sort
+    
+    def __lt__(self, other):
+        """Enable Pythonic sorting"""
+        return self.title_sort < other.title_sort
+
 
 class Source(dsl.Document):
     """
@@ -161,6 +183,17 @@ class Source(dsl.Document):
             self.__class__.__name__,
             self.encyclopedia_id
         )
+
+    def __str__(self):
+        return self.encyclopedia_id
+    
+    def __eq__(self, other):
+        """Enable Pythonic sorting"""
+        return self.encyclopedia_id == other.encyclopedia_id
+    
+    def __lt__(self, other):
+        """Enable Pythonic sorting"""
+        return self.encyclopedia_id < other.encyclopedia_id
 
 
 class Facet(dsl.Document):

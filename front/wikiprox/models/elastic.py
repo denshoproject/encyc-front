@@ -17,6 +17,7 @@ from django.db import models
 from wikiprox import citations
 from wikiprox import ddr
 from wikiprox import docstore
+from wikiprox import search
 from wikiprox import sources
 
 if not settings.DEBUG:

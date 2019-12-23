@@ -92,20 +92,24 @@ class Author(repo_models.Author):
         
         @returns: list
         """
-        searcher = search.Searcher()
-        searcher.prepare(
-            params={},
-            search_models=[docstore.Docstore().index_name('author')],
-            fields_nested=[],
-            fields_agg={},
-        )
-        objects = sorted([
-            Author.from_hit(hit)
-            for hit in searcher.execute(docstore.MAX_SIZE, 0).objects
-        ])
-        if num_columns:
-            return _columnizer(objects, num_columns)
-        return objects
+        KEY = 'encyc-front:authors'
+        data = cache.get(KEY)
+        if not data:
+            searcher = search.Searcher()
+            searcher.prepare(
+                params={},
+                search_models=[docstore.Docstore().index_name('author')],
+                fields_nested=[],
+                fields_agg={},
+            )
+            data = sorted([
+                Author.from_hit(hit)
+                for hit in searcher.execute(docstore.MAX_SIZE, 0).objects
+            ])
+            if num_columns:
+                return _columnizer(data, num_columns)
+            cache.set(KEY, data, settings.CACHE_TIMEOUT)
+        return data
 
     @staticmethod
     def from_hit(hit):
@@ -208,20 +212,25 @@ class Page(repo_models.Page):
         
         @returns: list
         """
-        params={
-            'published_encyc': True,  # filter out items from ResourceGuide
-        }
-        searcher = search.Searcher()
-        searcher.prepare(
-            params=params,
-            search_models=[docstore.Docstore().index_name('article')],
-            fields_nested=[],
-            fields_agg={},
-        )
-        return sorted([
-            Page.from_hit(hit)
-            for hit in searcher.execute(docstore.MAX_SIZE, 0).objects
-        ])
+        KEY = 'encyc-front:pages'
+        data = cache.get(KEY)
+        if not data:
+            params={
+                'published_encyc': True,  # filter out items from ResourceGuide
+            }
+            searcher = search.Searcher()
+            searcher.prepare(
+                params=params,
+                search_models=[docstore.Docstore().index_name('article')],
+                fields_nested=[],
+                fields_agg={},
+            )
+            data = sorted([
+                Page.from_hit(hit)
+                for hit in searcher.execute(docstore.MAX_SIZE, 0).objects
+            ])
+            cache.set(KEY, data, settings.CACHE_TIMEOUT)
+        return data
     
     @staticmethod
     def from_hit(hit):
@@ -254,7 +263,6 @@ class Page(repo_models.Page):
         @returns: list
         """
         KEY = 'encyc-front:pages_by_category'
-        TIMEOUT = 60*5
         data = cache.get(KEY)
         if not data:
             categories = {}
@@ -271,7 +279,7 @@ class Page(repo_models.Page):
                 (key,categories[key])
                 for key in sorted(categories.keys())
             ]
-            cache.set(KEY, data, TIMEOUT)
+            cache.set(KEY, data, settings.CACHE_TIMEOUT)
         return data
 
     def scrub(self):
@@ -449,17 +457,22 @@ class Source(repo_models.Source):
         
         @returns: list
         """
-        searcher = search.Searcher()
-        searcher.prepare(
-            params={},
-            search_models=[docstore.Docstore().index_name('source')],
-            fields_nested=[],
-            fields_agg={},
-        )
-        return sorted([
-            Source.from_hit(hit)
-            for hit in searcher.execute(docstore.MAX_SIZE, 0).objects
-        ])
+        KEY = 'encyc-front:sources'
+        data = cache.get(KEY)
+        if not data:
+            searcher = search.Searcher()
+            searcher.prepare(
+                params={},
+                search_models=[docstore.Docstore().index_name('source')],
+                fields_nested=[],
+                fields_agg={},
+            )
+            data = sorted([
+                Source.from_hit(hit)
+                for hit in searcher.execute(docstore.MAX_SIZE, 0).objects
+            ])
+            cache.set(KEY, data, settings.CACHE_TIMEOUT)
+        return data
     
     @staticmethod
     def from_hit(hit):

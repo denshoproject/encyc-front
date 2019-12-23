@@ -655,22 +655,21 @@ class Elasticsearch(object):
 
     @staticmethod
     def topics():
-        terms = []
-        results = docstore.get(
-            settings.DOCSTORE_HOSTS, settings.DOCSTORE_INDEX, 'vocab',
-            'topics'
-        )
-        if results and (results['_source']['terms']):
-            terms = [
-                {
-                    'id': term['id'],
-                    'title': term['title'],
-                    '_title': term['_title'],
-                    'encyc_urls': term['encyc_urls'],
-                }
-                for term in results['_source']['terms']
-            ]
-        return terms
+        # TODO elastic7
+        #terms = []
+        #results = docstore.Docstore().get('vocab', 'topics')
+        #if results and (results['_source']['terms']):
+        #    terms = [
+        #        {
+        #            'id': term['id'],
+        #            'title': term['title'],
+        #            '_title': term['_title'],
+        #            'encyc_urls': term['encyc_urls'],
+        #        }
+        #        for term in results['_source']['terms']
+        #    ]
+        #return terms
+        return []
 
     @staticmethod
     def topics_by_url():

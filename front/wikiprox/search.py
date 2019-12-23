@@ -21,6 +21,8 @@ DEFAULT_LIMIT = 1000
 # whitelist of params recognized in URL query
 # TODO derive from ddr-defs/repo_models/
 SEARCH_PARAM_WHITELIST = [
+    'published_encyc',
+    'published_rg',
     'fulltext',
     'sort',
     'topics',
@@ -433,6 +435,9 @@ def sanitize_input(text):
     http://lucene.apache.org/core/old_versioned_docs/versions/2_9_1/queryparsersyntax.html
     TODO Maybe elasticsearch-dsl or elasticsearch-py do this already
     """
+    if isinstance(text, bool):
+        return text
+    
     text = re.sub(
         '([{}])'.format(re.escape('\\+\-&|!(){}\[\]^~*?:\/')),
         r"\\\1",

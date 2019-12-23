@@ -208,9 +208,12 @@ class Page(repo_models.Page):
         
         @returns: list
         """
+        params={
+            'published_encyc': True,  # filter out items from ResourceGuide
+        }
         searcher = search.Searcher()
         searcher.prepare(
-            params={},
+            params=params,
             search_models=[docstore.Docstore().index_name('article')],
             fields_nested=[],
             fields_agg={},

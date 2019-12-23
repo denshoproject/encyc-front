@@ -282,6 +282,19 @@ class Page(repo_models.Page):
             cache.set(KEY, data, settings.CACHE_TIMEOUT)
         return data
 
+    @staticmethod
+    def titles():
+        """List of Page titles
+        
+        @returns: list
+        """
+        KEY = 'encyc-front:page-titles'
+        data = cache.get(KEY)
+        if not data:
+            data = [page.title for page in Page.pages()]
+            cache.set(KEY, data, settings.CACHE_TIMEOUT)
+        return data
+
     def scrub(self):
         """remove internal editorial markers.
         
@@ -390,6 +403,18 @@ class Page(repo_models.Page):
             )
         return page
 
+    def set_prev_next(self):
+        """Sets and previous and next page objects
+        """
+        # previous,next pages
+        titles = Page.titles()
+        page_index = None
+        for n,title in enumerate(titles):
+            if title == self.title:
+                page_index = n
+        self.prev_page = Page.get(titles[page_index-1])
+        self.next_page = Page.get(titles[page_index+1])
+        return self.prev_page,self.next_page
 
 class Source(repo_models.Source):
 

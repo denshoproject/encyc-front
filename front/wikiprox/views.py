@@ -77,6 +77,10 @@ def article(request, url_title='index', printed=False, template_name='wikiprox/p
         template_name = 'wikiprox/article-print.html'
     else:
         template_name = 'wikiprox/article.html'
+    
+    # choose previous,next page objects
+    page.set_prev_next()
+    
     # DDR objects
     # show small number of objects, distributed among topics
     TOTAL_OBJECTS = 10

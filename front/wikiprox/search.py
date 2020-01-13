@@ -44,6 +44,7 @@ SEARCH_PARAM_WHITELIST = [
     'mimetype',
     'persons',
     'rights',
+    'facet_id',
 ]
 
 # fields where the relevant value is nested e.g. topics.id

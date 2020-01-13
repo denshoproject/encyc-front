@@ -323,16 +323,13 @@ class Page(repo_models.Page):
         """
         # return list of dicts rather than an Elasticsearch results object
         terms = []
-        for t in Elasticsearch.topics_by_url().get(self.absolute_url(), []):
-            term = {
-                key: val
-                for key,val in t.iteritems()
-            }
-            term.pop('encyc_urls')
-            term['ddr_topic_url'] = '%s/%s/' % (
+        for term in FacetTerm.topics_by_url().get(self.title, []):
+            #term.pop('encyc_urls')
+            url = '%s/%s/' % (
                 settings.DDR_TOPICS_BASE,
                 term['id']
             )
+            setattr(term, 'ddr_topic_url', url)
             terms.append(term)
         return terms
     
@@ -344,11 +341,11 @@ class Page(repo_models.Page):
         if not hasattr(self, '_related_terms_docs'):
             terms = self.topics()
             objects = ddr.related_by_topic(
-                term_ids=[term['id'] for term in terms],
+                term_ids=[term.term_id for term in terms],
                 size=size
             )
             for term in terms:
-                term['objects'] = objects[term['id']]
+                term['objects'] = objects[term.term_id]
         return terms
     
     def ddr_objects(self, size=5):
@@ -648,29 +645,56 @@ class Citation(object):
         self.retrieved = datetime.now()
 
 
-class Elasticsearch(object):
+class FacetTerm(repo_models.FacetTerm):
     """Interface to Elasticsearch backend
     NOTE: not a Django model object!
     """
+    
+    @staticmethod
+    def from_hit(hit):
+        """Creates a Source object from a elasticsearch_dsl.response.hit.Hit.
+        """
+        obj = FacetTerm(
+            meta={'id': hit.id}
+        )
+        _set_attr(obj, hit, 'id')
+        _set_attr(obj, hit, 'facet')
+        _set_attr(obj, hit, 'term_id')
+        _set_attr(obj, hit, 'links_html')
+        _set_attr(obj, hit, 'links_json')
+        _set_attr(obj, hit, 'links_children')
+        _set_attr(obj, hit, 'title')
+        _set_attr(obj, hit, 'description')
+        # topics
+        _set_attr(obj, hit, 'path')
+        _set_attr(obj, hit, 'parent_id')
+        _set_attr(obj, hit, 'ancestors')
+        _set_attr(obj, hit, 'siblings')
+        _set_attr(obj, hit, 'children')
+        _set_attr(obj, hit, 'weight')
+        _set_attr(obj, hit, 'encyc_urls')
+        # facility
+        _set_attr(obj, hit, 'type')
+        _set_attr(obj, hit, 'elinks')
+        _set_attr(obj, hit, 'location_geopoint')
+        return obj
 
     @staticmethod
     def topics():
-        # TODO elastic7
-        #terms = []
-        #results = docstore.Docstore().get('vocab', 'topics')
-        #if results and (results['_source']['terms']):
-        #    terms = [
-        #        {
-        #            'id': term['id'],
-        #            'title': term['title'],
-        #            '_title': term['_title'],
-        #            'encyc_urls': term['encyc_urls'],
-        #        }
-        #        for term in results['_source']['terms']
-        #    ]
-        #return terms
-        return []
-
+        searcher = search.Searcher()
+        searcher.prepare(
+            params={
+                'facet_id': 'topics',
+            },
+            search_models=[docstore.Docstore().index_name('facetterm')],
+            fields_nested=[],
+            fields_agg={},
+        )
+        results = searcher.execute(docstore.MAX_SIZE, 0)
+        objects = results.objects
+        data = sorted([FacetTerm.from_hit(hit) for hit in objects])
+        return data
+    
     @staticmethod
     def topics_by_url():
         KEY = 'encyc-front:topics_by_url'
@@ -678,10 +702,23 @@ class Elasticsearch(object):
         data = cache.get(KEY)
         if not data:
             data = {}
-            for term in Elasticsearch.topics():
-                for url in term['encyc_urls']:
-                    if not data.get(url, None):
-                        data[url] = []
-                    data[url].append(term)
+            for term in FacetTerm.topics():
+                if hasattr(term, 'encyc_urls') and term.encyc_urls:
+                    for url in term.encyc_urls:
+                        title = url['title']
+                        if not data.get(title, None):
+                            data[title] = []
+                        data[title].append(term)
             cache.set(KEY, data, TIMEOUT)
         return data
+
+    def articles(self):
+        """Returns list of published Pages for this topic.
+        
+        @returns: list
+        """
+        return [
+            page
+            for page in Page.pages()
+            if page.url_title in self.article_titles
+        ]

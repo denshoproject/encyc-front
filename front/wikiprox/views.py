@@ -10,7 +10,6 @@ from django.shortcuts import redirect, render
 from django.views.decorators.http import require_http_methods
 
 from wikiprox import ddr
-from wikiprox.models import Elasticsearch as Backend
 from wikiprox.models import Page, Source, Author, Citation
 from wikiprox.models import NotFoundError
 

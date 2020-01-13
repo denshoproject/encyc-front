@@ -5,7 +5,6 @@ from rest_framework.decorators import api_view
 from rest_framework.reverse import reverse
 from rest_framework.response import Response
 
-from wikiprox.models import Elasticsearch as Backend
 from wikiprox.models.elastic import Page, Source, Author
 from wikiprox.models.elastic import MAX_SIZE, NotFoundError
 
@@ -114,7 +113,7 @@ def author(request, url_title, format=None):
 def categories(request, format=None):
     """DOCUMENTATION GOES HERE.
     """
-    categories = Backend().categories()
+    categories = Page.pages_by_category()
     assert False
     return Response(data)
 

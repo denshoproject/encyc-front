@@ -2,10 +2,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from elasticsearch.exceptions import NotFoundError
-from elasticsearch_dsl import Index
-from elasticsearch_dsl import DocType, String, Date, Nested, Boolean, analysis
-from elasticsearch_dsl import Search
-from elasticsearch_dsl.connections import connections
+import elasticsearch_dsl as dsl
 import requests
 
 from django.conf import settings
@@ -35,19 +32,22 @@ def index_locations():
 
 
             
-class MapCategory(DocType):
+class MapCategory(dsl.Document):
     """
     IMPORTANT: uses Elasticsearch-DSL, not the Django ORM.
     """
-    id = String(index='not_analyzed')  # Elasticsearch id
-    title = String()
+    id = dsl.Keyword()  # Elasticsearch id
+    title = dsl.Text()
     
-    class Meta:
-        index = settings.DOCSTORE_INDEX
-        doc_type = 'mapcategory'
+    class Index:
+        name = 'encycmapcategory'
     
     def __repr__(self):
-        return "<MapCategory '%s'>" % self.id
+        return '<%s.%s "%s">' % (
+            self.__module__,
+            self.__class__.__name__,
+            self.id
+        )
     
     def __str__(self):
         return self.title
@@ -98,27 +98,30 @@ class MapCategory(DocType):
 
 
 
-class Location(DocType):
+class Location(dsl.Document):
     """
     IMPORTANT: uses Elasticsearch-DSL, not the Django ORM.
     """
-    id = String(index='not_analyzed')  # Elasticsearch id
-    category = String(index='not_analyzed')
-    title = String()
-    location_name = String()
-    description = String()
-    lat = String(index='not_analyzed')
-    lng = String(index='not_analyzed')
-    resource_uri = String(index='not_analyzed')
-    location_uri = String(index='not_analyzed')
-    location_url = String(index='not_analyzed')
+    id = dsl.Keyword()  # Elasticsearch id
+    category = dsl.Keyword()
+    title = dsl.Text()
+    location_name = dsl.Text()
+    description = dsl.Text()
+    lat = dsl.Keyword()
+    lng = dsl.Keyword()
+    resource_uri = dsl.Keyword()
+    location_uri = dsl.Keyword()
+    location_url = dsl.Keyword()
         
-    class Meta:
-        index = settings.DOCSTORE_INDEX
-        doc_type = 'location'
+    class Index:
+        name = 'encyclocation'
     
     def __repr__(self):
-        return "<Location '%s'>" % self.id
+        return '<%s.%s "%s">' % (
+            self.__module__,
+            self.__class__.__name__,
+            self.id
+        )
     
     def __str__(self):
         return self.title

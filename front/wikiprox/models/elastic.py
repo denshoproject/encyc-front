@@ -1,45 +1,13 @@
-"""Encyclopedia models using Elasticsearch-DSL
-
-
-TODO "Article(s)" is often used to mean "Page(s)".
-
-
-See wikiprox/management/commands/encycpudate.py
-
-# Delete and recreate index
-$ python manage.py encycupdate --reset
-
-# Update authors
-$ python manage.py encycupdate --authors
-
-# Update articles
-$ python manage.py encycupdate --articles
-
-Example usage:
-
->>> from elasticsearch_dsl import Index
->>> from elasticsearch_dsl.connections import connections
->>> from django.conf import settings
->>> from wikiprox.models import Elasticsearch, Author, Page, Source
->>> connections.create_connection(hosts=settings.DOCSTORE_HOSTS)
->>> index = Index(settings.DOCSTORE_INDEX)
->>> authors = [author for author in Author.authors()]
->>> pages = [page for page in Page.pages()]
->>> sources = [source for source in Source.search().execute()]
-"""
-
 from datetime import datetime
 import json
 import logging
 logger = logging.getLogger(__name__)
 import os
 
-from elasticsearch.exceptions import NotFoundError
-from elasticsearch_dsl import Index
-from elasticsearch_dsl import DocType, String, Date, Nested, Boolean, analysis
-from elasticsearch_dsl import Search
-from elasticsearch_dsl.connections import connections
 import requests
+
+from elasticsearch.exceptions import NotFoundError
+import elasticsearch_dsl as dsl
 
 from django.conf import settings
 from django.core.cache import cache
@@ -49,20 +17,15 @@ from django.db import models
 from wikiprox import citations
 from wikiprox import ddr
 from wikiprox import docstore
-from wikiprox import encyclopedia
-from wikiprox import mediawiki
+from wikiprox import repo_models
+from wikiprox import search
 from wikiprox import sources
-from wikiprox.models.legacy import Proxy
 
 if not settings.DEBUG:
     from bs4 import BeautifulSoup
     from wikiprox.mediawiki import remove_status_markers
 
 MAX_SIZE = 10000
-
-# set default hosts and index
-connections.create_connection(hosts=settings.DOCSTORE_HOSTS)
-index = Index(settings.DOCSTORE_INDEX)
 
 
 def _columnizer(things, cols):
@@ -95,30 +58,21 @@ def none_strip(text):
         text = ''
     return text.strip()
 
+def _set_attr(obj, hit, fieldname):
+    """Assign a SearchResults Hit value if present
+    """
+    if hasattr(hit, fieldname):
+        setattr(obj, fieldname, getattr(hit, fieldname))
 
-class Author(DocType):
-    """
-    IMPORTANT: uses Elasticsearch-DSL, not the Django ORM.
-    """
-    url_title = String(index='not_analyzed')  # Elasticsearch id
-    public = Boolean()
-    published = Boolean()
-    modified = Date()
-    mw_api_url = String(index='not_analyzed')
-    title_sort = String(index='not_analyzed')
-    title = String()
-    body = String()
-    article_titles = String(index='not_analyzed', multi=True)
-    
-    class Meta:
-        index = settings.DOCSTORE_INDEX
-        doc_type = 'authors'
-    
-    def __repr__(self):
-        return "<Author '%s'>" % self.url_title
-    
-    def __str__(self):
-        return self.title
+
+class Author(repo_models.Author):
+
+    @staticmethod
+    def get(title):
+        ds = docstore.Docstore()
+        return super(Author, Author).get(
+            title, index=ds.index_name('author'), using=ds.es
+    )
 
     def absolute_url(self):
         return reverse('wikiprox-author', args=([self.title,]))
@@ -141,34 +95,41 @@ class Author(DocType):
         @returns: list
         """
         KEY = 'encyc-front:authors'
-        TIMEOUT = 60*5
         data = cache.get(KEY)
         if not data:
-            s = Search(doc_type='authors')[0:MAX_SIZE]
-            s = s.sort('title_sort')
-            s = s.fields([
-                'url_title',
-                'title',
-                'title_sort',
-                'published',
-                'modified',
+            searcher = search.Searcher()
+            searcher.prepare(
+                params={},
+                search_models=[docstore.Docstore().index_name('author')],
+                fields_nested=[],
+                fields_agg={},
+            )
+            data = sorted([
+                Author.from_hit(hit)
+                for hit in searcher.execute(docstore.MAX_SIZE, 0).objects
             ])
-            response = s.execute()
-            data = [
-                Author(
-                    url_title  = hitvalue(hit, 'url_title'),
-                    title      = hitvalue(hit, 'title'),
-                    title_sort = hitvalue(hit, 'title_sort'),
-                    published  = hitvalue(hit, 'published'),
-                    modified   = hitvalue(hit, 'modified'),
-                )
-                for hit in response
-                if hitvalue(hit, 'published')
-            ]
-            cache.set(KEY, data, TIMEOUT)
-        if num_columns:
-            return _columnizer(data, num_columns)
+            if num_columns:
+                return _columnizer(data, num_columns)
+            cache.set(KEY, data, settings.CACHE_TIMEOUT)
         return data
+
+    @staticmethod
+    def from_hit(hit):
+        """Creates an Author object from a elasticsearch_dsl.response.hit.Hit.
+        """
+        obj = Author(
+            meta={'id': hit.url_title}
+        )
+        _set_attr(obj, hit, 'url_title')
+        _set_attr(obj, hit, 'public')
+        _set_attr(obj, hit, 'published')
+        _set_attr(obj, hit, 'modified')
+        _set_attr(obj, hit, 'mw_api_url')
+        _set_attr(obj, hit, 'title_sort')
+        _set_attr(obj, hit, 'title')
+        _set_attr(obj, hit, 'body')
+        _set_attr(obj, hit, 'article_titles')
+        return obj
 
     def scrub(self):
         """Removes internal editorial markers.
@@ -218,40 +179,14 @@ class Author(DocType):
         return author
 
 
-class Page(DocType):
-    """
-    IMPORTANT: uses Elasticsearch-DSL, not the Django ORM.
-    """
-    url_title = String(index='not_analyzed')  # Elasticsearch id
-    public = Boolean()
-    published = Boolean()
-    published_encyc = Boolean()
-    modified = Date()
-    mw_api_url = String(index='not_analyzed')
-    title_sort = String(index='not_analyzed')
-    title = String()
-    body = String()
-    prev_page = String(index='not_analyzed')
-    next_page = String(index='not_analyzed')
-    categories = String(index='not_analyzed', multi=True)
-    coordinates = String(index='not_analyzed', multi=True)
-    source_ids = String(index='not_analyzed', multi=True)
-    authors_data = Nested(
-        properties={
-            'display': String(index='not_analyzed', multi=True),
-            'parsed': String(index='not_analyzed', multi=True),
-        }
-    )
-    
-    class Meta:
-        index = settings.DOCSTORE_INDEX
-        doc_type = 'articles'
-    
-    def __repr__(self):
-        return "<Page '%s'>" % self.url_title
-    
-    def __str__(self):
-        return self.url_title
+class Page(repo_models.Page):
+
+    @staticmethod
+    def get(title):
+        ds = docstore.Docstore()
+        return super(Page, Page).get(
+            id=title, index=ds.index_name('article'), using=ds.es
+        )
     
     def absolute_url(self):
         return reverse('wikiprox-page', args=([self.title]))
@@ -280,34 +215,48 @@ class Page(DocType):
         @returns: list
         """
         KEY = 'encyc-front:pages'
-        TIMEOUT = 60*5
         data = cache.get(KEY)
         if not data:
-            s = Search(doc_type='articles').filter('term', published_encyc=True)[0:MAX_SIZE]
-            s = s.sort('title_sort')
-            s = s.fields([
-                'url_title',
-                'title',
-                'title_sort',
-                'published',
-                'modified',
-                'categories',
+            params={
+                'published_encyc': True,  # filter out items from ResourceGuide
+            }
+            searcher = search.Searcher()
+            searcher.prepare(
+                params=params,
+                search_models=[docstore.Docstore().index_name('article')],
+                fields_nested=[],
+                fields_agg={},
+            )
+            data = sorted([
+                Page.from_hit(hit)
+                for hit in searcher.execute(docstore.MAX_SIZE, 0).objects
             ])
-            response = s.execute()
-            data = [
-                Page(
-                    url_title  = hitvalue(hit, 'url_title'),
-                    title      = hitvalue(hit, 'title'),
-                    title_sort = hitvalue(hit, 'title_sort'),
-                    published  = hitvalue(hit, 'published'),
-                    modified   = hitvalue(hit, 'modified'),
-                    categories = hit.get('categories',[]),
-                   )
-                for hit in response
-                if hitvalue(hit, 'published')
-            ]
-            cache.set(KEY, data, TIMEOUT)
+            cache.set(KEY, data, settings.CACHE_TIMEOUT)
         return data
+    
+    @staticmethod
+    def from_hit(hit):
+        """Creates a Page object from a elasticsearch_dsl.response.hit.Hit.
+        """
+        obj = Page(
+            meta={'id': hit.url_title}
+        )
+        _set_attr(obj, hit, 'url_title')
+        _set_attr(obj, hit, 'public')
+        _set_attr(obj, hit, 'published')
+        _set_attr(obj, hit, 'published_encyc')
+        _set_attr(obj, hit, 'published_rg')
+        _set_attr(obj, hit, 'modified')
+        _set_attr(obj, hit, 'mw_api_url')
+        _set_attr(obj, hit, 'title_sort')
+        _set_attr(obj, hit, 'title')
+        _set_attr(obj, hit, 'description')
+        _set_attr(obj, hit, 'body')
+        _set_attr(obj, hit, 'authors_data')
+        _set_attr(obj, hit, 'categories')
+        _set_attr(obj, hit, 'coordinates')
+        _set_attr(obj, hit, 'source_ids')
+        return obj
     
     @staticmethod
     def pages_by_category():
@@ -316,7 +265,6 @@ class Page(DocType):
         @returns: list
         """
         KEY = 'encyc-front:pages_by_category'
-        TIMEOUT = 60*5
         data = cache.get(KEY)
         if not data:
             categories = {}
@@ -333,7 +281,20 @@ class Page(DocType):
                 (key,categories[key])
                 for key in sorted(categories.keys())
             ]
-            cache.set(KEY, data, TIMEOUT)
+            cache.set(KEY, data, settings.CACHE_TIMEOUT)
+        return data
+
+    @staticmethod
+    def titles():
+        """List of Page titles
+        
+        @returns: list
+        """
+        KEY = 'encyc-front:page-titles'
+        data = cache.get(KEY)
+        if not data:
+            data = [page.title for page in Page.pages()]
+            cache.set(KEY, data, settings.CACHE_TIMEOUT)
         return data
 
     def scrub(self):
@@ -362,16 +323,13 @@ class Page(DocType):
         """
         # return list of dicts rather than an Elasticsearch results object
         terms = []
-        for t in Elasticsearch.topics_by_url().get(self.absolute_url(), []):
-            term = {
-                key: val
-                for key,val in t.iteritems()
-            }
-            term.pop('encyc_urls')
-            term['ddr_topic_url'] = '%s/%s/' % (
+        for term in FacetTerm.topics_by_url().get(self.title, []):
+            #term.pop('encyc_urls')
+            url = '%s/%s/' % (
                 settings.DDR_TOPICS_BASE,
                 term['id']
             )
+            setattr(term, 'ddr_topic_url', url)
             terms.append(term)
         return terms
     
@@ -383,11 +341,11 @@ class Page(DocType):
         if not hasattr(self, '_related_terms_docs'):
             terms = self.topics()
             objects = ddr.related_by_topic(
-                term_ids=[term['id'] for term in terms],
+                term_ids=[term.term_id for term in terms],
                 size=size
             )
             for term in terms:
-                term['objects'] = objects[term['id']]
+                term['objects'] = objects[term.term_id]
         return terms
     
     def ddr_objects(self, size=5):
@@ -444,50 +402,27 @@ class Page(DocType):
             )
         return page
 
+    def set_prev_next(self):
+        """Sets and previous and next page objects
+        """
+        # previous,next pages
+        titles = Page.titles()
+        page_index = None
+        for n,title in enumerate(titles):
+            if title == self.title:
+                page_index = n
+        self.prev_page = Page.get(titles[page_index-1])
+        self.next_page = Page.get(titles[page_index+1])
+        return self.prev_page,self.next_page
 
-class Source(DocType):
-    """
-    IMPORTANT: uses Elasticsearch-DSL, not the Django ORM.
-    """
-    encyclopedia_id = String(index='not_analyzed')  # Elasticsearch id
-    densho_id = String(index='not_analyzed')
-    psms_id = String(index='not_analyzed')
-    psms_api_uri = String(index='not_analyzed')
-    institution_id = String(index='not_analyzed')
-    collection_name = String(index='not_analyzed')
-    created = Date()
-    modified = Date()
-    published = Boolean()
-    creative_commons = Boolean()
-    headword = String(index='not_analyzed')
-    #original_path = String(index='not_analyzed')
-    original_url = String(index='not_analyzed')  # TODO use original_path
-    #streaming_path = String(index='not_analyzed')
-    #rtmp_path = String(index='not_analyzed')
-    streaming_url = String(index='not_analyzed')  # TODO remove
-    external_url = String(index='not_analyzed')
-    media_format = String(index='not_analyzed')
-    aspect_ratio = String(index='not_analyzed')
-    original_size = String(index='not_analyzed')
-    display_size = String(index='not_analyzed')
-    display = String(index='not_analyzed')
-    caption = String()
-    caption_extended = String()
-    #transcript_path = String(index='not_analyzed')
-    transcript = String()  # TODO remove
-    courtesy = String(index='not_analyzed')
-    filename = String(index='not_analyzed')
-    img_path = String(index='not_analyzed')
-    
-    class Meta:
-        index = settings.DOCSTORE_INDEX
-        doc_type = 'sources'
-    
-    def __repr__(self):
-        return "<Source '%s'>" % self.encyclopedia_id
-    
-    def __str__(self):
-        return self.encyclopedia_id
+class Source(repo_models.Source):
+
+    @staticmethod
+    def get(title):
+        ds = docstore.Docstore()
+        return super(Source, Source).get(
+            title, index=ds.index_name('source'), using=ds.es
+        )
     
     def absolute_url(self):
         return reverse('wikiprox-source', args=([self.encyclopedia_id]))
@@ -547,35 +482,65 @@ class Source(DocType):
         @returns: list
         """
         KEY = 'encyc-front:sources'
-        TIMEOUT = 60*5
         data = cache.get(KEY)
         if not data:
-            s = Search(doc_type='sources')[0:MAX_SIZE]
-            s = s.sort('encyclopedia_id')
-            s = s.fields([
-                'encyclopedia_id',
-                'published',
-                'modified',
-                'headword',
-                'media_format',
-                'img_path',
+            searcher = search.Searcher()
+            searcher.prepare(
+                params={},
+                search_models=[docstore.Docstore().index_name('source')],
+                fields_nested=[],
+                fields_agg={},
+            )
+            data = sorted([
+                Source.from_hit(hit)
+                for hit in searcher.execute(docstore.MAX_SIZE, 0).objects
             ])
-            response = s.execute()
-            data = [
-                Source(
-                    encyclopedia_id = hitvalue(hit, 'encyclopedia_id'),
-                    published = hitvalue(hit, 'published'),
-                    modified = hitvalue(hit, 'modified'),
-                    headword = hitvalue(hit, 'headword'),
-                    media_format = hitvalue(hit, 'media_format'),
-                    img_path = hitvalue(hit, 'img_path'),
-                   )
-                for hit in response
-                if hitvalue(hit, 'published')
-            ]
-            cache.set(KEY, data, TIMEOUT)
+            cache.set(KEY, data, settings.CACHE_TIMEOUT)
         return data
-
+    
+    @staticmethod
+    def from_hit(hit):
+        """Creates a Source object from a elasticsearch_dsl.response.hit.Hit.
+        """
+        obj = Source(
+            meta={'id': hit.encyclopedia_id}
+        )
+        _set_attr(obj, hit, 'encyclopedia_id')
+        _set_attr(obj, hit, 'densho_id')
+        _set_attr(obj, hit, 'psms_id')
+        _set_attr(obj, hit, 'psms_api')
+        _set_attr(obj, hit, 'institution_id')
+        _set_attr(obj, hit, 'collection_name')
+        _set_attr(obj, hit, 'created')
+        _set_attr(obj, hit, 'modified')
+        _set_attr(obj, hit, 'published')
+        _set_attr(obj, hit, 'creative_commons')
+        _set_attr(obj, hit, 'headword')
+        _set_attr(obj, hit, 'original')
+        _set_attr(obj, hit, 'original_size')
+        _set_attr(obj, hit, 'original_url')
+        _set_attr(obj, hit, 'original_path')
+        _set_attr(obj, hit, 'original_path_abs')
+        _set_attr(obj, hit, 'display')
+        _set_attr(obj, hit, 'display_size')
+        _set_attr(obj, hit, 'display_url')
+        _set_attr(obj, hit, 'display_path')
+        _set_attr(obj, hit, 'display_path_abs')
+        #_set_attr(obj, hit, 'streaming_path')
+        #_set_attr(obj, hit, 'rtmp_path')
+        _set_attr(obj, hit, 'streaming_url')
+        _set_attr(obj, hit, 'external_url')
+        _set_attr(obj, hit, 'media_format')
+        _set_attr(obj, hit, 'aspect_ratio')
+        _set_attr(obj, hit, 'caption')
+        _set_attr(obj, hit, 'caption_extended')
+        #_set_attr(obj, hit, 'transcript_path')
+        _set_attr(obj, hit, 'transcript')
+        _set_attr(obj, hit, 'courtesy')
+        _set_attr(obj, hit, 'filename')
+        _set_attr(obj, hit, 'img_path')
+        return obj
+    
     @staticmethod
     def from_mw(mwsource, url_title):
         """Creates an Source object from a models.legacy.Source object.
@@ -680,30 +645,56 @@ class Citation(object):
         self.retrieved = datetime.now()
 
 
-class Elasticsearch(object):
+class FacetTerm(repo_models.FacetTerm):
     """Interface to Elasticsearch backend
     NOTE: not a Django model object!
     """
+    
+    @staticmethod
+    def from_hit(hit):
+        """Creates a Source object from a elasticsearch_dsl.response.hit.Hit.
+        """
+        obj = FacetTerm(
+            meta={'id': hit.id}
+        )
+        _set_attr(obj, hit, 'id')
+        _set_attr(obj, hit, 'facet')
+        _set_attr(obj, hit, 'term_id')
+        _set_attr(obj, hit, 'links_html')
+        _set_attr(obj, hit, 'links_json')
+        _set_attr(obj, hit, 'links_children')
+        _set_attr(obj, hit, 'title')
+        _set_attr(obj, hit, 'description')
+        # topics
+        _set_attr(obj, hit, 'path')
+        _set_attr(obj, hit, 'parent_id')
+        _set_attr(obj, hit, 'ancestors')
+        _set_attr(obj, hit, 'siblings')
+        _set_attr(obj, hit, 'children')
+        _set_attr(obj, hit, 'weight')
+        _set_attr(obj, hit, 'encyc_urls')
+        # facility
+        _set_attr(obj, hit, 'type')
+        _set_attr(obj, hit, 'elinks')
+        _set_attr(obj, hit, 'location_geopoint')
+        return obj
 
     @staticmethod
     def topics():
-        terms = []
-        results = docstore.get(
-            settings.DOCSTORE_HOSTS, settings.DOCSTORE_INDEX, 'vocab',
-            'topics'
+        searcher = search.Searcher()
+        searcher.prepare(
+            params={
+                'facet_id': 'topics',
+            },
+            search_models=[docstore.Docstore().index_name('facetterm')],
+            fields_nested=[],
+            fields_agg={},
         )
-        if results and (results['_source']['terms']):
-            terms = [
-                {
-                    'id': term['id'],
-                    'title': term['title'],
-                    '_title': term['_title'],
-                    'encyc_urls': term['encyc_urls'],
-                }
-                for term in results['_source']['terms']
-            ]
-        return terms
-
+        results = searcher.execute(docstore.MAX_SIZE, 0)
+        objects = results.objects
+        data = sorted([FacetTerm.from_hit(hit) for hit in objects])
+        return data
+    
     @staticmethod
     def topics_by_url():
         KEY = 'encyc-front:topics_by_url'
@@ -711,162 +702,23 @@ class Elasticsearch(object):
         data = cache.get(KEY)
         if not data:
             data = {}
-            for term in Elasticsearch.topics():
-                for url in term['encyc_urls']:
-                    if not data.get(url, None):
-                        data[url] = []
-                    data[url].append(term)
+            for term in FacetTerm.topics():
+                if hasattr(term, 'encyc_urls') and term.encyc_urls:
+                    for url in term.encyc_urls:
+                        title = url['title']
+                        if not data.get(title, None):
+                            data[title] = []
+                        data[title].append(term)
             cache.set(KEY, data, TIMEOUT)
         return data
-    
-    @staticmethod
-    def index_articles(titles=[], start=0, num=1000000):
-        """
-        @param titles: list of url_titles to retrieve.
-        @param start: int Index of list at which to start.
-        @param num: int Number of articles to index, beginning at start.
-        @returns: (int num posted, list Articles that could not be posted)
-        """
-        posted = 0
-        could_not_post = []
-        for n,title in enumerate(titles):
-            if (posted < num) and (n > start):
-                logging.debug('%s/%s %s' % (n, len(titles), title))
-                mwpage = Proxy().page(title)
-                if (mwpage.published or settings.MEDIAWIKI_SHOW_UNPUBLISHED):
-                    page_sources = [source['encyclopedia_id'] for source in mwpage.sources]
-                    for mwsource in mwpage.sources:
-                        logging.debug('     %s' % mwsource['encyclopedia_id'])
-                        source = Source.from_mw(mwsource)
-                        source.save()
-                    page = Page.from_mw(mwpage)
-                    page.save()
-                    posted = posted + 1
-                    logging.debug('posted %s' % posted)
-                else:
-                    could_not_post.append(page)
-        if could_not_post:
-            logging.debug('Could not post these: %s' % could_not_post)
-        return posted,could_not_post
 
-    @staticmethod
-    def index_author(title):
-        """
-        @param title: str
-        """
-        for n,title in enumerate(titles):
-            logging.debug('%s/%s %s' % (n, len(titles), title))
-            mwauthor = Proxy().page(title)
-            author = Author.from_mw(mwauthor)
-            author.save()
-
-    @staticmethod
-    def index_topics(json_text=None, url=settings.DDR_TOPICS_SRC_URL):
-        """Upload topics.json; used for Encyc->DDR links on article pages.
+    def articles(self):
+        """Returns list of published Pages for this topic.
         
-        url = 'https://partner.densho.org/vocab/api/0.2/topics.json'
-        models.Elasticsearch.index_topics(url)
-        
-        @param json_text: unicode Raw topics.json file text.
-        @param url: URL of topics.json
+        @returns: list
         """
-        if url and not json_text:
-            r = requests.get(url)
-            if r.status_code == 200:
-                json_text = r.text
-        docstore.post(
-            settings.DOCSTORE_HOSTS, settings.DOCSTORE_INDEX, 'vocab',
-            'topics', json.loads(json_text),
-        )
-
-    @staticmethod
-    def _new_update_deleted(mw_pages, es_objects):
-        """
-        @param mw_pages: dict MediaWiki articles keyed to titles
-        @param es_objects: dict Page or Author objects keyed to titles
-        @returns: tuple containing lists of titles (new+updated, deleted)
-        """
-        new = [title for title in mw_pages.keys() if not title in es_objects.keys()]
-        deleted = [title for title in es_objects.keys() if not title in mw_pages.keys()]
-        updated = [
-            es.title for es in es_objects.values()
-            if mw_pages.get(es.title) and (mw_pages[es.title]['lastmod'] > es.modified)
+        return [
+            page
+            for page in Page.pages()
+            if page.url_title in self.article_titles
         ]
-        return (new + updated, deleted)
-    
-    @staticmethod
-    def articles_to_update(mw_author_titles, mw_articles, es_articles):
-        """Returns titles of articles to update and delete
-        
-        >>> mw_author_titles = Proxy().authors(cached_ok=False)
-        >>> mw_articles = Proxy().articles_lastmod()
-        >>> es_articles = Page.pages()
-        >>> update,delete = Elasticsearch.articles_to_update(mw_author_titles, mw_articles, es_articles)
-        
-        @param mw_author_titles: list of author page titles
-        @param mw_articles: list of MediaWiki author page dicts.
-        @param es_articles: list of elastic.Page objects.
-        @returns: (update,delete)
-        """
-        return Elasticsearch._new_update_deleted(
-            {a['title']: a for a in mw_articles if a['title'] not in mw_author_titles},
-            {a.title: a for a in es_articles}
-        )
-    
-    @staticmethod
-    def authors_to_update(mw_author_titles, mw_articles, es_authors):
-        """Returns titles of authors to add or delete
-        
-        Does not track updates because it's easy just to update them all.
-        
-        >>> mw_author_titles = Proxy().authors(cached_ok=False)
-        >>> mw_articles = Proxy().articles_lastmod()
-        >>> es_authors = Author.authors()
-        >>> update,delete = Elasticsearch.authors_to_update(mw_author_titles, mw_articles, es_authors)
-        
-        @param mw_author_titles: list of author page titles
-        @param mw_articles: list of MediaWiki author page dicts.
-        @param es_authors: list of elastic.Author objects.
-        @returns: (update,delete)
-        """
-        return Elasticsearch._new_update_deleted(
-            {a['title']: a for a in mw_articles if a['title'] in mw_author_titles},
-            {a.title: a for a in es_authors}
-        )
-
-    @staticmethod
-    def update_all():
-        """Check with Proxy source and update authors and articles.
-        
-        IMPORTANT: Will lock if unable to connect to MediaWiki server!
-        """
-        # authors
-        connections.create_connection(hosts=settings.DOCSTORE_HOSTS)
-        index = Index(settings.DOCSTORE_INDEX)
-        mw_authors = Proxy().authors(cached_ok=False)
-        es_authors = self.authors()
-        authors_new,authors_delete = self.authors_to_update(mw_authors, es_authors)
-        
-        for n,title in enumerate(authors_delete):
-            logging.debug('%s/%s %s' % (n, len(authors_delete), title))
-            author = Author.get(url_title=title)
-            author.delete()
-            
-        for n,title in enumerate(authors_new):
-            logging.debug('%s/%s %s' % (n, len(authors_new), title))
-            mwauthor = Proxy().page(title)
-            author = Author.from_mw(mwauthor)
-            author.save()
-        
-        # articles
-        connections.create_connection(hosts=settings.DOCSTORE_HOSTS)
-        index = Index(settings.DOCSTORE_INDEX)
-        # authors need to be refreshed
-        mw_authors = Proxy().authors(cached_ok=False)
-        mw_articles = Proxy().articles_lastmod()
-        es_authors = self.authors()
-        es_articles = self.articles()
-        articles_update,articles_delete = self.articles_to_update(
-            mw_authors, mw_articles, es_authors, es_articles)
-        self.delete_articles(titles=articles_delete)
-        self.index_articles(titles=articles_update)

@@ -3,7 +3,6 @@
 *~
 build/
 debs/
-front/front/settings.py
 media/
 pip-log.txt
 tmp/

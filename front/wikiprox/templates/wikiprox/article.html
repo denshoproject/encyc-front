@@ -124,7 +124,8 @@
 <div id="sidebar-left" class="visible-phone" style="margin-bottom:20px;">
 
 
-{% if page.sources.0 %}
+  {% if page.sources.0 %}
+  <!-- page.sources.0 {{ page.sources.0 }} - page.sources.0.img_url_local {{ page.sources.0.img_url_local }} -->
   {% thumbnail page.sources.0.img_url_local "260x400" as thumb_sm %}
   <div id="media-pointer" style="text-align:right; background:#fff; padding-left:20px; padding-bottom:10px; margin-left:20px; margin-bottom:20px; float:right;">
     <a href="#primary-sources">
@@ -175,6 +176,7 @@
   <a name="primary-sources"></a>
   <div class="block primarysources">
 {% for source in page.sources %}
+<!-- source {{ source }} -->
 {% primarysource source %}
 {% endfor %}
   </div><!-- .block .primarysources -->
@@ -226,6 +228,7 @@
   <a name="primary-sources"></a>
   <div class="block primarysources">
 {% for source in page.sources %}
+<!-- source {{ source }} -->
 {% primarysource_lightbox source %}
 {% endfor %}
   </div><!-- .block .primarysources -->

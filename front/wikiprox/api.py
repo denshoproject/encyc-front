@@ -28,7 +28,6 @@ def article(request, url_title, format=None):
     """
     try:
         page = Page.get(url_title)
-        page.scrub()
     except NotFoundError:
         return Response(status=status.HTTP_404_NOT_FOUND)
     categories = [

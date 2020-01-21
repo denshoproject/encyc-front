@@ -36,7 +36,6 @@ def authors(request, template_name='wikiprox/authors.html'):
 def author(request, url_title, template_name='wikiprox/author.html'):
     try:
         author = Author.get(url_title)
-        author.scrub()
     except NotFoundError:
         raise Http404
     return render(request, template_name, {
@@ -50,13 +49,11 @@ def article(request, url_title='index', printed=False, template_name='wikiprox/p
     alt_title = url_title.replace('_', ' ')
     try:
         page = Page.get(url_title)
-        page.scrub()
     except NotFoundError:
         page = None
     if not page:
         try:
             page = Page.get(alt_title)
-            page.scrub()
         except NotFoundError:
             page = None
     if not page:

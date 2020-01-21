@@ -21,10 +21,6 @@ from wikiprox import repo_models
 from wikiprox import search
 from wikiprox import sources
 
-if not settings.DEBUG:
-    from bs4 import BeautifulSoup
-    from wikiprox.mediawiki import remove_status_markers
-
 MAX_SIZE = 10000
 
 
@@ -130,14 +126,6 @@ class Author(repo_models.Author):
         _set_attr(obj, hit, 'body')
         _set_attr(obj, hit, 'article_titles')
         return obj
-
-    def scrub(self):
-        """Removes internal editorial markers.
-        Must be run on a full (non-list) Page object.
-        TODO Should this happen upon import from MediaWiki?
-        """
-        if (not settings.DEBUG) and hasattr(self,'body') and self.body:
-            self.body = unicode(remove_status_markers(BeautifulSoup(self.body)))
 
     @staticmethod
     def from_mw(mwauthor, author=None):
@@ -296,15 +284,6 @@ class Page(repo_models.Page):
             data = [page.title for page in Page.pages()]
             cache.set(KEY, data, settings.CACHE_TIMEOUT)
         return data
-
-    def scrub(self):
-        """remove internal editorial markers.
-        
-        Must be run on a full (non-list) Page object.
-        TODO Should this happen upon import from MediaWiki?
-        """
-        if (not settings.DEBUG) and hasattr(self,'body') and self.body:
-            self.body = unicode(remove_status_markers(BeautifulSoup(self.body)))
     
     def sources(self):
         """Returns list of published light Source objects for this Page.

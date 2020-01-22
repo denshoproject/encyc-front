@@ -263,7 +263,7 @@ THUMBNAIL_COLORSPACE = 'sRGB'
 THUMBNAIL_OPTIONS = ''
 THUMBNAIL_CACHE_TIMEOUT = 60*60*24*365*10  # 10 years
 THUMBNAIL_DUMMY = False
-THUMBNAIL_URL_TIMEOUT = 60  # 1min
+THUMBNAIL_URL_TIMEOUT = int(config.get('media', 'thumbnail_url_timeout'))
 
 #STATICFILES_FINDERS = (
 #    'django.contrib.staticfiles.finders.FileSystemFinder',

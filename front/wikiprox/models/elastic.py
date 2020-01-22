@@ -172,9 +172,13 @@ class Page(repo_models.Page):
     @staticmethod
     def get(title):
         ds = docstore.Docstore()
-        return super(Page, Page).get(
+        page = super(Page, Page).get(
             id=title, index=ds.index_name('article'), using=ds.es
         )
+        # filter out ResourceGuide items
+        if not page.published_encyc:
+            return None
+        return page
     
     def absolute_url(self):
         return reverse('wikiprox-page', args=([self.title]))
@@ -206,7 +210,8 @@ class Page(repo_models.Page):
         data = cache.get(KEY)
         if not data:
             params={
-                'published_encyc': True,  # filter out items from ResourceGuide
+                # filter out ResourceGuide items
+                'published_encyc': True,
             }
             searcher = search.Searcher()
             searcher.prepare(

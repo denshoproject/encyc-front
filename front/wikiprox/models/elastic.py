@@ -388,6 +388,7 @@ class Page(repo_models.Page):
 
     def set_prev_next(self):
         """Sets and previous and next page objects
+        Don't put in Page.get or lists or you'll get three pages for every one
         """
         # previous,next pages
         titles = Page.titles()
@@ -395,8 +396,14 @@ class Page(repo_models.Page):
         for n,title in enumerate(titles):
             if title == self.title:
                 page_index = n
-        self.prev_page = Page.get(titles[page_index-1])
-        self.next_page = Page.get(titles[page_index+1])
+        try:
+            self.prev_page = Page.get(titles[page_index-1])
+        except:
+            self.prev_page = None
+        try:
+            self.next_page = Page.get(titles[page_index+1])
+        except:
+            self.next_page = None
         return self.prev_page,self.next_page
 
 class Source(repo_models.Source):

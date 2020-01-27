@@ -52,13 +52,6 @@ Switch to the application user, activate the `virtualenv`, and run the Django sh
     $ source  ../venv/front/bin/activate
     $ python manage.py shell
 
-If this is a fresh install, or if you want to start over, delete the Elasticsearch index and create a new one.::
-
-    >>> from django.conf import settings
-    >>> from wikiprox import docstore
-    >>> docstore.delete_index(settings.DOCSTORE_HOSTS, settings.DOCSTORE_INDEX)
-    >>> docstore.create_index(settings.DOCSTORE_HOSTS, settings.DOCSTORE_INDEX)
-
 Now you are ready to upload the DDR topics file and pull down all the published articles.::
 
     >>> from wikiprox import models

@@ -15,8 +15,8 @@ class PrimarySourceNode(template.Node):
         try:
             primarysource = self.primarysource.resolve(context)
             lightbox = self.lightbox
-        except template.VariableDoesNotExist:
-            return ''
+        except template.VariableDoesNotExist as err:
+            return '<!-- {{ err }} -->'
         return format_primary_source(primarysource, lightbox)
 
 def do_primarysource(parser, token):

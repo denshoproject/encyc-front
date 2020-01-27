@@ -10,7 +10,6 @@ from django.shortcuts import redirect, render
 from django.views.decorators.http import require_http_methods
 
 from wikiprox import ddr
-from wikiprox.models import Elasticsearch as Backend
 from wikiprox.models import Page, Source, Author, Citation
 from wikiprox.models import NotFoundError
 
@@ -37,7 +36,6 @@ def authors(request, template_name='wikiprox/authors.html'):
 def author(request, url_title, template_name='wikiprox/author.html'):
     try:
         author = Author.get(url_title)
-        author.scrub()
     except NotFoundError:
         raise Http404
     return render(request, template_name, {
@@ -51,13 +49,11 @@ def article(request, url_title='index', printed=False, template_name='wikiprox/p
     alt_title = url_title.replace('_', ' ')
     try:
         page = Page.get(url_title)
-        page.scrub()
     except NotFoundError:
         page = None
     if not page:
         try:
             page = Page.get(alt_title)
-            page.scrub()
         except NotFoundError:
             page = None
     if not page:
@@ -69,14 +65,16 @@ def article(request, url_title='index', printed=False, template_name='wikiprox/p
             return HttpResponseRedirect(reverse('wikiprox-author', args=[alt_title]))
         raise Http404
     
-    if not page.published_encyc:
-        raise Http404
     if (not page.published) and (not settings.MEDIAWIKI_SHOW_UNPUBLISHED):
         template_name = 'wikiprox/unpublished.html'
     elif printed:
         template_name = 'wikiprox/article-print.html'
     else:
         template_name = 'wikiprox/article.html'
+    
+    # choose previous,next page objects
+    page.set_prev_next()
+    
     # DDR objects
     # show small number of objects, distributed among topics
     TOTAL_OBJECTS = 10

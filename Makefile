@@ -41,8 +41,7 @@ ifeq ($(DEBIAN_CODENAME), stretch)
 	OPENJDK_PKG=openjdk-8-jre
 endif
 
-ELASTICSEARCH=elasticsearch-2.4.4.deb
-# wget https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.0.1.deb
+ELASTICSEARCH=elasticsearch-2.4.6.deb
 
 SUPERVISOR_GUNICORN_CONF=/etc/supervisor/conf.d/$(APP).conf
 SUPERVISOR_CONF=/etc/supervisor/supervisord.conf
@@ -421,9 +420,6 @@ install-configs:
 	@echo ""
 	@echo "installing configs ----------------------------------------------------"
 # web app settings
-	cp $(INSTALLDIR)/conf/settings.py $(INSTALLDIR)/front/front/
-	chown root.root $(INSTALLDIR)/front/front/settings.py
-	chmod 644 $(INSTALLDIR)/front/front/settings.py
 	-mkdir /etc/encyc
 	cp $(INSTALLDIR)/conf/front.cfg /etc/encyc/
 	chown root.encyc /etc/encyc/front.cfg

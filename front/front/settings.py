@@ -79,7 +79,7 @@ if GITPKG_DEBUG:
         ]
         return pkg_paths
     
-    PACKAGES = package_debs('encycrg-%s' % GIT_BRANCH)
+    PACKAGES = package_debs('front-%s' % GIT_BRANCH)
 
 else:
     GIT_BRANCH = []
@@ -99,14 +99,9 @@ STATIC_URL = config.get('media', 'static_url')
 MEDIA_URL = config.get('media', 'media_url')
 MEDIA_URL_LOCAL = config.get('media', 'media_url_local')
 
-# elasticsearch
-DOCSTORE_HOSTS = []
-for node in config.get('elasticsearch', 'hosts').strip().split(','):
-    host,port = node.strip().split(':')
-    DOCSTORE_HOSTS.append(
-        {'host':host, 'port':port}
-    )
-DOCSTORE_INDEX = config.get('elasticsearch', 'index')
+#elasticsearch
+DOCSTORE_HOST = config.get('elasticsearch','docstore_host')
+DOCSTORE_TIMEOUT = int(config.get('elasticsearch','docstore_timeout'))
 
 # mediawiki
 MEDIAWIKI_HTML = 'http://dango.densho.org:9066/mediawiki/index.php'
@@ -268,7 +263,7 @@ THUMBNAIL_COLORSPACE = 'sRGB'
 THUMBNAIL_OPTIONS = ''
 THUMBNAIL_CACHE_TIMEOUT = 60*60*24*365*10  # 10 years
 THUMBNAIL_DUMMY = False
-THUMBNAIL_URL_TIMEOUT = 60  # 1min
+THUMBNAIL_URL_TIMEOUT = int(config.get('media', 'thumbnail_url_timeout'))
 
 #STATICFILES_FINDERS = (
 #    'django.contrib.staticfiles.finders.FileSystemFinder',

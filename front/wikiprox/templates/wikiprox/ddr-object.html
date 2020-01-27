@@ -1,5 +1,5 @@
 {% load thumbnail %}<span class="ddr_object"
-><a href="{{ DDR_MEDIA_URL }}{{ object.img_path }}"
+><a href="{{ object.img_url }}"
     class="document lightview"
     data-lightview-caption="{{ object.title }} ({{ object.id }})"
 >{% thumbnail object.img_url_local "150x150" crop="center" as thumb %}<img

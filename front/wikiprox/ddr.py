@@ -48,6 +48,8 @@ def _term_documents(term_id, size):
             if o.get('links',{}).get('html'):
                 o['absolute_url'] = o['links']['html']
             if o.get('links',{}).get('thumb'):
+                o['img_url'] = o['links']['img']
+            if o.get('links',{}).get('thumb'):
                 o['img_url_local'] = o['links']['thumb']
         cache.set(cache_key, json.dumps(objects), settings.CACHE_TIMEOUT)
     return objects

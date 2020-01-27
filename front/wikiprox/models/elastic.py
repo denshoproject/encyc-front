@@ -21,10 +21,6 @@ from wikiprox import repo_models
 from wikiprox import search
 from wikiprox import sources
 
-if not settings.DEBUG:
-    from bs4 import BeautifulSoup
-    from wikiprox.mediawiki import remove_status_markers
-
 MAX_SIZE = 10000
 
 
@@ -131,14 +127,6 @@ class Author(repo_models.Author):
         _set_attr(obj, hit, 'article_titles')
         return obj
 
-    def scrub(self):
-        """Removes internal editorial markers.
-        Must be run on a full (non-list) Page object.
-        TODO Should this happen upon import from MediaWiki?
-        """
-        if (not settings.DEBUG) and hasattr(self,'body') and self.body:
-            self.body = unicode(remove_status_markers(BeautifulSoup(self.body)))
-
     @staticmethod
     def from_mw(mwauthor, author=None):
         """Creates an Author object from a models.legacy.Author object.
@@ -184,9 +172,13 @@ class Page(repo_models.Page):
     @staticmethod
     def get(title):
         ds = docstore.Docstore()
-        return super(Page, Page).get(
+        page = super(Page, Page).get(
             id=title, index=ds.index_name('article'), using=ds.es
         )
+        # filter out ResourceGuide items
+        if not page.published_encyc:
+            return None
+        return page
     
     def absolute_url(self):
         return reverse('wikiprox-page', args=([self.title]))
@@ -218,7 +210,8 @@ class Page(repo_models.Page):
         data = cache.get(KEY)
         if not data:
             params={
-                'published_encyc': True,  # filter out items from ResourceGuide
+                # filter out ResourceGuide items
+                'published_encyc': True,
             }
             searcher = search.Searcher()
             searcher.prepare(
@@ -296,15 +289,6 @@ class Page(repo_models.Page):
             data = [page.title for page in Page.pages()]
             cache.set(KEY, data, settings.CACHE_TIMEOUT)
         return data
-
-    def scrub(self):
-        """remove internal editorial markers.
-        
-        Must be run on a full (non-list) Page object.
-        TODO Should this happen upon import from MediaWiki?
-        """
-        if (not settings.DEBUG) and hasattr(self,'body') and self.body:
-            self.body = unicode(remove_status_markers(BeautifulSoup(self.body)))
     
     def sources(self):
         """Returns list of published light Source objects for this Page.
@@ -404,6 +388,7 @@ class Page(repo_models.Page):
 
     def set_prev_next(self):
         """Sets and previous and next page objects
+        Don't put in Page.get or lists or you'll get three pages for every one
         """
         # previous,next pages
         titles = Page.titles()
@@ -411,8 +396,14 @@ class Page(repo_models.Page):
         for n,title in enumerate(titles):
             if title == self.title:
                 page_index = n
-        self.prev_page = Page.get(titles[page_index-1])
-        self.next_page = Page.get(titles[page_index+1])
+        try:
+            self.prev_page = Page.get(titles[page_index-1])
+        except:
+            self.prev_page = None
+        try:
+            self.next_page = Page.get(titles[page_index+1])
+        except:
+            self.next_page = None
         return self.prev_page,self.next_page
 
 class Source(repo_models.Source):

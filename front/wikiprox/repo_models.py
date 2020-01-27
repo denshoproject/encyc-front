@@ -59,8 +59,8 @@ class Page(dsl.Document):
     url_title = dsl.Keyword()  # Elasticsearch id
     public = dsl.Boolean()
     published = dsl.Boolean()
-    published_encyc = None
-    published_rg = None
+    published_encyc = dsl.Boolean()
+    published_rg = dsl.Boolean()
     modified = dsl.Date()
     mw_api_url = dsl.Keyword()
     title_sort = dsl.Keyword()

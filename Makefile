@@ -155,6 +155,8 @@ howto-install:
 
 install: install-prep install-app install-static install-configs
 
+test: test-app
+
 update: update-front
 
 uninstall: uninstall-front
@@ -244,6 +246,8 @@ install-setuptools: install-virtualenv
 
 install-app: install-virtualenv install-setuptools install-encyc-front
 
+test-app: test-encyc-front
+
 update-app: update-encyc-front install-configs
 
 uninstall-app: uninstall-encyc-front
@@ -308,6 +312,12 @@ uninstall-encyc-front:
 
 restart-front:
 	/etc/init.d/supervisor restart front
+
+test-encyc-front:
+	@echo ""
+	@echo "test-encyc-front -------------------------------------------------------"
+	source $(VIRTUALENV)/bin/activate; \
+	cd $(INSTALLDIR); python front/manage.py test
 
 shell:
 	source $(VIRTUALENV)/bin/activate; \

@@ -317,7 +317,7 @@ test-encyc-front:
 	@echo ""
 	@echo "test-encyc-front -------------------------------------------------------"
 	source $(VIRTUALENV)/bin/activate; \
-	cd $(INSTALLDIR); python front/manage.py test
+	cd $(INSTALLDIR); python front/manage.py test wikiprox
 
 shell:
 	source $(VIRTUALENV)/bin/activate; \

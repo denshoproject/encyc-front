@@ -313,6 +313,20 @@ uninstall-encyc-front:
 restart-front:
 	/etc/init.d/supervisor restart front
 
+test-encyc-front: test-encyc-events test-encyc-locations test-encyc-front
+
+test-encyc-events:
+	@echo ""
+	@echo "test-encyc-events ``----------------------------------------------------"
+	source $(VIRTUALENV)/bin/activate; \
+	cd $(INSTALLDIR); python front/manage.py test events
+
+test-encyc-locations:
+	@echo ""
+	@echo "test-encyc-locations ``-------------------------------------------------"
+	source $(VIRTUALENV)/bin/activate; \
+	cd $(INSTALLDIR); python front/manage.py test locations
+
 test-encyc-front:
 	@echo ""
 	@echo "test-encyc-front -------------------------------------------------------"

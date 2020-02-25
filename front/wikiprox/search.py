@@ -5,11 +5,9 @@ import logging
 logger = logging.getLogger(__name__)
 import os
 import re
-import urlparse
 
-from elasticsearch_dsl import Index, Search, A, Q
-from elasticsearch_dsl.query import Match, MultiMatch, QueryString
-from elasticsearch_dsl.connections import connections
+from elasticsearch_dsl import Search
+from elasticsearch_dsl.query import QueryString
 
 from django.conf import settings
 
@@ -111,25 +109,6 @@ SEARCH_INCLUDE_FIELDS = [
     'topics',
 ]
 
-# TODO derive from ddr-defs/repo_models/
-SEARCH_FORM_LABELS = {
-    'model': 'Model',
-    'status': 'Status',
-    'public': 'Public',
-    'contributor': 'Contributor',
-    'creators.namepart': 'Creators',
-    'facility': 'Facility',
-    'format': 'Format',
-    'genre': 'Genre',
-    'geography.term': 'Geography',
-    'language': 'Language',
-    'location': 'Location',
-    'mimetype': 'Mimetype',
-    'persons': 'Persons',
-    'rights': 'Rights',
-    'topics': 'Topics',
-}
-
 
 def es_offset(pagesize, thispage):
     """Convert Django pagination to Elasticsearch limit/offset
@@ -163,22 +142,6 @@ def start_stop(limit, offset):
     start = int(offset)
     stop = (start + int(limit))
     return start,stop
-    
-def django_page(limit, offset):
-    """Convert Elasticsearch limit/offset pagination to Django page
-    
-    >>> django_page(limit=10, offset=0)
-    1
-    >>> django_page(limit=10, offset=10)
-    2
-    >>> django_page(limit=10, offset=20)
-    3
-    
-    @param limit: int Number of items per page
-    @param offset: int Start of current page
-    @returns: int page
-    """
-    return divmod(offset, limit)[0] + 1
 
 def es_host_name(conn):
     """Extracts host:port from Elasticsearch conn object.
@@ -194,9 +157,6 @@ def es_host_name(conn):
     text = conn.__repr__()[start:end].replace("'", '"')
     hostdata = json.loads(text)
     return ':'.join([hostdata['host'], hostdata['port']])
-
-def es_search():
-    return Search(using=docstore.Docstore().es)
 
 
 class SearchResults(object):
@@ -322,8 +282,6 @@ class SearchResults(object):
         if params.get('page'): params.pop('page')
         if params.get('limit'): params.pop('limit')
         if params.get('offset'): params.pop('offset')
-        qs = [key + '=' + val for key,val in params.items()]
-        query_string = '&'.join(qs)
         data['prev_api'] = ''
         data['next_api'] = ''
         data['objects'] = []
@@ -349,38 +307,6 @@ class SearchResults(object):
         
         return data
 
-
-# TODO move to models
-def format_object(oi, d, is_detail=False):
-    """Format detail or list objects for command-line
-    
-    Certain fields are always included (id, title, etc and links).
-    Everything else is determined by what fields are in the result dict.
-    
-    d is basically an elasticsearch_dsl.Hit, packaged by
-    search.SearchResults.
-    
-    @param oi: Identifier
-    @param d: dict
-    @param is_detail: boolean
-    """
-    try:
-        collection_id = oi.collection_id()
-    except:
-        collection_id = None
-    
-    data = OrderedDict()
-    data['id'] = d.pop('id')
-    data['model'] = oi.model
-    data['collection_id'] = collection_id
-    data['links'] = make_links(
-        oi, d, source='es', is_detail=is_detail
-    )
-    DETAIL_EXCLUDE = []
-    for key,val in d.items():
-        if key not in DETAIL_EXCLUDE:
-            data[key] = val
-    return data
 
 def make_links(oi, d, source='fs', is_detail=False):
     """Make the 'links pod' at the top of detail or list objects.
@@ -484,7 +410,6 @@ class Searcher(object):
         params = {}
         q = OrderedDict()
         query = {}
-        sort_cleaned = None
     
     def __repr__(self):
         return u"<Searcher '%s', %s>" % (

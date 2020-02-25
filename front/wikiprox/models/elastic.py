@@ -36,24 +36,6 @@ def _columnizer(things, cols):
     columns.append(col)
     return columns
 
-def hitvalue(hit, field):
-    """
-    For some reason, Search hit objects wrap values in lists.
-    returns the value inside the list.
-    """
-    if hit.get(field) and isinstance(hit[field], list):
-        value = hit[field][0]
-    else:
-        value = hit[field]
-    return value
-
-def none_strip(text):
-    """Turn Nones into empty str, strip whitespace.
-    """
-    if text == None:
-        text = ''
-    return text.strip()
-
 def _set_attr(obj, hit, fieldname):
     """Assign a SearchResults Hit value if present
     """
@@ -127,45 +109,6 @@ class Author(repo_models.Author):
         _set_attr(obj, hit, 'article_titles')
         return obj
 
-    @staticmethod
-    def from_mw(mwauthor, author=None):
-        """Creates an Author object from a models.legacy.Author object.
-        """
-        if author:
-            author.public = mwauthor.public
-            author.published = mwauthor.published
-            author.modified = mwauthor.lastmod
-            author.mw_api_url = mwauthor.uri
-            author.title_sort = mwauthor.title_sort
-            author.title = none_strip(mwauthor.title)
-            author.body = none_strip(mwauthor.body)
-            author.article_titles = [title for title in mwauthor.author_articles]
-        else:
-            author = Author(
-                meta = {'id': mwauthor.url_title},
-                #status_code = myauthor.status_code,
-                #error = myauthor.error,
-                #is_article = myauthor.is_article,
-                #is_author = myauthor.is_author,
-                #uri = mwauthor.uri,
-                #categories = myauthor.categories,
-                #sources = myauthor.sources,
-                #coordinates = myauthor.coordinates,
-                #authors = myauthor.authors,
-                #next_path = myauthor.next_path,
-                #prev_page = myauthor.prev_page,
-                url_title = mwauthor.url_title,
-                public = mwauthor.public,
-                published = mwauthor.published,
-                modified = mwauthor.lastmod,
-                mw_api_url = mwauthor.uri,
-                title_sort = mwauthor.title_sort,
-                title = none_strip(mwauthor.title),
-                body = none_strip(mwauthor.body),
-                article_titles = [title for title in mwauthor.author_articles],
-            )
-        return author
-
 
 class Page(repo_models.Page):
 
@@ -196,9 +139,6 @@ class Page(repo_models.Page):
                 author = url_title
             objects.append(author)
         return objects
-
-    def first_letter(self):
-        return self.title_sort[0]
     
     @staticmethod
     def pages():
@@ -342,49 +282,6 @@ class Page(repo_models.Page):
             size=size
         )
         return ddr._balance(objects, size)
-    
-    @staticmethod
-    def from_mw(mwpage, page=None):
-        """Creates an Page object from a models.legacy.Page object.
-        """
-        if page:
-            page.public = mwpage.public
-            page.published = mwpage.published
-            page.modified = mwpage.lastmod
-            page.mw_api_url = mwpage.url
-            page.title_sort = mwpage.title_sort
-            page.title = none_strip(mwpage.title)
-            page.body = none_strip(mwpage.body)
-            page.prev_page = mwpage.prev_page
-            page.next_page = mwpage.next_page
-            page.categories = [category for category in mwpage.categories]
-            page.coordinates = [coord for coord in mwpage.coordinates]
-            page.source_ids = [source['encyclopedia_id'] for source in mwpage.sources]
-            page.authors_data = mwpage.authors
-        else:
-            page = Page(
-                meta = {'id': mwpage.url_title},
-                #status_code = mwpage.status_code,
-                #error = mwpage.error,
-                #is_article = mwpage.is_article,
-                #is_author = mwpage.is_author,
-                #uri = mwpage.uri,
-                url_title = mwpage.url_title,
-                public = mwpage.public,
-                published = mwpage.published,
-                modified = mwpage.lastmod,
-                mw_api_url = mwpage.url,
-                title_sort = mwpage.title_sort,
-                title = none_strip(mwpage.title),
-                body = none_strip(mwpage.body),
-                prev_page = mwpage.prev_page,
-                next_page = mwpage.next_page,
-                categories = [category for category in mwpage.categories],
-                coordinates = [coord for coord in mwpage.coordinates],
-                source_ids = [source['encyclopedia_id'] for source in mwpage.sources],
-                authors_data = mwpage.authors,
-            )
-        return page
 
     def set_prev_next(self):
         """Sets and previous and next page objects
@@ -424,9 +321,6 @@ class Source(repo_models.Source):
     def img_url_local(self):
         return os.path.join(settings.SOURCES_MEDIA_URL_LOCAL, self.img_path)
     
-    #def streaming_url(self):
-    #    return os.path.join(settings.SOURCES_MEDIA_URL, self.streaming_path)
-    
     def transcript_url(self):
         if self.transcript_path():
             return os.path.join(settings.SOURCES_MEDIA_URL, self.transcript_path())
@@ -438,9 +332,6 @@ class Source(repo_models.Source):
                 os.path.basename(self.original_url)
             )
         return None
-
-    def rtmp_path(self):
-        return self.streaming_url
     
     def streaming_path(self):
         if self.streaming_url:
@@ -531,59 +422,6 @@ class Source(repo_models.Source):
         _set_attr(obj, hit, 'filename')
         _set_attr(obj, hit, 'img_path')
         return obj
-    
-    @staticmethod
-    def from_mw(mwsource, url_title):
-        """Creates an Source object from a models.legacy.Source object.
-        
-        @param mwsource: wikiprox.models.legacy.Source
-        @param url_title: str url_title of associated Page
-        @returns: wikiprox.models.elastic.Source
-        """
-        # source.streaming_url has to be relative to RTMP_STREAMER
-        # TODO this should really happen when it's coming in from MediaWiki.
-        if mwsource.get('streaming_url'):
-            streaming_url = mwsource['streaming_url'].replace(settings.RTMP_STREAMER, '')
-        else:
-            streaming_url = ''
-        # fullsize image for thumbnail
-        filename = ''
-        img_path = ''
-        if mwsource.get('display'):
-            filename = os.path.basename(mwsource['display'])
-            img_path = os.path.join(settings.SOURCES_MEDIA_BUCKET, filename)
-        elif mwsource.get('original'):
-            filename = os.path.basename(mwsource['original'])
-            img_path = os.path.join(settings.SOURCES_MEDIA_BUCKET, filename)
-        source = Source(
-            meta = {'id': mwsource['encyclopedia_id']},
-            encyclopedia_id = mwsource['encyclopedia_id'],
-            densho_id = mwsource['densho_id'],
-            psms_id = mwsource['id'],
-            psms_api_uri = mwsource['resource_uri'],
-            institution_id = mwsource['institution_id'],
-            collection_name = mwsource['collection_name'],
-            created = mwsource['created'],
-            modified = mwsource['modified'],
-            published = mwsource['published'],
-            creative_commons = mwsource['creative_commons'],
-            headword = url_title,
-            original_url = mwsource['original'],
-            streaming_url = streaming_url,
-            external_url = mwsource['external_url'],
-            media_format = mwsource['media_format'],
-            aspect_ratio = mwsource['aspect_ratio'],
-            original_size = mwsource['original_size'],
-            display_size = mwsource['display_size'],
-            display = mwsource['display'],
-            caption = none_strip(mwsource['caption']),
-            caption_extended = none_strip(mwsource['caption_extended']),
-            transcript = none_strip(mwsource['transcript']),
-            courtesy = none_strip(mwsource['courtesy']),
-            filename = filename,
-            img_path = img_path,
-        )
-        return source
 
 
 class Citation(object):

@@ -2,6 +2,38 @@ from django.test import TestCase
 from django.urls import reverse
 
 
+class APIView(TestCase):
+
+    def test_index(self):
+        assert self.client.get(reverse('front-api-index')).status_code == 200
+
+    def test_articles(self):
+        data = {}
+        response = self.client.get(reverse('wikiprox-api-articles'), data)
+        assert response.status_code == 200
+        data = {'offset': 25}
+        response = self.client.get(reverse('wikiprox-api-articles'), data)
+        assert response.status_code == 200
+
+    def test_article(self):
+        assert self.client.get(
+            reverse('wikiprox-api-page', args=['Ansel%20Adams'])
+        ).status_code == 200
+
+    def test_authors(self):
+        data = {}
+        response = self.client.get(reverse('wikiprox-api-authors'), data)
+        assert response.status_code == 200
+        data = {'offset': 25}
+        response = self.client.get(reverse('wikiprox-api-authors'), data)
+        assert response.status_code == 200
+
+    def test_author(self):
+        assert self.client.get(
+            reverse('wikiprox-api-author', args=['Kaori Akiyama'])
+        ).status_code == 200
+
+
 class WikiPageTitles(TestCase):
     """Test that characters in MediaWiki titles are matched correctly
     """

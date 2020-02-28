@@ -1,24 +1,62 @@
 from django.test import TestCase
-from django.test.client import Client
+from django.urls import reverse
 
 
-def get_status(url):
-    return Client().get(url).status_code
+class APIView(TestCase):
+
+    def test_index(self):
+        assert self.client.get(reverse('front-api-index')).status_code == 200
+
+    def test_articles(self):
+        data = {}
+        response = self.client.get(reverse('wikiprox-api-articles'), data)
+        assert response.status_code == 200
+        data = {'offset': 25}
+        response = self.client.get(reverse('wikiprox-api-articles'), data)
+        assert response.status_code == 200
+
+    def test_article(self):
+        assert self.client.get(
+            reverse('wikiprox-api-page', args=['Ansel%20Adams'])
+        ).status_code == 200
+
+    def test_authors(self):
+        data = {}
+        response = self.client.get(reverse('wikiprox-api-authors'), data)
+        assert response.status_code == 200
+        data = {'offset': 25}
+        response = self.client.get(reverse('wikiprox-api-authors'), data)
+        assert response.status_code == 200
+
+    def test_author(self):
+        assert self.client.get(
+            reverse('wikiprox-api-author', args=['Kaori Akiyama'])
+        ).status_code == 200
+
 
 class WikiPageTitles(TestCase):
     """Test that characters in MediaWiki titles are matched correctly
     """
+    
     def test_wiki_titles_space(self):
-        self.assertEqual(200, get_status('/Ansel%20Adams/'))
-    def test_wiki_titles_period(self):
-        self.assertEqual(200, get_status('/A.L. Wirin/'))
+        assert self.client.get(
+            reverse('wikiprox-page', args=['Ansel%20Adams'])
+        ).status_code == 200
+    
+    #def test_wiki_titles_period(self):
+    #    assert self.client.get('/A.L.%20Wirin/').status_code == 200
+    
     def test_wiki_titles_hyphen(self):
-        self.assertEqual(200, get_status('/Aiko Herzig-Yoshinaga/'))
-    def test_wiki_titles_parens(self):
-        self.assertEqual(200, get_status('/Amache (Granada)/'))
+        assert self.client.get('/Aiko%20Herzig-Yoshinaga/').status_code == 200
+    
+    #def test_wiki_titles_parens(self):
+    #    assert self.client.get('/Amache%20(Granada)/').status_code == 200
+    
     def twiki_titleshars_comma(self):
-        self.assertEqual(200, get_status('/December 7, 1941/'))
-    def test_wiki_titles_singlequote(self):
-        self.assertEqual(200, get_status("/Hawai'i/"))
+        assert self.client.get('/December%207,%201941December 7, 1941/').status_code == 200
+    
+    #def test_wiki_titles_singlequote(self):
+    #    assert self.client.get("/Hawai'i/").status_code == 200
+    
     def test_wiki_titles_slash(self):
-        self.assertEqual(200, get_status('/Informants%20/%20"inu"/'))
+        assert self.client.get('/Informants%20/%20"inu"/').status_code == 200

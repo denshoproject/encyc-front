@@ -5,7 +5,7 @@ import requests
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse, HttpResponseRedirect, Http404
+from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_http_methods
 
@@ -182,21 +182,4 @@ def related_ddr(request, url_title='index', template_name='wikiprox/related-ddr.
         'ddr_terms_objects': ddr_terms_objects,
         'show_topics_ul': show_topics_ul,
         'DDR_MEDIA_URL': settings.DDR_MEDIA_URL,
-    })
-
-@require_http_methods(['GET',])
-def media(request, filename, template_name='wikiprox/mediafile.html'):
-    """
-    """
-    mediafile = None
-    url = '%s/imagefile/?uri=tansu/%s' % (settings.SOURCES_API, filename)
-    r = requests.get(url, headers={'content-type':'application/json'})
-    if r.status_code != 200:
-        assert False
-    response = json.loads(r.text)
-    if response and (response['meta']['total_count'] == 1):
-        mediafile = response['objects'][0]
-    return render(request, template_name, {
-        'media_url': settings.SOURCES_MEDIA_URL,
-        'mediafile': mediafile,
     })

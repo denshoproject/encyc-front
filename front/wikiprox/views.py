@@ -25,7 +25,7 @@ def categories(request, template_name='wikiprox/categories.html'):
 
 def contents(request, template_name='wikiprox/contents.html'):
     return render(request,  template_name, {
-        'articles': Page.pages(),
+        'articles_by_initial': Page.pages_by_initial(),
     })
 
 def authors(request, template_name='wikiprox/authors.html'):

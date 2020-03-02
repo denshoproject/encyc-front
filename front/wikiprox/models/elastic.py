@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from datetime import datetime
 import json
 import logging
@@ -214,6 +215,32 @@ class Page(repo_models.Page):
                 (key,categories[key])
                 for key in sorted(categories.keys())
             ]
+            cache.set(KEY, data, settings.CACHE_TIMEOUT)
+        return data
+
+    @staticmethod
+    def pages_by_initial():
+        KEY = 'encyc-front:pages_by_category'
+        data = cache.get(KEY)
+        if not data:
+            data = OrderedDict()
+            data['1-10'] = []
+            for c in 'abcdefghijklmnopqrstuvwxyz':
+                data[c] = []
+            for page in Page.pages():
+                initial = page.title_sort[0].lower()
+                if initial.isdigit():
+                    initial = '1-10'
+                data[initial].append({
+                    'first_letter': page.title_sort[0].upper(),
+                    'title_sort': page.title_sort,
+                    'title': page.title,
+                    'url': page.absolute_url(),
+                })
+            for initial,pages in data.items():
+                data[initial] = sorted(
+                    pages, key=lambda page: page['title_sort']
+                )
             cache.set(KEY, data, settings.CACHE_TIMEOUT)
         return data
 

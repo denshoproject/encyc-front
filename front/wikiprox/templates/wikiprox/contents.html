@@ -20,15 +20,27 @@
 
 {% include "wikiprox/comingsoonmessage.html" %}
 
-{% regroup articles by first_letter as letters_list %}
-<dl>
-{% for letter in letters_list %}
-<dt><h2>{{ letter.grouper }}</h2></dt>
-<dd>
-{% for article in letter.list %}
-<a href="{{ article.absolute_url }}">{{ article.title }}</a>&nbsp;&nbsp;
+<!--
+<h3>
+{% for letter,articles in articles_by_initial.items %}
+  {% if articles %}
+    <a href="#{{ letter.upper }}">{{ letter.upper }}</a>&nbsp;
+  {% endif %}{# articles #}
 {% endfor %}
-</dd>
+</h3>
+-->
+
+<dl>
+  {% for letter,articles in articles_by_initial.items %}
+  {% if articles %}
+  <a name="{{ letter.upper }}"></a>
+  <dt><h2>{{ letter.upper }}</h2></dt>
+  <dd>
+    {% for article in articles %}
+    <a href="{{ article.absolute_url }}">{{ article.title }}</a>&nbsp;&nbsp;
+    {% endfor %}
+  </dd>
+  {% endif %}{# articles #}
 {% endfor %}
 </dl>
 

@@ -455,6 +455,10 @@ class Searcher(object):
         
         s = Search(using=self.conn, index=indices)
         
+        # filter out ResourceGuide items
+        if 'encycarticle' in indices:
+            s = s.filter('term', published_encyc=True)
+        
         if params.get('match_all'):
             s = s.query('match_all')
         elif params.get('fulltext'):

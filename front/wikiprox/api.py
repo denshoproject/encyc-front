@@ -5,8 +5,7 @@ from rest_framework.decorators import api_view
 from rest_framework.reverse import reverse
 from rest_framework.response import Response
 
-from wikiprox.models.elastic import Page, Source, Author
-from wikiprox.models.elastic import MAX_SIZE, NotFoundError
+from wikiprox import models
 
 
 @api_view(['GET'])
@@ -18,7 +17,7 @@ def articles(request, format=None):
             'title': article.title,
             'url': reverse('wikiprox-api-page', args=([article.url_title]), request=request),
         }
-        for article in Page.pages()
+        for article in models.Page.pages()
     ]
     return Response(data)
 
@@ -27,8 +26,8 @@ def article(request, url_title, format=None):
     """DOCUMENTATION GOES HERE.
     """
     try:
-        page = Page.get(url_title)
-    except NotFoundError:
+        page = models.Page.get(url_title)
+    except models.NotFoundError:
         return Response(status=status.HTTP_404_NOT_FOUND)
     categories = [
         reverse('wikiprox-api-category', args=([category]), request=request)
@@ -76,7 +75,7 @@ def authors(request, format=None):
             'title_sort': author.title_sort,
             'url': reverse('wikiprox-api-author', args=([author.url_title]), request=request),
         }
-        for author in Author.authors()
+        for author in models.Author.authors()
     ]
     return Response(data)
 
@@ -85,8 +84,8 @@ def author(request, url_title, format=None):
     """DOCUMENTATION GOES HERE.
     """
     try:
-        author = Author.get(url_title)
-    except NotFoundError:
+        author = models.Author.get(url_title)
+    except models.NotFoundError:
         return Response(status=status.HTTP_404_NOT_FOUND)
     articles = [
         {
@@ -112,7 +111,7 @@ def author(request, url_title, format=None):
 def categories(request, format=None):
     """DOCUMENTATION GOES HERE.
     """
-    categories = Page.pages_by_category()
+    categories = models.Page.pages_by_category()
     assert False
     return Response(data)
 
@@ -137,8 +136,8 @@ def source(request, encyclopedia_id, format=None):
     """DOCUMENTATION GOES HERE.
     """
     try:
-        source = Source.get(encyclopedia_id)
-    except NotFoundError:
+        source = models.Source.get(encyclopedia_id)
+    except models.NotFoundError:
         return Response(status=status.HTTP_404_NOT_FOUND)
     data = {
         'encyclopedia_id': source.encyclopedia_id,

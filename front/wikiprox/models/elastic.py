@@ -235,7 +235,7 @@ class Page(repo_models.Page):
                     'first_letter': page.title_sort[0].upper(),
                     'title_sort': page.title_sort,
                     'title': page.title,
-                    'url': page.absolute_url(),
+                    'absolute_url': page.absolute_url(),
                 })
             for initial,pages in data.items():
                 data[initial] = sorted(

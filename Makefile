@@ -243,7 +243,7 @@ install-setuptools: install-virtualenv
 	@echo "install-setuptools -----------------------------------------------------"
 	apt-get --assume-yes install python3-dev
 	source $(VIRTUALENV)/bin/activate; \
-	pip3 install -U setuptools
+	pip3 install -U --cache-dir=$(PIP_CACHE_DIR) setuptools
 
 
 install-app: install-virtualenv install-setuptools install-encyc-front
@@ -271,7 +271,7 @@ endif
 
 # virtualenv
 	source $(VIRTUALENV)/bin/activate; \
-	pip3 install -U -r $(INSTALLDIR)/requirements.txt
+	pip3 install -U --cache-dir=$(PIP_CACHE_DIR) -r $(INSTALLDIR)/requirements.txt
 # log dir
 	-mkdir /var/log/encyc
 	chown -R encyc.root /var/log/encyc
@@ -303,7 +303,7 @@ update-encyc-front:
 	@echo "encyc-front --------------------------------------------------------------"
 	git fetch && git pull
 	source $(VIRTUALENV)/bin/activate; \
-	pip3 install -U -r $(INSTALLDIR)/requirements.txt
+	pip3 install -U --cache-dir=$(PIP_CACHE_DIR) -r $(INSTALLDIR)/requirements.txt
 
 uninstall-encyc-front:
 	cd $(INSTALLDIR)/front

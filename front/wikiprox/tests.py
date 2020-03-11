@@ -33,6 +33,20 @@ class APIView(TestCase):
             reverse('wikiprox-api-author', args=['Kaori Akiyama'])
         ).status_code == 200
 
+    #def test_sources(self):
+    #    # can't browse sources independent of articles
+    #    data = {}
+    #    response = self.client.get(reverse('wikiprox-api-sources'), data)
+    #    assert response.status_code == 200
+    #    data = {'offset': 25}
+    #    response = self.client.get(reverse('wikiprox-api-sources'), data)
+    #    assert response.status_code == 200
+
+    def test_source(self):
+        assert self.client.get(
+            reverse('wikiprox-api-source', args=['en-littletokyousa-1'])
+        ).status_code == 200
+
 
 class WikiPageTitles(TestCase):
     """Test that characters in MediaWiki titles are matched correctly

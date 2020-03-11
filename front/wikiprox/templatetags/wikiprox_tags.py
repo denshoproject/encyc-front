@@ -26,7 +26,9 @@ def do_primarysource(parser, token):
         # split_contents() knows not to split quoted strings.
         tag_name, primarysource = token.split_contents()
     except ValueError:
-        raise template.TemplateSyntaxError, "%r tag requires a single argument" % token.contents.split()[0]
+        raise template.TemplateSyntaxError(
+            "%r tag requires a single argument" % token.contents.split()[0]
+        )
     return PrimarySourceNode(primarysource, lightbox=False)
 def do_primarysource_lightbox(parser, token):
     """Render a Source using a templatetag. With a lightbox.
@@ -35,7 +37,9 @@ def do_primarysource_lightbox(parser, token):
         # split_contents() knows not to split quoted strings.
         tag_name, primarysource = token.split_contents()
     except ValueError:
-        raise template.TemplateSyntaxError, "%r tag requires a single argument" % token.contents.split()[0]
+        raise template.TemplateSyntaxError(
+            "%r tag requires a single argument" % token.contents.split()[0]
+        )
     return PrimarySourceNode(primarysource, lightbox=True)
 
 register.tag('primarysource', do_primarysource)

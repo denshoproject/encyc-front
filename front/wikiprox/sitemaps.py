@@ -3,7 +3,7 @@ from datetime import datetime
 from django.conf import settings
 from django.contrib.sitemaps import Sitemap
 
-from wikiprox.models.elastic import Page, Source
+from wikiprox import models
 
 
 class Item(object):
@@ -22,7 +22,7 @@ class MediaWikiSitemap(Sitemap):
     
     def items(self):
         items = []
-        for p in Page.pages():
+        for p in models.Page.pages():
             item = Item()
             item.title = p.title
             item.location = p.absolute_url()
@@ -39,7 +39,7 @@ class SourceSitemap(Sitemap):
     
     def items(self):
         items = []
-        for s in Source.sources():
+        for s in models.Source.sources():
             item = Item()
             item.title = s.encyclopedia_id
             item.location = s.absolute_url()

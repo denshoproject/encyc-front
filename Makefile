@@ -6,6 +6,8 @@ SHELL = /bin/bash
 APP_VERSION := $(shell cat VERSION)
 GIT_SOURCE_URL=https://github.com/densho/encyc-front
 
+PYTHON_VERSION=3.5
+
 # Release name e.g. jessie
 DEBIAN_CODENAME := $(shell lsb_release -sc)
 # Release numbers e.g. 8.10
@@ -184,7 +186,7 @@ apt-upgrade:
 	apt-get --assume-yes upgrade
 
 install-core:
-	apt-get --assume-yes install bzip2 curl gdebi-core git-core logrotate ntp p7zip-full wget
+	apt-get --assume-yes install bzip2 curl gdebi-core git-core logrotate ntp p7zip-full python3 wget
 
 git-config:
 	git config --global alias.st status
@@ -239,15 +241,15 @@ remove-elasticsearch:
 install-virtualenv:
 	@echo ""
 	@echo "install-virtualenv -----------------------------------------------------"
-	apt-get --assume-yes install python-pip python-virtualenv
-	test -d $(VIRTUALENV) || virtualenv --distribute --setuptools $(VIRTUALENV)
+	apt-get --assume-yes install python3-pip python3-virtualenv
+	test -d $(VIRTUALENV) || virtualenv --python=python3 --distribute --setuptools $(VIRTUALENV)
 
 install-setuptools: install-virtualenv
 	@echo ""
 	@echo "install-setuptools -----------------------------------------------------"
-	apt-get --assume-yes install python-dev
+	apt-get --assume-yes install python3-dev
 	source $(VIRTUALENV)/bin/activate; \
-	pip install -U setuptools
+	pip3 install -U --cache-dir=$(PIP_CACHE_DIR) setuptools
 
 
 install-app: install-virtualenv install-setuptools install-encyc-front
@@ -264,7 +266,7 @@ clean-app: clean-encyc-front
 install-encyc-front:
 	@echo ""
 	@echo "encyc-front --------------------------------------------------------------"
-	apt-get --assume-yes install imagemagick libxml2 libxslt1.1 libxslt1-dev python-dev sqlite3 supervisor zlib1g-dev
+	apt-get --assume-yes install imagemagick libxml2 libxslt1.1 libxslt1-dev python3-dev sqlite3 supervisor zlib1g-dev
 
 ifeq ($(DEBIAN_CODENAME), wheezy)
 	apt-get --assume-yes install libjpeg8-dev
@@ -275,7 +277,7 @@ endif
 
 # virtualenv
 	source $(VIRTUALENV)/bin/activate; \
-	pip install -U -r $(INSTALLDIR)/requirements.txt
+	pip3 install -U --cache-dir=$(PIP_CACHE_DIR) -r $(INSTALLDIR)/requirements.txt
 # log dir
 	-mkdir /var/log/encyc
 	chown -R encyc.root /var/log/encyc
@@ -307,14 +309,14 @@ update-encyc-front:
 	@echo "encyc-front --------------------------------------------------------------"
 	git fetch && git pull
 	source $(VIRTUALENV)/bin/activate; \
-	pip install -U -r $(INSTALLDIR)/requirements.txt
+	pip3 install -U --cache-dir=$(PIP_CACHE_DIR) -r $(INSTALLDIR)/requirements.txt
 
 uninstall-encyc-front:
 	cd $(INSTALLDIR)/front
 	source $(VIRTUALENV)/bin/activate; \
-	-pip uninstall -r $(INSTALLDIR)/requirements.txt
-	-rm /usr/local/lib/python2.7/dist-packages/front-*
-	-rm -Rf /usr/local/lib/python2.7/dist-packages/front
+	-pip3 uninstall -r $(INSTALLDIR)/requirements.txt
+	-rm /usr/local/lib/python$(PYTHON_VERSION)/dist-packages/front-*
+	-rm -Rf /usr/local/lib/python$(PYTHON_VERSION)/dist-packages/front
 
 restart-front:
 	/etc/init.d/supervisor restart front
@@ -533,7 +535,7 @@ deb-stretch:
 	@echo ""
 	@echo "DEB packaging (stretch) ------------------------------------------------"
 	-rm -Rf $(DEB_FILE_STRETCH)
-	virtualenv --relocatable $(VIRTUALENV)  # Make venv relocatable
+	virtualenv --python=python3 --relocatable $(VIRTUALENV)  # Make venv relocatable
 	fpm   \
 	--verbose   \
 	--input-type dir   \
@@ -549,9 +551,9 @@ deb-stretch:
 	--depends "libxml2"   \
 	--depends "libxslt1.1"   \
 	--depends "libxslt1-dev"   \
-	--depends "python-dev"   \
-	--depends "python-pip"   \
-	--depends "python-virtualenv"   \
+	--depends "python3-dev"   \
+	--depends "python3-pip"   \
+	--depends "python3-virtualenv"   \
 	--depends "sqlite3"   \
 	--depends "zlib1g-dev"   \
 	--depends "libjpeg62-turbo-dev"   \
@@ -571,7 +573,7 @@ deb-stretch:
 	README.rst=$(DEB_BASE)   \
 	requirements.txt=$(DEB_BASE)   \
 	venv=$(DEB_BASE)   \
-	venv/front/lib/python2.7/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
+	venv/front/lib/python$(PYTHON_VERSION)/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
 	VERSION=$(DEB_BASE)
 
 deb-buster:
@@ -616,5 +618,5 @@ deb-buster:
 	README.rst=$(DEB_BASE)   \
 	requirements.txt=$(DEB_BASE)   \
 	venv=$(DEB_BASE)   \
-	venv/front/lib/python2.7/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
+	venv/front/lib/python$(PYTHON_VERSION)/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
 	VERSION=$(DEB_BASE)

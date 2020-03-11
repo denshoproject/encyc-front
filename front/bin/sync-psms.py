@@ -46,7 +46,7 @@ Add this to `/etc/crontab`:
 """
 
 import argparse
-import ConfigParser
+import configparser
 from datetime import datetime
 import os
 import subprocess
@@ -105,7 +105,7 @@ def separate_files_dirs(raw):
         info = parse_rsync_line(line)
         if info and (isinstance(info, dict)):
             files.append(info)
-        elif info and (isinstance(info, basestring)):
+        elif info and (isinstance(info, str)):
             dirs.append(info)
     return files,dirs
 
@@ -245,7 +245,7 @@ def main():
     )
     args = parser.parse_args()
     
-    config = ConfigParser.ConfigParser()
+    config = configparser.ConfigParser()
     configs_read = config.read(CONFIG_FILES)
     if not configs_read:
         raise Exception('No config file!')

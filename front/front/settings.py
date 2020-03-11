@@ -8,7 +8,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.6/ref/settings/
 """
 
-import ConfigParser
+import configparser
 import os
 import subprocess
 import sys
@@ -25,7 +25,7 @@ CONFIG_FILES = [
     '/etc/encyc/front.cfg',
     '/etc/encyc/front-local.cfg'
 ]
-config = ConfigParser.ConfigParser()
+config = configparser.ConfigParser()
 configs_read = config.read(CONFIG_FILES)
 if not configs_read:
     raise Exception('No config file!')
@@ -70,7 +70,7 @@ if GITPKG_DEBUG:
             return ''
         data = {}
         for line in dpkg_raw.splitlines():
-            if line and isinstance(line, basestring) and (':' in line):
+            if line and isinstance(line, str) and (':' in line):
                 key,val = line.split(':', 1)
                 data[key.strip().lower()] = val.strip()
         pkg_paths = [
@@ -185,7 +185,7 @@ REDIS_DB_SORL = 3
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "%s:%s:%s" % (REDIS_HOST, REDIS_PORT, REDIS_DB_CACHE),
+        "LOCATION": "redis://%s:%s" % (REDIS_HOST, REDIS_PORT),
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         },

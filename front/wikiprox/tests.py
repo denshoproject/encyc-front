@@ -17,7 +17,7 @@ class APIView(TestCase):
 
     def test_article(self):
         assert self.client.get(
-            reverse('wikiprox-api-page', args=['Ansel%20Adams'])
+            reverse('wikiprox-api-page', args=['Ansel Adams'])
         ).status_code == 200
 
     def test_authors(self):
@@ -33,6 +33,20 @@ class APIView(TestCase):
             reverse('wikiprox-api-author', args=['Kaori Akiyama'])
         ).status_code == 200
 
+    #def test_sources(self):
+    #    # can't browse sources independent of articles
+    #    data = {}
+    #    response = self.client.get(reverse('wikiprox-api-sources'), data)
+    #    assert response.status_code == 200
+    #    data = {'offset': 25}
+    #    response = self.client.get(reverse('wikiprox-api-sources'), data)
+    #    assert response.status_code == 200
+
+    def test_source(self):
+        assert self.client.get(
+            reverse('wikiprox-api-source', args=['en-littletokyousa-1'])
+        ).status_code == 200
+
 
 class WikiPageTitles(TestCase):
     """Test that characters in MediaWiki titles are matched correctly
@@ -40,23 +54,29 @@ class WikiPageTitles(TestCase):
     
     def test_wiki_titles_space(self):
         assert self.client.get(
-            reverse('wikiprox-page', args=['Ansel%20Adams'])
+            reverse('wikiprox-page', args=['Ansel Adams'])
         ).status_code == 200
     
     #def test_wiki_titles_period(self):
     #    assert self.client.get('/A.L.%20Wirin/').status_code == 200
     
     def test_wiki_titles_hyphen(self):
-        assert self.client.get('/Aiko%20Herzig-Yoshinaga/').status_code == 200
+        assert self.client.get(
+            reverse('wikiprox-page', args=['Aiko Herzig-Yoshinaga'])
+        ).status_code == 200
     
     #def test_wiki_titles_parens(self):
     #    assert self.client.get('/Amache%20(Granada)/').status_code == 200
     
     def twiki_titleshars_comma(self):
-        assert self.client.get('/December%207,%201941December 7, 1941/').status_code == 200
+        assert self.client.get(
+            reverse('wikiprox-page', args=['December 7, 1941'])
+        ).status_code == 200
     
     #def test_wiki_titles_singlequote(self):
     #    assert self.client.get("/Hawai'i/").status_code == 200
     
     def test_wiki_titles_slash(self):
-        assert self.client.get('/Informants%20/%20"inu"/').status_code == 200
+        assert self.client.get(
+            reverse('wikiprox-page', args=['Informants / "inu"'])
+        ).status_code == 200

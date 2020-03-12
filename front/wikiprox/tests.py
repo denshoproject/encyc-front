@@ -30,7 +30,7 @@ class APIView(TestCase):
 
     def test_author(self):
         assert self.client.get(
-            reverse('wikiprox-api-author', args=['Kaori Akiyama'])
+            reverse('wikiprox-api-author', args=['Brian Niiya'])
         ).status_code == 200
 
     #def test_sources(self):
@@ -80,3 +80,20 @@ class WikiPageTitles(TestCase):
         assert self.client.get(
             reverse('wikiprox-page', args=['Informants / "inu"'])
         ).status_code == 200
+    
+    def test_authors(self):
+        response = self.client.get(reverse('wikiprox-authors'))
+        assert response.status_code == 200
+        content = str(response.content)
+        assert 'span3 column1' in content
+        assert '/authors/Brian%20Niiya/' in content
+        assert 'Brian Niiya' in content
+    
+    def test_author(self):
+        response = self.client.get(
+            reverse('wikiprox-author', args=['Brian Niiya'])
+        )
+        assert response.status_code == 200
+        content = str(response.content)
+        assert '<b>Brian Niiya</b> is the content director' in content
+        assert '<a href="/A.L.%20Wirin/">A.L. Wirin</a>' in content

@@ -73,7 +73,7 @@ class Author(repo_models.Author):
         
         @returns: list
         """
-        KEY = 'encyc-front:authors'
+        KEY = 'encyc-front:authors:{}'.format(num_columns)
         data = cache.get(KEY)
         if not data:
             searcher = search.Searcher()

@@ -39,27 +39,13 @@ bios and a list of entries they have contributed to the encyclopedia.</p>
 
 <div class="authors row">
 {% for column in authors %}
-  <div class="span3">
+  <div class="span3 column{{ forloop.counter }}">
 {% for author in column %}
     <a href="{{ author.absolute_url }}">{{ author }}</a><br/>
 {% endfor %}
   </div>
 {% endfor %}
 </div>
-
-<!--
-{% regroup authors by first_letter as letters_list %}
-<dl>
-{% for letter in letters_list %}
-<dt><h2>{{ letter.grouper }}</h2></dt>
-<dd>
-{% for authors in letter.list %}
-    <a href="{{ author.absolute_url }}">{{ author }}</a><br/>
-{% endfor %}
-</dd>
-{% endfor %}
-</dl>
--->
 
 </div><!-- .span12 -->
 {% endblock contents %}

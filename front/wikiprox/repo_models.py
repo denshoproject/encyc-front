@@ -272,6 +272,14 @@ class FacetTerm(dsl.Document):
             self.__class__.__name__,
             self.id
         )
+    
+    def __eq__(self, other):
+        """Enable Pythonic sorting"""
+        return self.term_id == other.term_id
+    
+    def __lt__(self, other):
+        """Enable Pythonic sorting"""
+        return self.term_id < other.term_id
 
 
 ELASTICSEARCH_CLASSES = {

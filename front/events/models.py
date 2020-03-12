@@ -2,7 +2,7 @@ from datetime import datetime
 import json
 import logging
 logger = logging.getLogger(__name__)
-from urllib2 import urlparse
+from urllib.parse import urlparse
 
 from elasticsearch.exceptions import NotFoundError
 import elasticsearch_dsl as dsl

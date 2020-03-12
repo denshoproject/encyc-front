@@ -25,7 +25,7 @@ from wikiprox import sources
 MAX_SIZE = 10000
 
 
-def _columnizer(things, cols):
+def columnizer(things, cols):
     columns = []
     collen = round(len(things) / float(cols))
     col = []
@@ -68,12 +68,12 @@ class Author(repo_models.Author):
         ]
 
     @staticmethod
-    def authors(num_columns=None):
+    def authors():
         """Returns list of published light Author objects.
         
         @returns: list
         """
-        KEY = 'encyc-front:authors:{}'.format(num_columns)
+        KEY = 'encyc-front:authors'
         data = cache.get(KEY)
         if not data:
             searcher = search.Searcher()
@@ -87,8 +87,6 @@ class Author(repo_models.Author):
                 Author.from_hit(hit)
                 for hit in searcher.execute(docstore.MAX_SIZE, 0).objects
             ])
-            if num_columns:
-                return _columnizer(data, num_columns)
             cache.set(KEY, data, settings.CACHE_TIMEOUT)
         return data
 

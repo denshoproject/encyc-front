@@ -183,7 +183,7 @@ class Page(repo_models.Page):
         _set_attr(obj, hit, 'title_sort')
         _set_attr(obj, hit, 'title')
         _set_attr(obj, hit, 'description')
-        _set_attr(obj, hit, 'body')
+        #_set_attr(obj, hit, 'body')
         _set_attr(obj, hit, 'authors_data')
         _set_attr(obj, hit, 'categories')
         _set_attr(obj, hit, 'coordinates')

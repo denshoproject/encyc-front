@@ -218,7 +218,7 @@ class Page(repo_models.Page):
 
     @staticmethod
     def pages_by_initial():
-        KEY = 'encyc-front:pages_by_category'
+        KEY = 'encyc-front:pages_by_initial'
         data = cache.get(KEY)
         if not data:
             data = OrderedDict()

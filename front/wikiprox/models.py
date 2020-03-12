@@ -192,7 +192,7 @@ class Page(repo_models.Page):
     
     @staticmethod
     def pages_by_category():
-        """Returns list of (category, Pages) tuples, alphabetical by category
+        """Returns list of (category, pages) tuples, alphabetical by category
         
         @returns: list
         """
@@ -209,10 +209,24 @@ class Page(repo_models.Page):
                         # pages already sorted so category lists will be sorted
                         if page not in categories[category]:
                             categories[category].append(page)
-            data = [
+            categories_list = [
                 (key,categories[key])
                 for key in sorted(categories.keys())
             ]
+            # cache only the data needed for display
+            data = []
+            while(categories_list):
+                key,pages = categories_list.pop(0)
+                pages_new = [
+                    {
+                        'first_letter': page.title_sort[0].upper(),
+                        'title_sort': page.title_sort,
+                        'title': page.title,
+                        'absolute_url': page.absolute_url(),
+                    }
+                    for page in pages
+                ]
+                data.append((key,pages_new))
             cache.set(KEY, data, settings.CACHE_TIMEOUT)
         return data
 
@@ -229,12 +243,13 @@ class Page(repo_models.Page):
                 initial = page.title_sort[0].lower()
                 if initial.isdigit():
                     initial = '1-10'
-                data[initial].append({
+                p = {
                     'first_letter': page.title_sort[0].upper(),
                     'title_sort': page.title_sort,
                     'title': page.title,
                     'absolute_url': page.absolute_url(),
-                })
+                }
+                data[initial].append(p)
             for initial,pages in data.items():
                 data[initial] = sorted(
                     pages, key=lambda page: page['title_sort']

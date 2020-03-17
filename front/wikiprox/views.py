@@ -29,7 +29,7 @@ def contents(request, template_name='wikiprox/contents.html'):
 
 def authors(request, template_name='wikiprox/authors.html'):
     return render(request, template_name, {
-        'authors': models.Author.authors(num_columns=4),
+        'authors': models.columnizer(models.Author.authors(), 4),
     })
 
 def author(request, url_title, template_name='wikiprox/author.html'):

@@ -95,5 +95,6 @@ class WikiPageTitles(TestCase):
         )
         assert response.status_code == 200
         content = str(response.content)
-        assert '<b>Brian Niiya</b> is the content director' in content
+        assert 'Brian Niiya' in content
+        assert 'is the content director' in content
         assert '<a href="/A.L.%20Wirin/">A.L. Wirin</a>' in content

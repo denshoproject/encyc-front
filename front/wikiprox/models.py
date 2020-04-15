@@ -291,7 +291,7 @@ class Page(repo_models.Page):
             #term.pop('encyc_urls')
             url = '%s/%s/' % (
                 settings.DDR_TOPICS_BASE,
-                term['id']
+                term['term_id']
             )
             setattr(term, 'ddr_topic_url', url)
             terms.append(term)

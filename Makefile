@@ -358,17 +358,29 @@ clean-pip:
 
 
 
-install-static: get-assets install-bootstrap install-jquery install-jwplayer install-lightview install-modernizr install-swfobject install-openlayers
+install-static: get-app-assets install-bootstrap install-jquery install-jwplayer install-lightview install-modernizr install-swfobject install-openlayers
 
-get-assets:
+clean-static: clean-app-assets clean-bootstrap clean-jquery clean-jwplayer clean-lightview clean-modernizr clean-swfobject clean-openlayers
+
+get-app-assets:
 	@echo ""
-	@echo "get assets --------------------------------------------------------------"
+	@echo "get assets -------------------------------------------------------------"
+	wget -nc -P /tmp http://$(PACKAGE_SERVER)/$(ASSETS)
+
+install-app-assets:
+	@echo ""
+	@echo "install assets ---------------------------------------------------------"
 	-mkdir -p $(MEDIA_BASE)
 	chown -R root.root $(MEDIA_BASE)
 	chmod -R 755 $(MEDIA_BASE)
-	wget -nc -P /tmp http://$(PACKAGE_SERVER)/$(ASSETS)
 	tar xzvf /tmp/$(ASSETS) -C /tmp/
-	cp -R /tmp/encyc-front-assets/* $(MEDIA_ROOT)
+	-mkdir -p $(STATIC_ROOT)
+	chown -R root.root $(STATIC_ROOT)
+	chmod -R 755 $(STATIC_ROOT)
+	cp -R /tmp/encyc-front-assets/* $(STATIC_ROOT)
+
+clean-app-assets:
+	-rm -Rf $(STATIC_ROOT)/
 
 install-bootstrap:
 	@echo ""
@@ -423,8 +435,6 @@ set-perms:
 	for i in `find . -type d`; do chmod 755 $i; done
 	for i in `find . -type f`; do chmod 644 $i; done
 
-
-clean-static: clean-bootstrap clean-jquery clean-jwplayer clean-lightview clean-modernizr clean-swfobject clean-openlayers
 
 clean-bootstrap:
 	-rm -Rf $(STATIC_ROOT)/$(BOOTSTRAP)

@@ -8,12 +8,9 @@
 
 
                                    # LICENSE
-django-nose==1.4.6
 django>=1.11,<2.0                  # MIT
 django-redis==4.11.0               # BSD
 djangorestframework>=3.6.0,<3.7    # BSD
-coreapi==2.3.3                     # BSD
-coreapi-cli==1.0.9                 # BSD
 elasticsearch>=7.0.0,<8.0.0        # Apache
 elasticsearch-dsl>=7.0.0,<8.0.0    # Apache
 gunicorn==20.0.4                   # MIT

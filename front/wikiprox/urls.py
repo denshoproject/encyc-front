@@ -1,14 +1,14 @@
 from django.conf import settings
-from django.conf.urls.defaults import *
 from django.http import HttpResponseRedirect
+from django.urls import path, re_path
 
 from wikiprox import views
 
 urlpatterns = [
-    url(r"^index.php/(?P<page>[\w\W]+)/$", views.page, name='wikiprox-page'),
-    url(r"^(?P<page>[\w\W]+)/$", views.page, name='wikiprox-page'),
+    re_path(r"^index.php/(?P<page>[\w\W]+)/$", views.page, name='wikiprox-page'),
+    re_path(r"^(?P<page>[\w\W]+)/$", views.page, name='wikiprox-page'),
     #
-    url(r'^$', lambda x: HttpResponseRedirect('/wiki/%s' % settings.MEDIAWIKI_DEFAULT_PAGE)),
+    path('', lambda x: HttpResponseRedirect('/wiki/%s' % settings.MEDIAWIKI_DEFAULT_PAGE)),
 ]
 
 # problematic page titles

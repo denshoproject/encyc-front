@@ -360,9 +360,9 @@ clean-pip:
 
 
 
-install-static: get-app-assets install-bootstrap install-jquery install-jwplayer install-lightview install-modernizr install-swfobject install-openlayers
+install-static: get-app-assets install-bootstrap install-jquery install-jwplayer install-lightview install-modernizr install-swfobject install-openlayers install-restframework
 
-clean-static: clean-app-assets clean-bootstrap clean-jquery clean-jwplayer clean-lightview clean-modernizr clean-swfobject clean-openlayers
+clean-static: clean-app-assets clean-bootstrap clean-jquery clean-jwplayer clean-lightview clean-modernizr clean-swfobject clean-openlayers clean-restframework
 
 get-app-assets:
 	@echo ""
@@ -383,6 +383,14 @@ install-app-assets:
 
 clean-app-assets:
 	-rm -Rf $(STATIC_ROOT)/
+
+install-restframework:
+	@echo ""
+	@echo "rest-framework assets ---------------------------------------------------"
+	cp -R $(VIRTUALENV)/lib/$(PYTHON_VERSION)/site-packages/rest_framework/static/rest_framework/ $(STATIC_ROOT)/
+
+clean-restframework:
+	-rm -Rf $(STATIC_ROOT)/rest_framework/
 
 install-bootstrap:
 	@echo ""
@@ -585,7 +593,7 @@ deb-stretch:
 	README.rst=$(DEB_BASE)   \
 	requirements.txt=$(DEB_BASE)   \
 	venv=$(DEB_BASE)   \
-	venv/front/lib/python$(PYTHON_VERSION)/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
+	venv/front/lib/$(PYTHON_VERSION)/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
 	VERSION=$(DEB_BASE)
 
 deb-buster:
@@ -630,5 +638,5 @@ deb-buster:
 	README.rst=$(DEB_BASE)   \
 	requirements.txt=$(DEB_BASE)   \
 	venv=$(DEB_BASE)   \
-	venv/front/lib/python$(PYTHON_VERSION)/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
+	venv/front/lib/$(PYTHON_VERSION)/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
 	VERSION=$(DEB_BASE)

@@ -8,9 +8,9 @@
 
 
                                    # LICENSE
-django>=2.2.0,<3.0                 # MIT
+django>=3.0.0,<3.1                 # MIT
 django-redis==4.11.0               # BSD
-djangorestframework>=3.9.0,<3.10   # BSD
+djangorestframework>=3.11.0,<3.12  # BSD
 elasticsearch>=7.0.0,<8.0.0        # Apache
 elasticsearch-dsl>=7.0.0,<8.0.0    # Apache
 gunicorn==20.0.4                   # MIT

@@ -6,14 +6,16 @@ SHELL = /bin/bash
 APP_VERSION := $(shell cat VERSION)
 GIT_SOURCE_URL=https://github.com/densho/encyc-front
 
-PYTHON_VERSION=3.5
-
 # Release name e.g. jessie
 DEBIAN_CODENAME := $(shell lsb_release -sc)
 # Release numbers e.g. 8.10
 DEBIAN_RELEASE := $(shell lsb_release -sr)
 # Sortable major version tag e.g. deb8
 DEBIAN_RELEASE_TAG = deb$(shell lsb_release -sr | cut -c1)
+
+ifeq ($(DEBIAN_CODENAME), buster)
+	PYTHON_VERSION=python3.7
+endif
 
 PACKAGE_SERVER=ddr.densho.org/static/encycfront
 

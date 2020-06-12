@@ -12,8 +12,8 @@ import elasticsearch_dsl as dsl
 
 from django.conf import settings
 from django.core.cache import cache
-from django.core.urlresolvers import reverse
 from django.db import models
+from django.urls import reverse
 
 from wikiprox import citations
 from wikiprox import ddr

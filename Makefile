@@ -321,7 +321,7 @@ uninstall-encyc-front:
 restart-front:
 	/etc/init.d/supervisor restart front
 
-test-encyc-front: test-encyc-events test-encyc-locations test-encyc-front
+test-encyc-front: test-encyc-events test-encyc-locations
 
 test-encyc-events:
 	@echo ""

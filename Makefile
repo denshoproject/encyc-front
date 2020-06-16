@@ -6,14 +6,16 @@ SHELL = /bin/bash
 APP_VERSION := $(shell cat VERSION)
 GIT_SOURCE_URL=https://github.com/densho/encyc-front
 
-PYTHON_VERSION=3.5
-
 # Release name e.g. jessie
 DEBIAN_CODENAME := $(shell lsb_release -sc)
 # Release numbers e.g. 8.10
 DEBIAN_RELEASE := $(shell lsb_release -sr)
 # Sortable major version tag e.g. deb8
 DEBIAN_RELEASE_TAG = deb$(shell lsb_release -sr | cut -c1)
+
+ifeq ($(DEBIAN_CODENAME), buster)
+	PYTHON_VERSION=python3.7
+endif
 
 PACKAGE_SERVER=ddr.densho.org/static/encycfront
 
@@ -321,7 +323,7 @@ uninstall-encyc-front:
 restart-front:
 	/etc/init.d/supervisor restart front
 
-test-encyc-front: test-encyc-events test-encyc-locations test-encyc-front
+test-encyc-front: test-encyc-events test-encyc-locations
 
 test-encyc-events:
 	@echo ""
@@ -358,9 +360,9 @@ clean-pip:
 
 
 
-install-static: get-app-assets install-bootstrap install-jquery install-jwplayer install-lightview install-modernizr install-swfobject install-openlayers
+install-static: get-app-assets install-bootstrap install-jquery install-jwplayer install-lightview install-modernizr install-swfobject install-openlayers install-restframework
 
-clean-static: clean-app-assets clean-bootstrap clean-jquery clean-jwplayer clean-lightview clean-modernizr clean-swfobject clean-openlayers
+clean-static: clean-app-assets clean-bootstrap clean-jquery clean-jwplayer clean-lightview clean-modernizr clean-swfobject clean-openlayers clean-restframework
 
 get-app-assets:
 	@echo ""
@@ -381,6 +383,14 @@ install-app-assets:
 
 clean-app-assets:
 	-rm -Rf $(STATIC_ROOT)/
+
+install-restframework:
+	@echo ""
+	@echo "rest-framework assets ---------------------------------------------------"
+	cp -R $(VIRTUALENV)/lib/$(PYTHON_VERSION)/site-packages/rest_framework/static/rest_framework/ $(STATIC_ROOT)/
+
+clean-restframework:
+	-rm -Rf $(STATIC_ROOT)/rest_framework/
 
 install-bootstrap:
 	@echo ""
@@ -583,7 +593,7 @@ deb-stretch:
 	README.rst=$(DEB_BASE)   \
 	requirements.txt=$(DEB_BASE)   \
 	venv=$(DEB_BASE)   \
-	venv/front/lib/python$(PYTHON_VERSION)/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
+	venv/front/lib/$(PYTHON_VERSION)/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
 	VERSION=$(DEB_BASE)
 
 deb-buster:
@@ -628,5 +638,5 @@ deb-buster:
 	README.rst=$(DEB_BASE)   \
 	requirements.txt=$(DEB_BASE)   \
 	venv=$(DEB_BASE)   \
-	venv/front/lib/python$(PYTHON_VERSION)/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
+	venv/front/lib/$(PYTHON_VERSION)/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
 	VERSION=$(DEB_BASE)

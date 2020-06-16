@@ -7,8 +7,8 @@ import requests
 
 from django.conf import settings
 from django.core.cache import cache
-from django.core.urlresolvers import reverse
 from django.db import models
+from django.urls import reverse
 
 from locations import backend as loc
 

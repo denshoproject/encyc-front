@@ -5,7 +5,7 @@ from datetime import datetime
 import os
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 def sitewide(request):
     """Variables that need to be inserted into all templates.

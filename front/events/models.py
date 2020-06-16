@@ -9,8 +9,8 @@ import elasticsearch_dsl as dsl
 import requests
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
 from django.db import models
+from django.urls import reverse
 
 MAX_SIZE = 10000
 

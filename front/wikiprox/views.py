@@ -4,9 +4,9 @@ import os
 import requests
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import redirect, render
+from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 
 from wikiprox import ddr

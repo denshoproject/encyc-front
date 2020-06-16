@@ -5,8 +5,8 @@ import requests
 
 from django.conf import settings
 from django.core.cache import cache
-from django.core.urlresolvers import reverse
 from django.template import loader
+from django.urls import reverse
 
 from wikiprox import make_cache_key
 

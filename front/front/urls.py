@@ -44,8 +44,8 @@ urlpatterns = [
     path('about/editorsmessage/embed/', TemplateView.as_view(template_name='front/editorsmessage-lightbox.html'), name='editorsmessageembed'),
     path('about/editorsmessage/', TemplateView.as_view(template_name='front/editorsmessage.html'), name='editorsmessage'),
     path('about/', TemplateView.as_view(template_name='front/about.html'), name='about'),
-    path('history/', TemplateView.as_view(template_name='front/history.html')),
-    path('search/', TemplateView.as_view(template_name='front/search.html')),
+    path('history/', TemplateView.as_view(template_name='front/history.html'), name='wikiprox-history'),
+    path('search/', TemplateView.as_view(template_name='front/search.html'), name='wikiprox-search'),
     path('terminology/', TemplateView.as_view(template_name='front/terminology.html')),
     #
     path('timeline/', events_views.events, name='events-events'),

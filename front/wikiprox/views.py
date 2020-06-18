@@ -4,7 +4,8 @@ import os
 import requests
 
 from django.conf import settings
-from django.http import HttpResponseRedirect, Http404
+from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect
+from django.http import Http404
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
@@ -40,6 +41,11 @@ def author(request, url_title, template_name='wikiprox/author.html'):
     return render(request, template_name, {
         'author': author,
     })
+
+def wiki_article(request, url_title):
+    return HttpResponsePermanentRedirect(
+        reverse('wikiprox-page', args=([url_title]))
+    )
 
 @require_http_methods(['GET',])
 def article(request, url_title='index', printed=False, template_name='wikiprox/page.html'):

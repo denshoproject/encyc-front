@@ -5,6 +5,7 @@ import logging
 logger = logging.getLogger(__name__)
 import os
 
+from bs4 import BeautifulSoup
 import requests
 
 from elasticsearch.exceptions import NotFoundError
@@ -120,7 +121,18 @@ class Page(repo_models.Page):
         # filter out ResourceGuide items
         if not page.published_encyc:
             return None
+        page.prepare()
         return page
+    
+    def prepare(self):
+        soup = BeautifulSoup(self.body, 'html.parser')
+        # remove `wiki/` from URL
+        # append trailing slashes to internal links
+        for a in soup.find_all('a', class_='encyc'):
+            a['href'] = a['href'].replace('/wiki', '')
+            if a['href'][-1] != '/':
+                a['href'] += '/'
+        self.body = soup.prettify()
     
     def absolute_url(self):
         return reverse('wikiprox-page', args=([self.title]))

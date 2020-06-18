@@ -67,6 +67,7 @@ urlpatterns = [
     re_path(r"^cite/page/(?P<url_title>[\w\W]+)/$", wiki_views.page_cite, name='wikiprox-page-cite'),
     re_path(r"^ddr/(?P<url_title>[\w\W]+)/$", wiki_views.related_ddr, name='wikiprox-related-ddr'),
     re_path(r"^print/(?P<url_title>[\w\W]+)/$", wiki_views.article, {'printed':True}, name='wikiprox-page-print'),
+    re_path(r"^wiki/(?P<url_title>[\w\W]+)/$", wiki_views.wiki_article, name='wikiprox-wiki-page'),
     re_path(r"^(?P<url_title>[\w\W]+)/$", wiki_views.article, name='wikiprox-page'),
     #
     path('', wiki_views.index, name='wikiprox-index'),

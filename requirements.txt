@@ -8,6 +8,7 @@
 
 
                                    # LICENSE
+beautifulsoup4                     # MIT      y
 django>=3.0.0,<3.1                 # MIT
 django-redis==4.12.1               # BSD
 djangorestframework>=3.11.0,<3.12  # BSD

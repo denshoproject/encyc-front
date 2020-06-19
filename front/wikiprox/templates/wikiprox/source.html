@@ -73,7 +73,7 @@ Primary Source &mdash; {{ source.encyclopedia_id }}
 {% endif %}
 {% if source.media_format == 'document' %}
   <img src="{{ MEDIA_URL }}{{ thumb_lg }}" />
-  {% if source.original_path %}<br/><a href="{{ document_download_url }}">Download full PDF ({{ source.original_size|filesizeformat }})</a>{% endif %}
+  {% if source.original_path and source.original_size %}<br/><a href="{{ document_download_url }}">Download full PDF ({{ source.original_size|filesizeformat }})</a>{% endif %}
 {% endif %}
 {% if source.media_format == 'video' %}
   <div id="videocontainer">Loading video player...</div>

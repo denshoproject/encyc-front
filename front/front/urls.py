@@ -69,6 +69,8 @@ urlpatterns = [
     re_path(r"^print/(?P<url_title>[\w\W]+)/$", wiki_views.article, {'printed':True}, name='wikiprox-page-print'),
     re_path(r"^wiki/(?P<url_title>[\w\W]+)/$", wiki_views.wiki_article, name='wikiprox-wiki-page'),
     re_path(r"^(?P<url_title>[\w\W]+)/$", wiki_views.article, name='wikiprox-page'),
+    # TODO fix this hack find the right way to deal with missing trailing slashes
+    re_path(r"^(?P<url_title>[\w\W]+)$", wiki_views.article, name='wikiprox-page'),
     #
     path('', wiki_views.index, name='wikiprox-index'),
 ]

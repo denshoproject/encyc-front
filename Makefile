@@ -173,7 +173,7 @@ howto-install:
 
 
 
-install: install-prep install-app install-static install-configs
+install: install-prep install-app install-configs
 
 test: test-app
 
@@ -293,15 +293,11 @@ endif
 	-mkdir /var/lib/encyc
 	chown -R encyc.root /var/lib/encyc
 	chmod -R 755 /var/lib/encyc
-# media dirs
-	-mkdir -p $(MEDIA_ROOT)
-	-mkdir -p $(STATIC_ROOT)
-	chown -R encyc.root $(STATIC_ROOT)
-	chmod -R 755 $(STATIC_ROOT)
-	cp -R $(INSTALLDIR)/front/static/* $(STATIC_ROOT)/
-	cp -R $(INSTALLDIR)/front/wikiprox/static/* $(STATIC_ROOT)/
-	chown -R encyc.root $(MEDIA_BASE)
-	chmod -R 755 $(MEDIA_BASE)
+# media dir
+	-mkdir $(MEDIA_BASE)
+	-mkdir $(MEDIA_ROOT)
+	chown -R ddr.root $(MEDIA_ROOT)
+	chmod -R 755 $(MEDIA_ROOT)
 
 syncdb:
 	source $(VIRTUALENV)/bin/activate
@@ -362,115 +358,6 @@ clean-encyc-front:
 
 clean-pip:
 	-rm -Rf $(PIP_CACHE_DIR)/*
-
-
-
-install-static: get-app-assets install-bootstrap install-jquery install-jwplayer install-lightview install-modernizr install-swfobject install-openlayers install-restframework
-
-clean-static: clean-app-assets clean-bootstrap clean-jquery clean-jwplayer clean-lightview clean-modernizr clean-swfobject clean-openlayers clean-restframework
-
-get-app-assets:
-	@echo ""
-	@echo "get assets -------------------------------------------------------------"
-	wget -nc -P /tmp http://$(PACKAGE_SERVER)/$(ASSETS)
-
-install-app-assets:
-	@echo ""
-	@echo "install assets ---------------------------------------------------------"
-	-mkdir -p $(MEDIA_BASE)
-	chown -R root.root $(MEDIA_BASE)
-	chmod -R 755 $(MEDIA_BASE)
-	tar xzvf /tmp/$(ASSETS) -C /tmp/
-	-mkdir -p $(STATIC_ROOT)
-	chown -R root.root $(STATIC_ROOT)
-	chmod -R 755 $(STATIC_ROOT)
-	cp -R /tmp/encyc-front-assets/* $(STATIC_ROOT)
-
-clean-app-assets:
-	-rm -Rf $(STATIC_ROOT)/
-
-install-restframework:
-	@echo ""
-	@echo "rest-framework assets ---------------------------------------------------"
-	cp -R $(VIRTUALENV)/lib/$(PYTHON_VERSION)/site-packages/rest_framework/static/rest_framework/ $(STATIC_ROOT)/
-
-clean-restframework:
-	-rm -Rf $(STATIC_ROOT)/rest_framework/
-
-install-bootstrap:
-	@echo ""
-	@echo "Bootstrap --------------------------------------------------------------"
-	wget -nc -P /tmp/ http://$(PACKAGE_SERVER)/$(BOOTSTRAP).zip
-	7z x -y -o$(STATIC_ROOT)/ /tmp/$(BOOTSTRAP).zip
-
-install-jquery:
-	@echo ""
-	@echo "jQuery -----------------------------------------------------------------"
-	wget -nc -P $(STATIC_ROOT)/ http://$(PACKAGE_SERVER)/$(JQUERY)
-
-install-jwplayer:
-	@echo ""
-	@echo "jwplayer ---------------------------------------------------------------"
-	-wget -nc -P /tmp/ http://$(PACKAGE_SERVER)/$(JWPLAYER).tgz
-	-tar xzf /tmp/$(JWPLAYER).tgz -C /tmp/
-	-mv /tmp/$(JWPLAYER) $(STATIC_ROOT)/
-
-install-lightview:
-	@echo ""
-	@echo "lightview --------------------------------------------------------------"
-	-wget -nc -P /tmp/ http://$(PACKAGE_SERVER)/$(LIGHTVIEW).tgz
-	-tar xzf /tmp/$(LIGHTVIEW).tgz -C /tmp/
-	-mv /tmp/$(LIGHTVIEW) $(STATIC_ROOT)/
-
-install-modernizr:
-	@echo ""
-	@echo "Modernizr --------------------------------------------------------------"
-	-rm $(STATIC_ROOT)/js/$(MODERNIZR)*
-	-wget -nc -P $(STATIC_ROOT)/ http://$(PACKAGE_SERVER)/$(MODERNIZR).js
-
-install-swfobject:
-	@echo ""
-	@echo "swfobject --------------------------------------------------------------"
-	-wget -nc -P /tmp/ http://$(PACKAGE_SERVER)/$(SWFOBJECT).zip
-	-7z x -y -o/tmp/ /tmp/$(SWFOBJECT).zip
-	-mv /tmp/swfobject/ $(STATIC_ROOT)/$(SWFOBJECT)
-
-install-openlayers:
-	@echo ""
-	@echo "OpenLayers -------------------------------------------------------------"
-	-wget -nc -P /tmp/ http://$(PACKAGE_SERVER)/$(OPENLAYERS).tar.gz
-	-tar xzf /tmp/$(OPENLAYERS).tar.gz -C /tmp/
-	-mv /tmp/$(OPENLAYERS) $(STATIC_ROOT)/
-
-set-perms:
-#	recursively chmod directories 755, files 644
-#	from CWD
-	chown -R encyc.root $(MEDIA_BASE)
-	cd $(MEDIA_BASE)
-	for i in `find . -type d`; do chmod 755 $i; done
-	for i in `find . -type f`; do chmod 644 $i; done
-
-
-clean-bootstrap:
-	-rm -Rf $(STATIC_ROOT)/$(BOOTSTRAP)
-
-clean-jquery:
-	-rm -Rf $(STATIC_ROOT)/$(JQUERY)
-
-clean-jwplayer:
-	-rm -Rf $(STATIC_ROOT)/$(JWPLAYER)
-
-clean-lightview:
-	-rm -Rf $(STATIC_ROOT)/$(LIGHTVIEW)
-
-clean-modernizr:
-	-rm $(STATIC_ROOT)/$(MODERNIZR).js
-
-clean-swfobject:
-	-rm -Rf $(STATIC_ROOT)/$(SWFOBJECT)
-
-clean-openlayers:
-	-rm -Rf $(STATIC_ROOT)/$(OPENLAYERS)
 
 
 install-configs:
@@ -615,5 +502,4 @@ deb-buster:
 	README.rst=$(DEB_BASE)   \
 	requirements.txt=$(DEB_BASE)   \
 	venv=$(DEB_BASE)   \
-	venv/front/lib/$(PYTHON_VERSION)/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
 	VERSION=$(DEB_BASE)

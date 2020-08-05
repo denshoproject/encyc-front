@@ -6,7 +6,7 @@ SHELL = /bin/bash
 APP_VERSION := $(shell cat VERSION)
 GIT_SOURCE_URL=https://github.com/densho/encyc-front
 
-# Release name e.g. jessie
+# Release name e.g. stretch
 DEBIAN_CODENAME := $(shell lsb_release -sc)
 # Release numbers e.g. 8.10
 DEBIAN_RELEASE := $(shell lsb_release -sr)
@@ -540,62 +540,15 @@ install-fpm:
 	apt-get install --assume-yes ruby ruby-dev rubygems build-essential
 	gem install --no-ri --no-rdoc fpm
 
-
-# http://fpm.readthedocs.io/en/latest/
 # https://stackoverflow.com/questions/32094205/set-a-custom-install-directory-when-making-a-deb-package-with-fpm
 # https://brejoc.com/tag/fpm/
-deb: deb-stretch deb-buster
-
-deb-stretch:
-	@echo ""
-	@echo "DEB packaging (stretch) ------------------------------------------------"
-	-rm -Rf $(DEB_FILE_STRETCH)
-	virtualenv --python=python3 --relocatable $(VIRTUALENV)  # Make venv relocatable
-	fpm   \
-	--verbose   \
-	--input-type dir   \
-	--output-type deb   \
-	--name $(DEB_NAME_STRETCH)   \
-	--version $(DEB_VERSION_STRETCH)   \
-	--package $(DEB_FILE_STRETCH)   \
-	--url "$(GIT_SOURCE_URL)"   \
-	--vendor "$(DEB_VENDOR)"   \
-	--maintainer "$(DEB_MAINTAINER)"   \
-	--description "$(DEB_DESCRIPTION)"   \
-	--depends "imagemagick"   \
-	--depends "libxml2"   \
-	--depends "libxslt1.1"   \
-	--depends "libxslt1-dev"   \
-	--depends "python3-dev"   \
-	--depends "python3-pip"   \
-	--depends "python3-virtualenv"   \
-	--depends "sqlite3"   \
-	--depends "zlib1g-dev"   \
-	--depends "libjpeg62-turbo-dev"   \
-	--depends "nginx"   \
-	--depends "redis-server"   \
-	--depends "supervisor"   \
-	--chdir $(INSTALLDIR)   \
-	conf/front.cfg=etc/encyc/front.cfg   \
-	conf=$(DEB_BASE)   \
-	COPYRIGHT=$(DEB_BASE)   \
-	front=$(DEB_BASE)   \
-	.git=$(DEB_BASE)   \
-	.gitignore=$(DEB_BASE)   \
-	INSTALL=$(DEB_BASE)   \
-	LICENSE=$(DEB_BASE)   \
-	Makefile=$(DEB_BASE)   \
-	README.rst=$(DEB_BASE)   \
-	requirements.txt=$(DEB_BASE)   \
-	venv=$(DEB_BASE)   \
-	venv/front/lib/$(PYTHON_VERSION)/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
-	VERSION=$(DEB_BASE)
+deb: deb-buster
 
 deb-buster:
 	@echo ""
-	@echo "DEB packaging (buster) ------------------------------------------------"
+	@echo "DEB packaging (buster) -------------------------------------------------"
 	-rm -Rf $(DEB_FILE_BUSTER)
-	virtualenv --relocatable $(VIRTUALENV)  # Make venv relocatable
+	virtualenv --python=python3 --relocatable $(VIRTUALENV)  # Make venv relocatable
 	fpm   \
 	--verbose   \
 	--input-type dir   \

@@ -6,7 +6,7 @@ SHELL = /bin/bash
 APP_VERSION := $(shell cat VERSION)
 GIT_SOURCE_URL=https://github.com/densho/encyc-front
 
-# Release name e.g. jessie
+# Release name e.g. stretch
 DEBIAN_CODENAME := $(shell lsb_release -sc)
 # Release numbers e.g. 8.10
 DEBIAN_RELEASE := $(shell lsb_release -sr)
@@ -19,9 +19,13 @@ endif
 
 PACKAGE_SERVER=ddr.densho.org/static/encycfront
 
+SRC_REPO_ASSETS=https://github.com/denshoproject/encyc-front-assets.git
+
 INSTALL_BASE=/opt
 INSTALLDIR=$(INSTALL_BASE)/encyc-front
 DOWNLOADS_DIR=/tmp/$(APP)-install
+INSTALL_FRONT=/opt/encyc-front
+INSTALL_ASSETS=/opt/encyc-front-assets
 REQUIREMENTS=$(INSTALLDIR)/requirements.txt
 PIP_CACHE_DIR=$(INSTALL_BASE)/pip-cache
 
@@ -33,7 +37,7 @@ CONF_PRODUCTION=$(CONF_BASE)/front.cfg
 CONF_LOCAL=$(CONF_BASE)/front-local.cfg
 CONF_DJANGO=$(INSTALLDIR)/front/front/settings.py
 
-MEDIA_BASE=/var/www/html/front
+MEDIA_BASE=/var/www/encycfront
 MEDIA_ROOT=$(MEDIA_BASE)/media
 STATIC_ROOT=$(MEDIA_BASE)/static
 
@@ -69,6 +73,12 @@ OPENLAYERS=OpenLayers-2.12
 # lightview-3.2.2
 # wget https://swfobject.googlecode.com/files/swfobject_2_2.zip
 ASSETS=encyc-front-assets.tgz
+
+TGZ_BRANCH := $(shell git rev-parse --abbrev-ref HEAD | tr -d _ | tr -d -)
+TGZ_FILE=$(APP)_$(APP_VERSION)
+TGZ_DIR=$(INSTALL_FRONT)/$(TGZ_FILE)
+TGZ_FRONT=$(TGZ_DIR)/encyc-front
+TGZ_ASSETS=$(TGZ_DIR)/encyc-front/encyc-front-assets
 
 DEB_BRANCH := $(shell git rev-parse --abbrev-ref HEAD | tr -d _ | tr -d -)
 DEB_ARCH=amd64
@@ -163,7 +173,7 @@ howto-install:
 
 
 
-install: install-prep install-app install-static install-configs
+install: install-prep install-app install-configs
 
 test: test-app
 
@@ -174,7 +184,7 @@ uninstall: uninstall-front
 clean: clean-front
 
 
-install-prep: apt-update install-core git-config install-misc-tools
+install-prep: apt-update install-core git-config
 
 
 apt-update:
@@ -195,11 +205,6 @@ git-config:
 	git config --global alias.co checkout
 	git config --global alias.br branch
 	git config --global alias.ci commit
-
-install-misc-tools:
-	@echo ""
-	@echo "Installing miscellaneous tools -----------------------------------------"
-	apt-get --assume-yes install ack-grep byobu elinks htop httpie iftop iotop mg multitail sshuttle
 
 
 install-daemons: install-nginx install-redis install-elasticsearch
@@ -243,8 +248,8 @@ remove-elasticsearch:
 install-virtualenv:
 	@echo ""
 	@echo "install-virtualenv -----------------------------------------------------"
-	apt-get --assume-yes install python3-pip python3-virtualenv
-	test -d $(VIRTUALENV) || virtualenv --python=python3 --distribute --setuptools $(VIRTUALENV)
+	apt-get --assume-yes install python3-pip python3-venv
+	python3 -m venv $(VIRTUALENV)
 
 install-setuptools: install-virtualenv
 	@echo ""
@@ -288,15 +293,11 @@ endif
 	-mkdir /var/lib/encyc
 	chown -R encyc.root /var/lib/encyc
 	chmod -R 755 /var/lib/encyc
-# media dirs
-	-mkdir -p $(MEDIA_ROOT)
-	-mkdir -p $(STATIC_ROOT)
-	chown -R encyc.root $(STATIC_ROOT)
-	chmod -R 755 $(STATIC_ROOT)
-	cp -R $(INSTALLDIR)/front/static/* $(STATIC_ROOT)/
-	cp -R $(INSTALLDIR)/front/wikiprox/static/* $(STATIC_ROOT)/
-	chown -R encyc.root $(MEDIA_BASE)
-	chmod -R 755 $(MEDIA_BASE)
+# media dir
+	-mkdir $(MEDIA_BASE)
+	-mkdir $(MEDIA_ROOT)
+	chown -R ddr.root $(MEDIA_ROOT)
+	chmod -R 755 $(MEDIA_ROOT)
 
 syncdb:
 	source $(VIRTUALENV)/bin/activate
@@ -359,115 +360,6 @@ clean-pip:
 	-rm -Rf $(PIP_CACHE_DIR)/*
 
 
-
-install-static: get-app-assets install-bootstrap install-jquery install-jwplayer install-lightview install-modernizr install-swfobject install-openlayers install-restframework
-
-clean-static: clean-app-assets clean-bootstrap clean-jquery clean-jwplayer clean-lightview clean-modernizr clean-swfobject clean-openlayers clean-restframework
-
-get-app-assets:
-	@echo ""
-	@echo "get assets -------------------------------------------------------------"
-	wget -nc -P /tmp http://$(PACKAGE_SERVER)/$(ASSETS)
-
-install-app-assets:
-	@echo ""
-	@echo "install assets ---------------------------------------------------------"
-	-mkdir -p $(MEDIA_BASE)
-	chown -R root.root $(MEDIA_BASE)
-	chmod -R 755 $(MEDIA_BASE)
-	tar xzvf /tmp/$(ASSETS) -C /tmp/
-	-mkdir -p $(STATIC_ROOT)
-	chown -R root.root $(STATIC_ROOT)
-	chmod -R 755 $(STATIC_ROOT)
-	cp -R /tmp/encyc-front-assets/* $(STATIC_ROOT)
-
-clean-app-assets:
-	-rm -Rf $(STATIC_ROOT)/
-
-install-restframework:
-	@echo ""
-	@echo "rest-framework assets ---------------------------------------------------"
-	cp -R $(VIRTUALENV)/lib/$(PYTHON_VERSION)/site-packages/rest_framework/static/rest_framework/ $(STATIC_ROOT)/
-
-clean-restframework:
-	-rm -Rf $(STATIC_ROOT)/rest_framework/
-
-install-bootstrap:
-	@echo ""
-	@echo "Bootstrap --------------------------------------------------------------"
-	wget -nc -P /tmp/ http://$(PACKAGE_SERVER)/$(BOOTSTRAP).zip
-	7z x -y -o$(STATIC_ROOT)/ /tmp/$(BOOTSTRAP).zip
-
-install-jquery:
-	@echo ""
-	@echo "jQuery -----------------------------------------------------------------"
-	wget -nc -P $(STATIC_ROOT)/ http://$(PACKAGE_SERVER)/$(JQUERY)
-
-install-jwplayer:
-	@echo ""
-	@echo "jwplayer ---------------------------------------------------------------"
-	-wget -nc -P /tmp/ http://$(PACKAGE_SERVER)/$(JWPLAYER).tgz
-	-tar xzf /tmp/$(JWPLAYER).tgz -C /tmp/
-	-mv /tmp/$(JWPLAYER) $(STATIC_ROOT)/
-
-install-lightview:
-	@echo ""
-	@echo "lightview --------------------------------------------------------------"
-	-wget -nc -P /tmp/ http://$(PACKAGE_SERVER)/$(LIGHTVIEW).tgz
-	-tar xzf /tmp/$(LIGHTVIEW).tgz -C /tmp/
-	-mv /tmp/$(LIGHTVIEW) $(STATIC_ROOT)/
-
-install-modernizr:
-	@echo ""
-	@echo "Modernizr --------------------------------------------------------------"
-	-rm $(STATIC_ROOT)/js/$(MODERNIZR)*
-	-wget -nc -P $(STATIC_ROOT)/ http://$(PACKAGE_SERVER)/$(MODERNIZR).js
-
-install-swfobject:
-	@echo ""
-	@echo "swfobject --------------------------------------------------------------"
-	-wget -nc -P /tmp/ http://$(PACKAGE_SERVER)/$(SWFOBJECT).zip
-	-7z x -y -o/tmp/ /tmp/$(SWFOBJECT).zip
-	-mv /tmp/swfobject/ $(STATIC_ROOT)/$(SWFOBJECT)
-
-install-openlayers:
-	@echo ""
-	@echo "OpenLayers -------------------------------------------------------------"
-	-wget -nc -P /tmp/ http://$(PACKAGE_SERVER)/$(OPENLAYERS).tar.gz
-	-tar xzf /tmp/$(OPENLAYERS).tar.gz -C /tmp/
-	-mv /tmp/$(OPENLAYERS) $(STATIC_ROOT)/
-
-set-perms:
-#	recursively chmod directories 755, files 644
-#	from CWD
-	chown -R encyc.root $(MEDIA_BASE)
-	cd $(MEDIA_BASE)
-	for i in `find . -type d`; do chmod 755 $i; done
-	for i in `find . -type f`; do chmod 644 $i; done
-
-
-clean-bootstrap:
-	-rm -Rf $(STATIC_ROOT)/$(BOOTSTRAP)
-
-clean-jquery:
-	-rm -Rf $(STATIC_ROOT)/$(JQUERY)
-
-clean-jwplayer:
-	-rm -Rf $(STATIC_ROOT)/$(JWPLAYER)
-
-clean-lightview:
-	-rm -Rf $(STATIC_ROOT)/$(LIGHTVIEW)
-
-clean-modernizr:
-	-rm $(STATIC_ROOT)/$(MODERNIZR).js
-
-clean-swfobject:
-	-rm -Rf $(STATIC_ROOT)/$(SWFOBJECT)
-
-clean-openlayers:
-	-rm -Rf $(STATIC_ROOT)/$(OPENLAYERS)
-
-
 install-configs:
 	@echo ""
 	@echo "installing configs ----------------------------------------------------"
@@ -475,7 +367,7 @@ install-configs:
 	-mkdir /etc/encyc
 	cp $(INSTALLDIR)/conf/front.cfg /etc/encyc/
 	chown root.encyc /etc/encyc/front.cfg
-	chmod 640 /etc/encyc/front.cfg
+	chmod 644 /etc/encyc/front.cfg
 	touch /etc/encyc/front-local.cfg
 	chown root.encyc /etc/encyc/front-local.cfg
 	chmod 640 /etc/encyc/front-local.cfg
@@ -539,68 +431,40 @@ git-status:
 	cd $(INSTALLDIR) && git status
 
 
+tgz-local:
+	rm -Rf $(TGZ_DIR)
+	git clone $(INSTALL_FRONT) $(TGZ_FRONT)
+	git clone $(INSTALL_ASSETS) $(TGZ_ASSETS)
+	cd $(TGZ_FRONT); git checkout develop; git checkout master
+	cd $(TGZ_ASSETS); git checkout develop; git checkout master
+	tar czf $(TGZ_FILE).tgz $(TGZ_FILE)
+	rm -Rf $(TGZ_DIR)
+
+tgz:
+	rm -Rf $(TGZ_DIR)
+	git clone $(GIT_SOURCE_URL) $(TGZ_FRONT)
+	git clone $(SRC_REPO_ASSETS) $(TGZ_ASSETS)
+	cd $(TGZ_FRONT); git checkout develop; git checkout master
+	cd $(TGZ_ASSETS); git checkout develop; git checkout master
+	tar czf $(TGZ_FILE).tgz $(TGZ_FILE)
+	rm -Rf $(TGZ_DIR)
+
+
 # http://fpm.readthedocs.io/en/latest/
 install-fpm:
 	@echo "install-fpm ------------------------------------------------------------"
 	apt-get install --assume-yes ruby ruby-dev rubygems build-essential
 	gem install --no-ri --no-rdoc fpm
 
-
-# http://fpm.readthedocs.io/en/latest/
 # https://stackoverflow.com/questions/32094205/set-a-custom-install-directory-when-making-a-deb-package-with-fpm
 # https://brejoc.com/tag/fpm/
-deb: deb-stretch deb-buster
-
-deb-stretch:
-	@echo ""
-	@echo "DEB packaging (stretch) ------------------------------------------------"
-	-rm -Rf $(DEB_FILE_STRETCH)
-	virtualenv --python=python3 --relocatable $(VIRTUALENV)  # Make venv relocatable
-	fpm   \
-	--verbose   \
-	--input-type dir   \
-	--output-type deb   \
-	--name $(DEB_NAME_STRETCH)   \
-	--version $(DEB_VERSION_STRETCH)   \
-	--package $(DEB_FILE_STRETCH)   \
-	--url "$(GIT_SOURCE_URL)"   \
-	--vendor "$(DEB_VENDOR)"   \
-	--maintainer "$(DEB_MAINTAINER)"   \
-	--description "$(DEB_DESCRIPTION)"   \
-	--depends "imagemagick"   \
-	--depends "libxml2"   \
-	--depends "libxslt1.1"   \
-	--depends "libxslt1-dev"   \
-	--depends "python3-dev"   \
-	--depends "python3-pip"   \
-	--depends "python3-virtualenv"   \
-	--depends "sqlite3"   \
-	--depends "zlib1g-dev"   \
-	--depends "libjpeg62-turbo-dev"   \
-	--depends "nginx"   \
-	--depends "redis-server"   \
-	--depends "supervisor"   \
-	--chdir $(INSTALLDIR)   \
-	conf/front.cfg=etc/encyc/front.cfg   \
-	conf=$(DEB_BASE)   \
-	COPYRIGHT=$(DEB_BASE)   \
-	front=$(DEB_BASE)   \
-	.git=$(DEB_BASE)   \
-	.gitignore=$(DEB_BASE)   \
-	INSTALL=$(DEB_BASE)   \
-	LICENSE=$(DEB_BASE)   \
-	Makefile=$(DEB_BASE)   \
-	README.rst=$(DEB_BASE)   \
-	requirements.txt=$(DEB_BASE)   \
-	venv=$(DEB_BASE)   \
-	venv/front/lib/$(PYTHON_VERSION)/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
-	VERSION=$(DEB_BASE)
+deb: deb-buster
 
 deb-buster:
 	@echo ""
-	@echo "DEB packaging (buster) ------------------------------------------------"
+	@echo "DEB packaging (buster) -------------------------------------------------"
 	-rm -Rf $(DEB_FILE_BUSTER)
-	virtualenv --relocatable $(VIRTUALENV)  # Make venv relocatable
+	virtualenv --python=python3 --relocatable $(VIRTUALENV)  # Make venv relocatable
 	fpm   \
 	--verbose   \
 	--input-type dir   \
@@ -638,5 +502,4 @@ deb-buster:
 	README.rst=$(DEB_BASE)   \
 	requirements.txt=$(DEB_BASE)   \
 	venv=$(DEB_BASE)   \
-	venv/front/lib/$(PYTHON_VERSION)/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
 	VERSION=$(DEB_BASE)

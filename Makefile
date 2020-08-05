@@ -19,9 +19,13 @@ endif
 
 PACKAGE_SERVER=ddr.densho.org/static/encycfront
 
+SRC_REPO_ASSETS=https://github.com/denshoproject/encyc-front-assets.git
+
 INSTALL_BASE=/opt
 INSTALLDIR=$(INSTALL_BASE)/encyc-front
 DOWNLOADS_DIR=/tmp/$(APP)-install
+INSTALL_FRONT=/opt/encyc-front
+INSTALL_ASSETS=/opt/encyc-front-assets
 REQUIREMENTS=$(INSTALLDIR)/requirements.txt
 PIP_CACHE_DIR=$(INSTALL_BASE)/pip-cache
 
@@ -69,6 +73,12 @@ OPENLAYERS=OpenLayers-2.12
 # lightview-3.2.2
 # wget https://swfobject.googlecode.com/files/swfobject_2_2.zip
 ASSETS=encyc-front-assets.tgz
+
+TGZ_BRANCH := $(shell git rev-parse --abbrev-ref HEAD | tr -d _ | tr -d -)
+TGZ_FILE=$(APP)_$(APP_VERSION)
+TGZ_DIR=$(INSTALL_FRONT)/$(TGZ_FILE)
+TGZ_FRONT=$(TGZ_DIR)/encyc-front
+TGZ_ASSETS=$(TGZ_DIR)/encyc-front/encyc-front-assets
 
 DEB_BRANCH := $(shell git rev-parse --abbrev-ref HEAD | tr -d _ | tr -d -)
 DEB_ARCH=amd64
@@ -532,6 +542,25 @@ status:
 git-status:
 	@echo "------------------------------------------------------------------------"
 	cd $(INSTALLDIR) && git status
+
+
+tgz-local:
+	rm -Rf $(TGZ_DIR)
+	git clone $(INSTALL_FRONT) $(TGZ_FRONT)
+	git clone $(INSTALL_ASSETS) $(TGZ_ASSETS)
+	cd $(TGZ_FRONT); git checkout develop; git checkout master
+	cd $(TGZ_ASSETS); git checkout develop; git checkout master
+	tar czf $(TGZ_FILE).tgz $(TGZ_FILE)
+	rm -Rf $(TGZ_DIR)
+
+tgz:
+	rm -Rf $(TGZ_DIR)
+	git clone $(GIT_SOURCE_URL) $(TGZ_FRONT)
+	git clone $(SRC_REPO_ASSETS) $(TGZ_ASSETS)
+	cd $(TGZ_FRONT); git checkout develop; git checkout master
+	cd $(TGZ_ASSETS); git checkout develop; git checkout master
+	tar czf $(TGZ_FILE).tgz $(TGZ_FILE)
+	rm -Rf $(TGZ_DIR)
 
 
 # http://fpm.readthedocs.io/en/latest/

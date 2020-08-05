@@ -174,7 +174,7 @@ uninstall: uninstall-front
 clean: clean-front
 
 
-install-prep: apt-update install-core git-config install-misc-tools
+install-prep: apt-update install-core git-config
 
 
 apt-update:
@@ -195,11 +195,6 @@ git-config:
 	git config --global alias.co checkout
 	git config --global alias.br branch
 	git config --global alias.ci commit
-
-install-misc-tools:
-	@echo ""
-	@echo "Installing miscellaneous tools -----------------------------------------"
-	apt-get --assume-yes install ack-grep byobu elinks htop httpie iftop iotop mg multitail sshuttle
 
 
 install-daemons: install-nginx install-redis install-elasticsearch

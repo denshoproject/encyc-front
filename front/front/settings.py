@@ -199,8 +199,8 @@ CACHE_MIDDLEWARE_KEY_PREFIX = 'front'
 # low-level caching
 CACHE_TIMEOUT = 60 * 5
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
-MEDIA_ROOT = '/var/www/html/front/media/'
+STATIC_ROOT = '/var/www/encycfront/static/'
+MEDIA_ROOT = '/var/www/encycfront/media/'
 
 TEMPLATES = [
     {

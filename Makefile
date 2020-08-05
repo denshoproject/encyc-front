@@ -37,7 +37,7 @@ CONF_PRODUCTION=$(CONF_BASE)/front.cfg
 CONF_LOCAL=$(CONF_BASE)/front-local.cfg
 CONF_DJANGO=$(INSTALLDIR)/front/front/settings.py
 
-MEDIA_BASE=/var/www/html/front
+MEDIA_BASE=/var/www/encycfront
 MEDIA_ROOT=$(MEDIA_BASE)/media
 STATIC_ROOT=$(MEDIA_BASE)/static
 

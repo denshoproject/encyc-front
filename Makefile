@@ -475,7 +475,7 @@ install-configs:
 	-mkdir /etc/encyc
 	cp $(INSTALLDIR)/conf/front.cfg /etc/encyc/
 	chown root.encyc /etc/encyc/front.cfg
-	chmod 640 /etc/encyc/front.cfg
+	chmod 644 /etc/encyc/front.cfg
 	touch /etc/encyc/front-local.cfg
 	chown root.encyc /etc/encyc/front-local.cfg
 	chmod 640 /etc/encyc/front-local.cfg

@@ -378,20 +378,20 @@ uninstall-configs:
 install-daemon-configs:
 	@echo ""
 	@echo "installing daemon configs ---------------------------------------------"
-# nginx settings
-	cp $(INSTALLDIR)/conf/nginx.conf /etc/nginx/sites-available/front.conf
-	chown root.root /etc/nginx/sites-available/front.conf
-	chmod 644 /etc/nginx/sites-available/front.conf
-	-ln -s /etc/nginx/sites-available/front.conf /etc/nginx/sites-enabled/front.conf
-	-rm /etc/nginx/sites-enabled/default
-# supervisord
-	cp $(INSTALLDIR)/conf/supervisor.conf /etc/supervisor/conf.d/front.conf
-	chown root.root /etc/supervisor/conf.d/front.conf
-	chmod 644 /etc/supervisor/conf.d/front.conf
+ # nginx settings
+	cp $(INSTALLDIR)/conf/nginx.conf /etc/nginx/sites-available/encycfront.conf
+	chown root.root /etc/nginx/sites-available/encycfront.conf
+	chmod 644 /etc/nginx/sites-available/encycfront.conf
+	-ln -s /etc/nginx/sites-available/encycfront.conf /etc/nginx/sites-enabled/encycfront.conf
+	 -rm /etc/nginx/sites-enabled/default
+ # supervisord
+	cp $(INSTALLDIR)/conf/supervisor.conf /etc/supervisor/conf.d/encycfront.conf
+	chown root.root /etc/supervisor/conf.d/encycfront.conf
+	chmod 644 /etc/supervisor/conf.d/encycfront.conf
 
 uninstall-daemon-configs:
-	-rm /etc/nginx/sites-available/front.conf
-	-rm /etc/nginx/sites-enabled/front.conf
+	-rm /etc/nginx/sites-available/encycfront.conf
+	-rm /etc/nginx/sites-enabled/encycfront.conf
 	-rm /etc/supervisor/conf.d/gunicorn_front.conf
 
 

@@ -108,7 +108,7 @@ MEDIAWIKI_HTML = 'http://dango.densho.org:9066/mediawiki/index.php'
 MEDIAWIKI_API  = config.get('mediawiki', 'api_url')
 MEDIAWIKI_API_USERNAME = config.get('mediawiki', 'api_username')
 MEDIAWIKI_API_PASSWORD = config.get('mediawiki', 'api_password')
-MEDIAWIKI_API_TIMEOUT = config.get('mediawiki', 'api_timeout')
+MEDIAWIKI_API_TIMEOUT = int(config.get('mediawiki', 'api_timeout'))
 MEDIAWIKI_DEFAULT_PAGE = 'Encyclopedia'
 MEDIAWIKI_TITLE = ' - Densho Encyclopedia'
 MEDIAWIKI_SHOW_UNPUBLISHED = False
@@ -146,7 +146,7 @@ DANGO_HTPASSWD_PWD  = 'TODO'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = config.get('email', 'host')
 EMAIL_PORT = config.get('email', 'port')
-EMAIL_USE_TLS = config.get('email', 'use_tls')
+EMAIL_USE_TLS = config.getboolean('email', 'use_tls')
 EMAIL_HOST_USER = config.get('email', 'host_user')
 EMAIL_HOST_PASSWORD = config.get('email', 'host_password')
 EMAIL_SUBJECT_PREFIX = '[front] '
@@ -199,8 +199,8 @@ CACHE_MIDDLEWARE_KEY_PREFIX = 'front'
 # low-level caching
 CACHE_TIMEOUT = 60 * 5
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
-MEDIA_ROOT = '/var/www/html/front/media/'
+STATIC_ROOT = '/var/www/encycfront/static/'
+MEDIA_ROOT = '/var/www/encycfront/media/'
 
 TEMPLATES = [
     {

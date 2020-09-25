@@ -261,7 +261,7 @@ install-setuptools: install-virtualenv
 
 install-app: install-virtualenv install-setuptools install-encyc-front
 
-test-app: test-encyc-front
+test-app: test-encyc-front test-encyc-events test-encyc-locations
 
 update-app: update-encyc-front install-configs
 
@@ -324,25 +324,23 @@ uninstall-encyc-front:
 restart-front:
 	/etc/init.d/supervisor restart front
 
-test-encyc-front: test-encyc-events test-encyc-locations
-
 test-encyc-events:
 	@echo ""
 	@echo "test-encyc-events ``----------------------------------------------------"
 	source $(VIRTUALENV)/bin/activate; \
-	cd $(INSTALLDIR); python front/manage.py test events
+	cd $(INSTALLDIR)/; pytest --disable-warnings --reuse-db front/events/tests.py
 
 test-encyc-locations:
 	@echo ""
 	@echo "test-encyc-locations ``-------------------------------------------------"
 	source $(VIRTUALENV)/bin/activate; \
-	cd $(INSTALLDIR); python front/manage.py test locations
+	cd $(INSTALLDIR)/; pytest --disable-warnings --reuse-db front/locations/tests.py
 
 test-encyc-front:
 	@echo ""
 	@echo "test-encyc-front -------------------------------------------------------"
 	source $(VIRTUALENV)/bin/activate; \
-	cd $(INSTALLDIR); python front/manage.py test wikiprox
+	cd $(INSTALLDIR)/; pytest --disable-warnings --reuse-db front/wikiprox/tests.py
 
 shell:
 	source $(VIRTUALENV)/bin/activate; \

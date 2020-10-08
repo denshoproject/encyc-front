@@ -50,12 +50,17 @@
   </a>
   &nbsp;
   <!-- AddThis Button BEGIN -->
-  <div class="addthis_inline_share_toolbox"></div>  
+  <div class="addthis_inline_share_toolbox"></div>
   <!-- AddThis Button END -->
 </div><!-- #share -->
 
 
 {{ page.body|safe }}
+
+<p class="text-right">
+Last updated {{ page.modified }}.
+</p>
+<hr class="visible-phone"/>
 
 </div><!-- #article .span8 -->
 {% endblock contents %}

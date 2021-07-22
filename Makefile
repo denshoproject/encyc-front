@@ -37,6 +37,9 @@ CONF_PRODUCTION=$(CONF_BASE)/front.cfg
 CONF_LOCAL=$(CONF_BASE)/front-local.cfg
 CONF_DJANGO=$(INSTALLDIR)/front/front/settings.py
 
+SQLITE_BASE=/var/lib/encyc
+LOG_BASE=/var/log/encyc
+
 MEDIA_BASE=/var/www/encycfront
 MEDIA_ROOT=$(MEDIA_BASE)/media
 STATIC_ROOT=$(MEDIA_BASE)/static
@@ -288,13 +291,13 @@ endif
 	source $(VIRTUALENV)/bin/activate; \
 	pip3 install -U --cache-dir=$(PIP_CACHE_DIR) -r $(INSTALLDIR)/requirements.txt
 # log dir
-	-mkdir /var/log/encyc
-	chown -R encyc.root /var/log/encyc
-	chmod -R 755 /var/log/encyc
+	-mkdir $(LOG_BASE)
+	chown -R encyc.root $(LOG_BASE)
+	chmod -R 755 $(LOG_BASE)
 # sqlite db dir
-	-mkdir /var/lib/encyc
-	chown -R encyc.root /var/lib/encyc
-	chmod -R 755 /var/lib/encyc
+	-mkdir $(SQLITE_BASE)
+	chown -R encyc.root $(SQLITE_BASE)
+	chmod -R 755 $(SQLITE_BASE)
 # media dir
 	-mkdir $(MEDIA_BASE)
 	-mkdir $(MEDIA_ROOT)

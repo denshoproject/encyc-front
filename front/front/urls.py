@@ -44,9 +44,9 @@ urlpatterns = [
     path('about/editorsmessage/embed/', TemplateView.as_view(template_name='front/editorsmessage-lightbox.html'), name='editorsmessageembed'),
     path('about/editorsmessage/', TemplateView.as_view(template_name='front/editorsmessage.html'), name='editorsmessage'),
     path('about/', TemplateView.as_view(template_name='front/about.html'), name='about'),
-    path('history/', TemplateView.as_view(template_name='front/history.html')),
-    path('search/', TemplateView.as_view(template_name='front/search.html')),
-    path('terminology/', TemplateView.as_view(template_name='front/terminology.html')),
+    path('history/', TemplateView.as_view(template_name='front/history.html'), name='history'),
+    path('search/', TemplateView.as_view(template_name='front/search.html'), name='search'),
+    path('terminology/', TemplateView.as_view(template_name='front/terminology.html'), name='terminology'),
     #
     path('timeline/', events_views.events, name='events-events'),
     #

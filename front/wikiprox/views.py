@@ -47,10 +47,27 @@ def wiki_article(request, url_title):
         reverse('wikiprox-page', args=([url_title]))
     )
 
+NON_ARTICLE_PAGES = [
+    'categories',
+    'contents',
+    'authors',
+    'history',
+    'search',
+    'terminology',
+    'timeline',
+    'citehelp',
+    'about',
+    'about/editorsmessage',
+    'about/editorsmessage/embed',
+]
+
 @require_http_methods(['GET',])
 def article(request, url_title='index', printed=False, template_name='wikiprox/page.html'):
     """
     """
+    # append trailing slash to static pages
+    if url_title in NON_ARTICLE_PAGES:
+        return HttpResponseRedirect(f'{url_title}/')
     alt_title = url_title.replace('_', ' ')
     try:
         page = models.Page.get(url_title)

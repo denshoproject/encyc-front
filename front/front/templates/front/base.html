@@ -118,7 +118,7 @@ window.cookieconsent.initialise({
   "content": {
     "message": "Densho uses cookies to ensure you get the best experience on our website.",
     "link": "More about our privacy policy",
-    "href": "https://encyclopedia.densho.org/about/#tosprivacy"
+    "href": "{% url 'about' %}#tosprivacy"
   }
 })});
 </script>
@@ -151,10 +151,10 @@ window.cookieconsent.initialise({
 		<div class="nav-collapse collapse">
 	      <ul class="nav pull-right">
 	        <li><a href="/">Home</a></li>
-	        <li><a href="/about/">About</a></li>
-	        <li><a href="/about/#contact">Contact</a></li>
+	        <li><a href="{% url 'about' %}">About</a></li>
+	        <li><a href="{% url 'about' %}#contact">Contact</a></li>
 	        <li><a href="//www.densho.org">Densho.org</a></li>
-	        <li><a href="/search/">Search</a></li>
+	        <li><a href="{% url 'search' %}">Search</a></li>
 	      </ul>
 		</div> <!-- div.nav-collapse -->
 	    </div>

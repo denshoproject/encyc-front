@@ -21,8 +21,8 @@
 	
 <p>Densho's policy is to avoid using these and other overtly euphemistic terms for the most part, except when quoting from historic documents or in proper nouns. Contributors to this encyclopedia were asked to adhere to these policies and also to limit the use of the term "internment" to the legally permissible detention of enemy aliens and not to refer to the mass forced removal and incarceration of Japanese Americans, most of whom were U.S. citizens.</p>
 
-<p>Read Densho's full statement on terminology at <a href="https://densho.org/terminology">densho.org/terminology</a></p>
-</section>	
+<p>Read Densho's full statement on terminology at <a href="{% url 'terminology' %}">densho.org/terminology/</a></p>
+</section>
 
 <div class="page-header">
 <h3>Other resources</h3>
@@ -53,11 +53,11 @@
 
 <div class="footer" id="footerToolsMenu">
 
-	<a href="/about/#usingandciting">Using and Citing Articles</a> | 
-	<a href="/about/#tosprivacy/">Terms of Use/Privacy</a> | 
-	<a href="/about/">About</a> | 
-	<a href="/about/#contact">Contact</a>
-	
+	<a href="{% url 'about' %}#usingandciting">Using and Citing Articles</a> |
+	<a href="{% url 'about' %}#tosprivacy/">Terms of Use/Privacy</a> |
+	<a href="{% url 'about' %}">About</a> |
+	<a href="{% url 'about' %}#contact">Contact</a>
+
 </div>
 
 {% if lastmod %}<p class="lastmod">{{ lastmod }}</p>{% endif %}

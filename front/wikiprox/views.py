@@ -115,6 +115,7 @@ def source(request, encyclopedia_id, template_name='wikiprox/source.html'):
         raise Http404
     return render(request, template_name, {
         'source': source,
+        'article_url': source.article().absolute_url(),
         # TODO this belongs in model
         'document_download_url': os.path.join(
             settings.SOURCES_MEDIA_URL,

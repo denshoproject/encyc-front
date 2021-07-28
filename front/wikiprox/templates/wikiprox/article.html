@@ -114,7 +114,7 @@ Last updated {{ page.modified }}.
     <p>
     
 <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/3.0/80x15.png" /></a><br />
-<a href="/about/#usingandciting">Learn more&nbsp;&raquo;</a>
+<a href="{% url 'about' %}#usingandciting">Learn more&nbsp;&raquo;</a>
 
     </p>
 
@@ -162,7 +162,7 @@ Last updated {{ page.modified }}.
     </td>
   </tr>{% endif %}
 </table>
-  <a href="/about/#usingandciting">Creative Commons</a><br/>
+  <a href="{% url 'about' %}#usingandciting">Creative Commons</a><br/>
   </strong>
 
 
@@ -211,9 +211,9 @@ Last updated {{ page.modified }}.
   <div class="block">
     <p>
     <strong>
-    <a href="/history/">About the Incarceration</a><br />
-    <a href="/terminology/">Do Words Matter?</a><br />
-	<a href="/timeline/">Historical Timeline</a></br />
+    <a href="{% url 'history' %}">About the Incarceration</a><br />
+    <a href="{% url 'terminology' %}">Do Words Matter?</a><br />
+	<a href="{% url 'events-events' %}">Historical Timeline</a></br />
 	<a href="https://maps.densho.org/sitesofshame/" class="offsite" target="offsite">Map <i class="fa fa-external-link"></i></a></br />
     </strong>
     </p>
@@ -262,9 +262,9 @@ Last updated {{ page.modified }}.
   <div class="block">
     <p>
     <strong>
-    <a href="/history/">About the Incarceration</a><br/>
-    <a href="/terminology/">Do Words Matter?</a><br/>
-	<a href="/timeline/">Historical Timeline</a></br />
+    <a href="{% url 'history' %}">About the Incarceration</a><br />
+    <a href="{% url 'terminology' %}">Do Words Matter?</a><br />
+	<a href="{% url 'events-events' %}">Historical Timeline</a></br />
 	<a href="https://maps.densho.org/sitesofshame/" class="offsite" target="offsite">Map <i class="fa fa-external-link"></i></a></br />
    </strong>
     </p>

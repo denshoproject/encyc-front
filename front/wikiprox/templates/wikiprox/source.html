@@ -124,6 +124,6 @@ Primary Source &mdash; {{ source.encyclopedia_id }}
 
 
 {# PS pages should not include standard cc message #}
-{% block footer %}{{ block.super }}
+{% block footer %}
 <a class="api-url" href="{% url "wikiprox-api-source" source.encyclopedia_id %}">{% url "wikiprox-api-source" source.encyclopedia_id %}</a>
 {% endblock footer %}

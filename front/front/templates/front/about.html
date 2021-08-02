@@ -1,50 +1,5 @@
 {% extends "front/base.html" %}
 
-{% block css %}
-  <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}lightview-3.2.2/css/lightview/lightview.css"/>
-{% endblock %}
-
-{% block javascript %}
-<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}jwplayer-5.9/jwplayer.js"></script>
-<!--[if lt IE 9]>
-<script type="text/javascript" src="{{ STATIC_URL }}lightview-3.2.2/js/excanvas/excanvas.js"></script>
-<![endif]-->
-<script type="text/javascript" src="{{ STATIC_URL }}lightview-3.2.2/js/spinners/spinners.min.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}lightview-3.2.2/js/lightview/lightview.js"></script>
-<script type='text/javascript'>
-  $(document).ready(function(){
-      /* tablet,desktop -- show in popup */
-      /* phone -- link directly to page */
-      function addLightboxClass() {
-          var msg = $(window).width();
-          if (Modernizr.mq('screen and (min-width: 768px)')) {
-              $('a#editorsmessagelink').each(function() {
-                  $(this).addClass('lightview');
-                  $(this).attr({ href: '{% url "editorsmessageembed" %}' });
-              });
-          }
-          else {
-              $('a#editorsmessagelink').each(function() {
-                  $(this).removeClass('lightview');
-                  $(this).attr({ href: '{% url "editorsmessage" %}' });
-              });
-          }
-      }
-      addLightboxClass();
-      $(window).resize(function() {
-          addLightboxClass();
-      });
-      Lightview.setDefaultSkin('mac');
-  });
-</script>
-{% endblock javascript %}
-
-
-
-
-
-
 {% block title %}About{% endblock %}
 
 
@@ -239,25 +194,3 @@ Washington, DC 20240
 </div> <!-- /container-fluid -->
 
 {% endblock contents %}
-
-{% block footer %}
-<div id="ccNotice">
-<p>
-	<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png" /></a>
-	</p>
-<p>
-&copy; Densho {% now "Y" %}. The text of this work is licensed under a <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License</a>. Where indicated, images and other primary source materials may be subject to use restrictions by their respective rights holders. <a href="/about/#usingandciting">More information &raquo;</a>
-</p>
-</div>
-
-<div class="footer" id="footerToolsMenu">
-
-	<a href="{% url 'about' %}#usingandciting">Using and Citing Articles</a> |
-	<a href="{% url 'about' %}#tosprivacy/">Terms of Use/Privacy</a> |
-	<a href="{% url 'about' %}">About</a> |
-	<a href="{% url 'about' %}#contact">Contact</a>
-
-</div>
-
-{% if lastmod %}<p class="lastmod">{{ lastmod }}</p>{% endif %}
-{% endblock footer %}

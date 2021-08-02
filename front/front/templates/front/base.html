@@ -7,9 +7,9 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  
+
   <title>{% block title %}{% endblock %} | Densho Encyclopedia</title>
-  
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   {% block meta %}{% endblock %}
 
@@ -21,40 +21,41 @@
   <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap/css/bootstrap-responsive.css" />
   <link rel="stylesheet" href="{{ STATIC_URL }}css/mediawiki-common.css" />
   <link rel="stylesheet" href="{{ STATIC_URL }}css/font-awesome.css" />
+
   <style>
     /* brown:        #5C5823 */
     /* dark orange:  #ED5417 */
     /* light orange: #F2A885 */
 
-	body {
-	  font-family: Verdana, "Helvetica Neue", Arial, sans-serif;
-	  font-size: 12px;
-	  line-height: 18px;
-	}
+    body {
+	font-family: Verdana, "Helvetica Neue", Arial, sans-serif;
+	font-size: 12px;
+	line-height: 18px;
+    }
 
     h1 {
         color: #ED5417;
         font-size: 24px;
-		line-height: 30px;
-		font-weight: bold;
+	line-height: 30px;
+	font-weight: bold;
     }
-   h2, h3, h4 {
+    h2, h3, h4 {
         color: #555;
         font-size: 20px;
-		line-height: 24px;
+	line-height: 24px;
     }
 
-	a { 
-		color:#ED5417; 
-	}
-	a:hover { 
-		color:#F2A885; 
-	}
+    a {
+	color:#ED5417;
+    }
+    a:hover {
+	color:#F2A885;
+    }
     a.api-url { color:#ddd; }
 
-	.lead {
-		line-height: 24px;
-	}
+    .lead {
+	line-height: 24px;
+    }
 
     .navbar {
         margin-bottom: 20px;
@@ -62,67 +63,63 @@
     .navbar-inner {
         background: #5C5823;
     }
+    .navbar .brand {
+	font-weight:400;
+	color: white;
+    }
+    .navbar .nav li a {
+        color: white;
+    }
 
-	.navbar .brand {
-		font-weight:400;
-		color: white;
-	}
-      .navbar .nav li a { 
-              color: white; 
-      }
-      
-      .navbar .nav li a:hover { 
-              color: white; 
-      }
+    .navbar .nav li a:hover {
+        color: white;
+    }
 
     .footer {
-      margin-top: 32px;
-      border-top: 1px solid #eee;
-      padding-top: 32px;
-      padding-bottom: 32px;
-	}
+        margin-top: 32px;
+        border-top: 1px solid #eee;
+        padding-top: 32px;
+        padding-bottom: 32px;
+    }
 
-	.carousel .carousel-caption h4 { 
-		font-size: 18px; 
-	}
-
-	.carousel-caption p {
-		line-height: 18px;
-	}
-
-	.carousel img {
-		max-width: 100%;
-	}
-
+    .carousel .carousel-caption h4 {
+	font-size: 18px;
+    }
+    .carousel-caption p {
+	line-height: 18px;
+    }
+    .carousel img {
+	max-width: 100%;
+    }
   </style>
 
   {% block css %}{% endblock css %}
 
+  <!-- cookie consent courtesy https://cookieconsent.insites.com/ -->
+  <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.css" />
+  <script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.js"></script>
+  <script>
+    window.addEventListener("load", function(){
+        window.cookieconsent.initialise({
+            "palette": {
+                "popup": {
+                    "background": "#5c5823"
+                },
+                "button": {
+                    "background": "transparent",
+                    "border": "#ffffff",
+                    "text": "#ffffff"
+                }
+            },
+            "content": {
+                "message": "Densho uses cookies to ensure you get the best experience on our website.",
+                "link": "More about our privacy policy",
+                "href": "{% url 'about' %}#tosprivacy"
+            }
+        })
+    });
+  </script>
 
-<!-- cookie consent courtesy https://cookieconsent.insites.com/ -->
-<link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.css" />
-<script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.js"></script>
-<script>
-window.addEventListener("load", function(){
-window.cookieconsent.initialise({
-  "palette": {
-    "popup": {
-      "background": "#5c5823"
-    },
-    "button": {
-      "background": "transparent",
-      "border": "#ffffff",
-      "text": "#ffffff"
-    }
-  },
-  "content": {
-    "message": "Densho uses cookies to ensure you get the best experience on our website.",
-    "link": "More about our privacy policy",
-    "href": "{% url 'about' %}#tosprivacy"
-  }
-})});
-</script>
-  
 </head>
 <body>
 
@@ -136,38 +133,35 @@ window.cookieconsent.initialise({
     </div>
   </div>
 {% endif %}{# site_msg_text #}
-    
-	<div class="navbar navbar-static-top">
-	  <div class="navbar-inner">
-	    <div class="container">
-	      <a class="brand" href="/">
-	        <img src="{{ STATIC_URL }}img/logo-white.png" height="30" /> Densho Encyclopedia
-	      </a>
-		 <button type="buton" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-		 	<span class="icon-bar"></span>
-		 	<span class="icon-bar"></span>
-		 	<span class="icon-bar"></span>
-		</button>
-		<div class="nav-collapse collapse">
-	      <ul class="nav pull-right">
-	        <li><a href="/">Home</a></li>
-	        <li><a href="{% url 'about' %}">About</a></li>
-	        <li><a href="{% url 'about' %}#contact">Contact</a></li>
-	        <li><a href="//www.densho.org">Densho.org</a></li>
-	        <li><a href="{% url 'search' %}">Search</a></li>
-	      </ul>
-		</div> <!-- div.nav-collapse -->
-	    </div>
-	  </div>
-	</div>
+
+  <div class="navbar navbar-static-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <a class="brand" href="/">
+          <img src="{{ STATIC_URL }}img/logo-white.png" height="30" /> Densho Encyclopedia
+        </a>
+        <button type="buton" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <div class="nav-collapse collapse">
+          <ul class="nav pull-right">
+            <li><a href="/">Home</a></li>
+            <li><a href="{% url 'about' %}">About</a></li>
+            <li><a href="{% url 'about' %}#contact">Contact</a></li>
+            <li><a href="//www.densho.org">Densho.org</a></li>
+            <li><a href="{% url 'search' %}">Search</a></li>
+          </ul>
+        </div> <!-- div.nav-collapse -->
+      </div>
+    </div>
+  </div>
 
 
+  <div class="container">
 
-
-<div class="container">
-
-
-  <div class="row">
+    <div class="row">
 
 
 {% block sidebar_left %}{% endblock sidebar_left %}
@@ -179,39 +173,61 @@ window.cookieconsent.initialise({
 {% block sidebar_right %}{% endblock sidebar_right %}
 
 
-  </div><!-- .row -->
+    </div><!-- .row -->
 
 
-  <footer class="footer">
-{% block footer %}{% endblock footer %}
-  </footer>
+    <footer class="footer">
+{% block footer %}
+      <div id="ccNotice">
+        <p>
+          <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png" /></a>
+        </p>
+        <p>
+          &copy; Densho {% now "Y" %}. The text of this work is licensed under a
+          <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License</a>.
+          Where indicated, images and other primary source materials may be
+          subject to use restrictions by their respective rights holders.
+          <a href="/about/#usingandciting">More information &raquo;</a>
+        </p>
+      </div>
+
+      <div class="footer" id="footerToolsMenu">
+                      <a href="{% url 'about' %}#usingandciting">Using and Citing Articles</a>
+        &nbsp;|&nbsp; <a href="{% url 'about' %}#tosprivacy/">Terms of Use/Privacy</a>
+        &nbsp;|&nbsp; <a href="{% url 'about' %}">About</a>
+        &nbsp;|&nbsp; <a href="{% url 'about' %}#contact">Contact</a>
+      </div>
+
+      {% if lastmod %}<p class="lastmod">Last updated {{ lastmod }}</p>{% endif %}
+{% endblock footer %}
+    </footer>
 
 
-</div><!-- .container -->
+  </div><!-- .container -->
 
 
-<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}bootstrap/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
+  <script type="text/javascript" src="{{ STATIC_URL }}bootstrap/js/bootstrap.min.js"></script>
 
-{% block javascript %}{% endblock javascript %}
+  {% block javascript %}{% endblock javascript %}
 
-<!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-1762741-12"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'UA-1762741-12');
-</script>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-1762741-12"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-1762741-12');
+  </script>
 
-<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=densho"></script>
+  <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=densho"></script>
 
-<!--
-{{ time }}
-{{ host }} {{ pid }}
-{{ git_commit }} {{ git_branch }} {{ version }} {{ packages }}
-{{ docstore_host }}
--->
+  <!--
+      {{ time }}
+      {{ host }} {{ pid }}
+      {{ git_commit }} {{ git_branch }} {{ version }} {{ packages }}
+      {{ docstore_host }}
+    -->
 
 </body>
 </html>

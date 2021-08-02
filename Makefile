@@ -62,21 +62,6 @@ SUPERVISOR_CONF=/etc/supervisor/supervisord.conf
 NGINX_CONF=/etc/nginx/sites-available/$(APP).conf
 NGINX_CONF_LINK=/etc/nginx/sites-enabled/$(APP).conf
 
-MODERNIZR=modernizr-2.5.3
-BOOTSTRAP=bootstrap-2.3.1
-JQUERY=jquery-1.7.2.min.js
-JWPLAYER=jwplayer-5.9
-LIGHTVIEW=lightview-3.2.2
-SWFOBJECT=swfobject-2.2
-OPENLAYERS=OpenLayers-2.12
-# wget https://github.com/twbs/bootstrap/archive/v2.0.4.zip
-# wget http://code.jquery.com/jquery-1.7.2.min.js
-# wget http://modernizr.com/downloads/modernizr-2.5.3.js
-# jwplayer-5.9
-# lightview-3.2.2
-# wget https://swfobject.googlecode.com/files/swfobject_2_2.zip
-ASSETS=encyc-front-assets.tgz
-
 TGZ_BRANCH := $(shell git rev-parse --abbrev-ref HEAD | tr -d _ | tr -d -)
 TGZ_FILE=$(APP)_$(APP_VERSION)
 TGZ_DIR=$(INSTALL_FRONT)/$(TGZ_FILE)

@@ -234,7 +234,6 @@ INSTALLED_APPS = (
     #
     'front',
     'events',
-    'locations',
     'wikiprox',
 )
 

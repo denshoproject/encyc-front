@@ -12,6 +12,5 @@ def index(request, format=None):
         'authors': reverse('wikiprox-api-authors', request=request),
         'categories': reverse('wikiprox-api-categories', request=request),
         'events': reverse('events-api-events', request=request),
-        'locations': reverse('locations-api-locations', request=request),
     }
     return Response(data)

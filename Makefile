@@ -37,6 +37,9 @@ CONF_PRODUCTION=$(CONF_BASE)/front.cfg
 CONF_LOCAL=$(CONF_BASE)/front-local.cfg
 CONF_DJANGO=$(INSTALLDIR)/front/front/settings.py
 
+SQLITE_BASE=/var/lib/encyc
+LOG_BASE=/var/log/encyc
+
 MEDIA_BASE=/var/www/encycfront
 MEDIA_ROOT=$(MEDIA_BASE)/media
 STATIC_ROOT=$(MEDIA_BASE)/static
@@ -58,21 +61,6 @@ SUPERVISOR_GUNICORN_CONF=/etc/supervisor/conf.d/$(APP).conf
 SUPERVISOR_CONF=/etc/supervisor/supervisord.conf
 NGINX_CONF=/etc/nginx/sites-available/$(APP).conf
 NGINX_CONF_LINK=/etc/nginx/sites-enabled/$(APP).conf
-
-MODERNIZR=modernizr-2.5.3
-BOOTSTRAP=bootstrap-2.3.1
-JQUERY=jquery-1.7.2.min.js
-JWPLAYER=jwplayer-5.9
-LIGHTVIEW=lightview-3.2.2
-SWFOBJECT=swfobject-2.2
-OPENLAYERS=OpenLayers-2.12
-# wget https://github.com/twbs/bootstrap/archive/v2.0.4.zip
-# wget http://code.jquery.com/jquery-1.7.2.min.js
-# wget http://modernizr.com/downloads/modernizr-2.5.3.js
-# jwplayer-5.9
-# lightview-3.2.2
-# wget https://swfobject.googlecode.com/files/swfobject_2_2.zip
-ASSETS=encyc-front-assets.tgz
 
 TGZ_BRANCH := $(shell git rev-parse --abbrev-ref HEAD | tr -d _ | tr -d -)
 TGZ_FILE=$(APP)_$(APP_VERSION)
@@ -263,7 +251,7 @@ install-setuptools: install-virtualenv
 
 install-app: install-virtualenv install-setuptools install-encyc-front
 
-test-app: test-encyc-front test-encyc-events test-encyc-locations
+test-app: test-encyc-front test-encyc-events
 
 update-app: update-encyc-front install-configs
 
@@ -288,13 +276,13 @@ endif
 	source $(VIRTUALENV)/bin/activate; \
 	pip3 install -U --cache-dir=$(PIP_CACHE_DIR) -r $(INSTALLDIR)/requirements.txt
 # log dir
-	-mkdir /var/log/encyc
-	chown -R encyc.root /var/log/encyc
-	chmod -R 755 /var/log/encyc
+	-mkdir $(LOG_BASE)
+	chown -R encyc.root $(LOG_BASE)
+	chmod -R 755 $(LOG_BASE)
 # sqlite db dir
-	-mkdir /var/lib/encyc
-	chown -R encyc.root /var/lib/encyc
-	chmod -R 755 /var/lib/encyc
+	-mkdir $(SQLITE_BASE)
+	chown -R encyc.root $(SQLITE_BASE)
+	chmod -R 755 $(SQLITE_BASE)
 # media dir
 	-mkdir $(MEDIA_BASE)
 	-mkdir $(MEDIA_ROOT)
@@ -331,12 +319,6 @@ test-encyc-events:
 	@echo "test-encyc-events ``----------------------------------------------------"
 	source $(VIRTUALENV)/bin/activate; \
 	cd $(INSTALLDIR)/; pytest --disable-warnings --reuse-db front/events/tests.py
-
-test-encyc-locations:
-	@echo ""
-	@echo "test-encyc-locations ``-------------------------------------------------"
-	source $(VIRTUALENV)/bin/activate; \
-	cd $(INSTALLDIR)/; pytest --disable-warnings --reuse-db front/locations/tests.py
 
 test-encyc-front:
 	@echo ""
@@ -464,7 +446,6 @@ deb-buster:
 	@echo ""
 	@echo "DEB packaging (buster) -------------------------------------------------"
 	-rm -Rf $(DEB_FILE_BUSTER)
-	virtualenv --python=python3 --relocatable $(VIRTUALENV)  # Make venv relocatable
 	fpm   \
 	--verbose   \
 	--input-type dir   \

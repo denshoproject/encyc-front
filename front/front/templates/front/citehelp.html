@@ -1,20 +1,7 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap/assets/css/bootstrap.css" />
-  <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap/assets/css/bootstrap-responsive.css" />
+{% extends "front/base.html" %}
 
-</head>
-<body>
-<div id="cite" class="span12">
 
-<div class="plainlinks">
-
+{% block contents %}
   <h2>
   Citing Densho Articles
   </h2>
@@ -50,7 +37,7 @@ Odo, Franklin. "Varsity Victory Volunteers." <em>Densho Encyclopedia</em>. Densh
 "Varsity Victory Volunteers." <em>Densho Encyclopedia</em>. Densho, 2012. Web. 31 July 2015.
 </p>
 
-<p>For further information:<br /> 
+<p>For further information:<br />
 <a href="http://owl.english.purdue.edu/owl/resource/747/08/" target="_blank">http://owl.english.purdue.edu/owl/resource/747/08/</a>
 </p>
 
@@ -67,7 +54,7 @@ Odo, Franklin. "Varsity Victory Volunteers." <em>Densho Encyclopedia</em>. Densh
 	"Varsity Victory Volunteers." <em>Densho Encyclopedia</em> (2012). Accessed July 31, 2015. https://encyclopedia.densho.org/Varsity%20Victory%20Volunteers/.
 </p>
 
-<p>For further information:<br /> 
+<p>For further information:<br />
 	<a href="http://www.chicagomanualofstyle.org/tools_citationguide.html" target="_blank">http://www.chicagomanualofstyle.org/tools_citationguide.html</a>
 </p>
 
@@ -94,7 +81,7 @@ Odo, Franklin. "Varsity Victory Volunteers." <em>Densho Encyclopedia</em>. Densh
   <h3 id="CBE.2FCS">Council of Science Editors (CSE) Style
 [Formerly Council of Biology Editors (CBE)]</h3>
   <p>
-	[Author last name] [Author first (and middle if available) initial]. [Article name] <em>Densho Encyclopedia</em> [Internet]. [Date published]. [cited [Date retrieved]]. Available from [URL]. 
+	[Author last name] [Author first (and middle if available) initial]. [Article name] <em>Densho Encyclopedia</em> [Internet]. [Date published]. [cited [Date retrieved]]. Available from [URL].
 </p>
 
 <p>Example:<br />
@@ -105,7 +92,7 @@ Odo, Franklin. "Varsity Victory Volunteers." <em>Densho Encyclopedia</em>. Densh
 	Varsity Victory Volunteers. <em>Densho Encyclopedia</em> [Internet]. 2012 [cited 2015 July 31]. Available from: https://encyclopedia.densho.org/Varsity%20Victory%20Volunteers/.
 </p>
 
-<p>For further information:<br /> 
+<p>For further information:<br />
 	<a href="http://www.libraries.psu.edu/psul/lls/students/cse_citation.html" target="_blank">http://www.libraries.psu.edu/psul/lls/students/cse_citation.html</a>
 </p>
 
@@ -119,19 +106,12 @@ Odo, Franklin. "Varsity Victory Volunteers." <em>Densho Encyclopedia</em>. Densh
 	Franklin Odo, <em>Varsity Victory Volunteers</em>, DENSHO ENCYCLOPEDIA, (2012),  https://encyclopedia.densho.org/Varsity%20Victory%20Volunteers/.
 </p>
 
-<p>If no listed author:<br /> 
+<p>If no listed author:<br />
 	<em>Varsity Victory Volunteers</em>, DENSHO ENCYCLOPEDIA, (2012),  https://encyclopedia.densho.org/Varsity%20Victory%20Volunteers/.
 </p>
 
 <p>For further information:<br />
-	<a href="http://libraryguides.nesl.edu/content.php?pid=358326&sid=2934955#inet" target="_blank">http://libraryguides.nesl.edu/content.php?pid=358326&amp;sid=2934955#inet</a>  
-	
+	<a href="http://libraryguides.nesl.edu/content.php?pid=358326&sid=2934955#inet" target="_blank">http://libraryguides.nesl.edu/content.php?pid=358326&amp;sid=2934955#inet</a>
+
 </p>
-
-
-</div><!-- .plainlinks -->
-
-
-</div>
-</body>
-</html>
+{% endblock contents %}

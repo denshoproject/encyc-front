@@ -8,8 +8,6 @@ from django.urls import include, path, re_path
 from front import api as front_api
 from events import api as events_api
 from events import views as events_views
-from locations import api as locations_api
-from locations import views as locations_views
 from wikiprox import api as wiki_api
 from wikiprox import views as wiki_views
 from wikiprox.sitemaps import MediaWikiSitemap, SourceSitemap
@@ -28,8 +26,6 @@ urlpatterns = [
     re_path(r'^api/0.1/categories/(?P<category>[\w]+)/$', wiki_api.category, name='wikiprox-api-category'),
     path('api/0.1/categories/', wiki_api.categories, name='wikiprox-api-categories'),
     path('api/0.1/events/', events_api.events, name='events-api-events'),
-    re_path(r'^api/0.1/locations/(?P<category>[\w]+)/$', locations_api.category, name='locations-api-category'),
-    path('api/0.1/locations/', locations_api.locations, name='locations-api-locations'),
     re_path(r"^api/0.1/sources/(?P<encyclopedia_id>[\w .:_-]+)/$", wiki_api.source, name='wikiprox-api-source'),
     path('api/0.1/sources/', wiki_api.sources, name='wikiprox-api-sources'),
     path('api/0.1/', front_api.index, name='front-api-index'),
@@ -41,19 +37,16 @@ urlpatterns = [
     #
     path('videotest/', TemplateView.as_view(template_name='wikiprox/LVplusJWPlayer.html')),
     #
+    # IMPORTANT: keep wikiprox.views.NON_ARTICLE_PAGES up to date with non-article pages
+    #
     path('about/editorsmessage/embed/', TemplateView.as_view(template_name='front/editorsmessage-lightbox.html'), name='editorsmessageembed'),
     path('about/editorsmessage/', TemplateView.as_view(template_name='front/editorsmessage.html'), name='editorsmessage'),
     path('about/', TemplateView.as_view(template_name='front/about.html'), name='about'),
-    path('history/', TemplateView.as_view(template_name='front/history.html'), name='wikiprox-history'),
-    path('search/', TemplateView.as_view(template_name='front/search.html'), name='wikiprox-search'),
-    path('terminology/', TemplateView.as_view(template_name='front/terminology.html')),
+    path('history/', TemplateView.as_view(template_name='front/history.html'), name='history'),
+    path('search/', TemplateView.as_view(template_name='front/search.html'), name='search'),
+    path('terminology/', TemplateView.as_view(template_name='front/terminology.html'), name='terminology'),
     #
     path('timeline/', events_views.events, name='events-events'),
-    #
-    re_path(r'^locations-(?P<category>[\w]+).kml$', locations_views.locations_kml, name='locations-kml-category'),
-    path('locations.kml', locations_views.locations_kml, name='locations-kml'),
-    re_path(r'^map/(?P<category>[\w]+)/$', locations_views.locations, name='locations-category'),
-    path('map/', locations_views.locations, name='locations-index'),
     #
     # temp cite functionality patch 2013-03-26 gf
     path('citehelp/', TemplateView.as_view(template_name='front/citehelp.html'), name='citehelp'),

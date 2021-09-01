@@ -102,7 +102,10 @@ MEDIA_URL_LOCAL = config.get('media', 'media_url_local')
 BOOTSTRAP_URL = f'{STATIC_URL}bootstrap/2.3.1'
 
 #elasticsearch
+DOCSTORE_SSL_CERTFILE = config.get('elasticsearch', 'docstore_ssl_certfile')
 DOCSTORE_HOST = config.get('elasticsearch','docstore_host')
+DOCSTORE_USERNAME = 'elastic'
+DOCSTORE_PASSWORD = config.get('elasticsearch', 'docstore_password')
 DOCSTORE_TIMEOUT = int(config.get('elasticsearch','docstore_timeout'))
 
 # mediawiki

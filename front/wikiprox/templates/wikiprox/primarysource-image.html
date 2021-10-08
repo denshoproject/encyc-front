@@ -1,9 +1,9 @@
 {% load thumbnail %}
-<!-- source.img_url_local {{ source.img_url_local }} -->
 {% thumbnail source.img_url_local "260x400" as thumb_sm %}
 {% thumbnail source.img_url_local "700x700" as thumb_lg %}
 {% if lightbox %}
 <div class="primarysource"><!-- lightbox -->
+  <!-- thumbnail: {{ source.img_url_local }} -->
   <a href="{{ MEDIA_URL }}{{ thumb_lg }}" class="image lightview"
      data-lightview-caption="{{ source.caption }} {{ source.courtesy }} <a class='more' href='{{ source.absolute_url }}'>More info &raquo;</a>">
     <img src="{{ MEDIA_URL }}{{ thumb_sm }}"
@@ -19,6 +19,7 @@
 </div>
 {% else %}
 <div class="primarysource">
+  <!-- thumbnail: {{ MEDIA_URL }}{{ thumb_sm }} -->
   <a href="{{ source.absolute_url }}"><img src="{{ MEDIA_URL }}{{ thumb_sm }}" /></a>
   <br/>
   <span class="caption">

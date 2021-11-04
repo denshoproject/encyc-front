@@ -331,7 +331,9 @@ LOGGING = {
         'django.request': {
             'level': 'ERROR',
             'propagate': True,
-            'handlers': ['mail_admins'],
+            'handlers': [
+                #'mail_admins'
+            ],
         },
     },
     # This is the only way I found to write log entries from the whole DDR stack.

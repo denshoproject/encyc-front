@@ -58,6 +58,7 @@ Related topics and primary source items from the <a target="ddr" href="https://d
   <div class="span3">
 {% if object.img_url_local %}
 {% thumbnail object.img_url_local "400x400" as img %}
+    <!-- thumbnail: {{ object.img_url_local }} -->
     <a target="ddr" href="{{ object.absolute_url }}">
       <img class="img-responsive img-polaroid" src="{{ MEDIA_URL }}{{ img }}">
     </a>

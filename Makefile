@@ -513,9 +513,9 @@ deb-bullseye:
 	--depends "libxml2"   \
 	--depends "libxslt1.1"   \
 	--depends "libxslt1-dev"   \
-	--depends "python-dev"   \
-	--depends "python-pip"   \
-	--depends "python-virtualenv"   \
+	--depends "python3-dev"   \
+	--depends "python3-pip"   \
+	--depends "python3-venv"   \
 	--depends "sqlite3"   \
 	--depends "zlib1g-dev"   \
 	--depends "libjpeg62-turbo-dev"   \

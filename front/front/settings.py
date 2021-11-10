@@ -313,10 +313,8 @@ LOGGING = {
         },
         'file': {
             'level': LOG_LEVEL,
-            'class': 'logging.handlers.TimedRotatingFileHandler',
-            'filename': '/var/log/encyc/front.log',
-            'when': 'D',
-            'backupCount': 14,
+            'class': 'logging.handlers.WatchedFileHandler',
+            'filename': '/var/log/encyc/encycfront.log',
             'filters': [],
             'formatter': 'verbose',
         },

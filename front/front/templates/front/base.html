@@ -226,7 +226,7 @@
       {{ time }}
       {{ host }} {{ pid }}
       {{ git_commit }} {{ git_branch }} {{ version }} {{ packages }}
-      {{ docstore_host }}
+      encycfront {{ docstore_host|safe }} ({{ encycfront_cluster|safe }})
     -->
 
 </body>

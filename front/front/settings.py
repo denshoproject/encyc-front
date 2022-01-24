@@ -105,6 +105,18 @@ BOOTSTRAP_URL = f'{STATIC_URL}bootstrap/2.3.1'
 DOCSTORE_HOST = config.get('elasticsearch','docstore_host')
 DOCSTORE_TIMEOUT = int(config.get('elasticsearch','docstore_timeout'))
 
+ELASTICSEARCH_GREEN = [
+    g for g in config['elasticsearch'].get('docstore_green','').split(',') if g
+]
+ELASTICSEARCH_BLUE  = [
+    b for b in config['elasticsearch'].get('docstore_blue', '').split(',') if b
+]
+ENCYCFRONT_CLUSTER = '¯\_(ツ)_/¯'
+if DOCSTORE_HOST.split(':')[0] in ELASTICSEARCH_GREEN:
+    ENCYCFRONT_CLUSTER = 'green'
+elif DOCSTORE_HOST.split(':')[0] in ELASTICSEARCH_BLUE:
+    ENCYCFRONT_CLUSTER = 'blue'
+
 # mediawiki
 MEDIAWIKI_HTML = 'http://dango.densho.org:9066/mediawiki/index.php'
 MEDIAWIKI_API  = config.get('mediawiki', 'api_url')

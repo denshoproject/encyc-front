@@ -512,6 +512,7 @@ deb-bullseye:
 	--vendor "$(DEB_VENDOR)"   \
 	--maintainer "$(DEB_MAINTAINER)"   \
 	--description "$(DEB_DESCRIPTION)"   \
+	--depends "git-core"   \
 	--depends "imagemagick"   \
 	--depends "libxml2"   \
 	--depends "libxslt1.1"   \

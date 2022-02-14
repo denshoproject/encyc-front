@@ -60,6 +60,9 @@ endif
 ifeq ($(DEBIAN_CODENAME), bullseye)
 	OPENJDK_PKG=openjdk-17-jre-headless
 endif
+ifeq ($(DEBIAN_CODENAME), bullseye)
+	OPENJDK_PKG=openjdk-17-jre-headless
+endif
 
 ELASTICSEARCH=elasticsearch-2.4.6.deb
 

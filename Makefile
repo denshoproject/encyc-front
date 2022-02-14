@@ -60,6 +60,9 @@ endif
 ifeq ($(DEBIAN_CODENAME), bullseye)
 	OPENJDK_PKG=openjdk-17-jre-headless
 endif
+ifeq ($(DEBIAN_CODENAME), bullseye)
+	OPENJDK_PKG=openjdk-17-jre-headless
+endif
 
 ELASTICSEARCH=elasticsearch-2.4.6.deb
 
@@ -509,6 +512,7 @@ deb-bullseye:
 	--vendor "$(DEB_VENDOR)"   \
 	--maintainer "$(DEB_MAINTAINER)"   \
 	--description "$(DEB_DESCRIPTION)"   \
+	--depends "git-core"   \
 	--depends "imagemagick"   \
 	--depends "libxml2"   \
 	--depends "libxslt1.1"   \

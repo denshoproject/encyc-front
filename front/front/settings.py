@@ -103,6 +103,9 @@ BOOTSTRAP_URL = f'{STATIC_URL}bootstrap/2.3.1'
 
 #elasticsearch
 DOCSTORE_HOST = config.get('elasticsearch','docstore_host')
+DOCSTORE_SSL_CERTFILE = config.get('elasticsearch', 'docstore_ssl_certfile')
+DOCSTORE_USERNAME = 'elastic'
+DOCSTORE_PASSWORD = config.get('elasticsearch', 'docstore_password')
 DOCSTORE_TIMEOUT = int(config.get('elasticsearch','docstore_timeout'))
 
 ELASTICSEARCH_GREEN = [

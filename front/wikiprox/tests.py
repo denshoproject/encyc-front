@@ -51,14 +51,48 @@ class APIView(TestCase):
 class WikiPageTitles(TestCase):
     """Test that characters in MediaWiki titles are matched correctly
     """
+
+    def test_titles_az(self):
+        response = self.client.get(reverse('wikiprox-contents'))
+        assert response.status_code == 200
+        content = str(response.content)
+        assert '<h2>1-10</h2>' in content
+        assert '<a href="/1399th%20Engineer%20Construction%20Battalion">' in content
+        assert '<h2>A</h2>' in content
+        assert '<a href="/Ruth%20Asawa">Ruth Asawa</a>' in content
+        assert '<h2>C</h2>' in content
+        assert '<a href="/Chicago%20Brethren%20Hostel">' in content
+        assert '<h2>D</h2>' in content
+        assert '<a href="/Iva%20Toguri%20D&#x27;Aquino">' in content
+        assert '<h2>N</h2>' in content
+        assert '<a href="/Nisei%20Progressives">' in content
+        assert '<h2>P</h2>' in content
+        assert '<a href="/Pinedale%20(detention%20facility)">' in content
+        assert '<h2>Z</h2>' in content
+        assert '<a href="/Kenichi%20Zenimura">' in content
+
+    def test_topics(self):
+        response = self.client.get(reverse('wikiprox-categories'))
+        assert response.status_code == 200
+        content = str(response.content)
+        assert '<h2>Arts</h2>' in content
+        assert '<a href="/Ruth%20Asawa">Ruth Asawa</a>' in content
+        assert '<h2>Camps</h2>' in content
+        assert '<a href="/Pinedale%20(detention%20facility)">' in content
+        assert '<h2>Organizations</h2>' in content
+        assert '<a href="/Nisei%20Progressives">' in content
+        assert '<h2>People</h2>' in content
+        assert '<a href="/Iva%20Toguri%20D&#x27;Aquino">' in content
+        assert '<h2>Resettlement</h2>' in content
+        assert '<a href="/Chicago%20Brethren%20Hostel">' in content
     
     def test_wiki_titles_space(self):
         assert self.client.get(
             reverse('wikiprox-page', args=['Ansel Adams'])
         ).status_code == 200
     
-    #def test_wiki_titles_period(self):
-    #    assert self.client.get('/A.L.%20Wirin/').status_code == 200
+    def test_wiki_titles_period(self):
+        assert self.client.get('/A.L.%20Wirin/').status_code == 200
     
     def test_wiki_titles_hyphen(self):
         assert self.client.get(

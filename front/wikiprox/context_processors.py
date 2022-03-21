@@ -21,7 +21,7 @@ def sitewide(request):
         'version': settings.VERSION,
         'packages': settings.PACKAGES,
         'docstore_host': settings.DOCSTORE_HOST,
-        'encycfront_cluster': settings.ENCYCFRONT_CLUSTER,
+        'encycfront_cluster': settings.DOCSTORE_CLUSTER,
         'MEDIA_URL': settings.MEDIA_URL,
         'STATIC_URL': settings.STATIC_URL,
         'BOOTSTRAP_URL': settings.BOOTSTRAP_URL,

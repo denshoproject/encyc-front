@@ -16,14 +16,113 @@ from django.core.cache import cache
 from django.db import models
 from django.urls import reverse
 
+from elastictools import docstore
 from wikiprox import citations
 from wikiprox import ddr
-from wikiprox import docstore
 from wikiprox import repo_models
 from wikiprox import search
 from wikiprox import sources
 
+INDEX_PREFIX = 'encyc'
+
+# see if cluster is available, quit with nice message if not
+docstore.Docstore(INDEX_PREFIX, settings.DOCSTORE_HOST, settings).start_test()
+
+# set default hosts and index
+DOCSTORE = docstore.Docstore(INDEX_PREFIX, settings.DOCSTORE_HOST, settings)
+
 MAX_SIZE = 10000
+
+#SEARCH_LIST_FIELDS = models.all_list_fields()
+DEFAULT_LIMIT = 1000
+
+# whitelist of params recognized in URL query
+# TODO derive from ddr-defs/repo_models/
+SEARCH_PARAM_WHITELIST = [
+    'published_encyc',
+    'published_rg',
+    'fulltext',
+    'sort',
+    'categories',
+    'topics',
+    'facility',
+    'model',
+    'models',
+    'parent',
+    'status',
+    'public',
+    'topics',
+    'facility',
+    'contributor',
+    'creators',
+    'format',
+    'genre',
+    'geography',
+    'language',
+    'location',
+    'mimetype',
+    'persons',
+    'rights',
+    'facet_id',
+]
+
+# fields where the relevant value is nested e.g. topics.id
+# TODO derive from ddr-defs/repo_models/
+SEARCH_NESTED_FIELDS = [
+    'facility',
+    'topics',
+]
+
+# TODO derive from ddr-defs/repo_models/
+SEARCH_AGG_FIELDS = {
+    #'model': 'model',
+    #'status': 'status',
+    #'public': 'public',
+    #'contributor': 'contributor',
+    #'creators': 'creators.namepart',
+    'facility': 'facility.id',
+    'format': 'format',
+    'genre': 'genre',
+    #'geography': 'geography.term',
+    #'language': 'language',
+    #'location': 'location',
+    #'mimetype': 'mimetype',
+    #'persons': 'persons',
+    'rights': 'rights',
+    'topics': 'topics.id',
+}
+
+# TODO derive from ddr-defs/repo_models/
+SEARCH_MODELS = [
+    'encycarticle',
+]
+
+# fields searched by query
+# TODO derive from ddr-defs/repo_models/
+SEARCH_INCLUDE_FIELDS = [
+    'id',
+    'model',
+    'links_html',
+    'links_json',
+    'links_img',
+    'links_thumb',
+    'links_children',
+    'url_title',
+    'public',
+    'published',
+    'modified',
+    'mw_api_url',
+    'title_sort',
+    'title',
+    'description',
+    'body',
+    'prev_page',
+    'next_page',
+    'categories',
+    'coordinates',
+    'source_ids',
+    'authors_data',
+]
 
 
 def columnizer(things, cols):
@@ -49,7 +148,7 @@ class Author(repo_models.Author):
 
     @staticmethod
     def get(title):
-        ds = docstore.Docstore()
+        ds = DOCSTORE
         return super(Author, Author).get(
             title, index=ds.index_name('author'), using=ds.es
     )
@@ -77,10 +176,13 @@ class Author(repo_models.Author):
         KEY = 'encyc-front:authors'
         data = cache.get(KEY)
         if not data:
-            searcher = search.Searcher()
+            searcher = search.Searcher(DOCSTORE)
             searcher.prepare(
                 params={},
-                search_models=[docstore.Docstore().index_name('author')],
+                params_whitelist=SEARCH_PARAM_WHITELIST,
+                search_models=[DOCSTORE.index_name('author')],
+                sort=[],
+                fields=SEARCH_INCLUDE_FIELDS,
                 fields_nested=[],
                 fields_agg={},
             )
@@ -114,7 +216,7 @@ class Page(repo_models.Page):
 
     @staticmethod
     def get(title):
-        ds = docstore.Docstore()
+        ds = DOCSTORE
         page = super(Page, Page).get(
             id=title, index=ds.index_name('article'), using=ds.es
         )
@@ -160,14 +262,13 @@ class Page(repo_models.Page):
         KEY = 'encyc-front:pages'
         data = cache.get(KEY)
         if not data:
-            params={
-                # filter out ResourceGuide items
-                'published_encyc': True,
-            }
-            searcher = search.Searcher()
+            searcher = search.Searcher(DOCSTORE)
             searcher.prepare(
-                params=params,
-                search_models=[docstore.Docstore().index_name('article')],
+                params={},
+                params_whitelist=SEARCH_PARAM_WHITELIST,
+                search_models=[DOCSTORE.index_name('article')],
+                sort=[],
+                fields=SEARCH_INCLUDE_FIELDS,
                 fields_nested=[],
                 fields_agg={},
             )
@@ -359,7 +460,7 @@ class Source(repo_models.Source):
 
     @staticmethod
     def get(title):
-        ds = docstore.Docstore()
+        ds = DOCSTORE
         return super(Source, Source).get(
             title, index=ds.index_name('source'), using=ds.es
         )
@@ -418,10 +519,13 @@ class Source(repo_models.Source):
         KEY = 'encyc-front:sources'
         data = cache.get(KEY)
         if not data:
-            searcher = search.Searcher()
+            searcher = search.Searcher(DOCSTORE)
             searcher.prepare(
                 params={},
-                search_models=[docstore.Docstore().index_name('source')],
+                params_whitelist=SEARCH_PARAM_WHITELIST,
+                search_models=[DOCSTORE.index_name('source')],
+                sort=[],
+                fields=SEARCH_INCLUDE_FIELDS,
                 fields_nested=[],
                 fields_agg={},
             )
@@ -562,12 +666,16 @@ class FacetTerm(repo_models.FacetTerm):
 
     @staticmethod
     def topics():
-        searcher = search.Searcher()
+        TERM_INCLUDE_FIELDS = ['id', 'term_id', 'title',]
+        searcher = search.Searcher(DOCSTORE)
         searcher.prepare(
             params={
                 'facet_id': 'topics',
             },
-            search_models=[docstore.Docstore().index_name('facetterm')],
+            params_whitelist=SEARCH_PARAM_WHITELIST,
+            search_models=[DOCSTORE.index_name('facetterm')],
+            sort=[],
+            fields=TERM_INCLUDE_FIELDS,
             fields_nested=[],
             fields_agg={},
         )

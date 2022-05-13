@@ -249,7 +249,7 @@ install-virtualenv:
 	@echo ""
 	@echo "install-virtualenv -----------------------------------------------------"
 	apt-get --assume-yes install python3-pip python3-venv
-	python3 -m venv $(VIRTUALENV)
+	python3 -m venv --system-site-packages $(VIRTUALENV)
 	source $(VIRTUALENV)/bin/activate; \
 	pip3 install -U --cache-dir=$(PIP_CACHE_DIR) pip
 
@@ -275,7 +275,20 @@ clean-app: clean-encyc-front
 install-encyc-front:
 	@echo ""
 	@echo "encyc-front --------------------------------------------------------------"
-	apt-get --assume-yes install imagemagick libxml2 libxslt1.1 libxslt1-dev python3-dev sqlite3 supervisor zlib1g-dev
+	apt-get --assume-yes install imagemagick libxml2 libxslt1.1 libxslt1-dev sqlite3 \
+	supervisor zlib1g-dev \
+	python3-bs4 \
+	python3-django \
+	python3-djangorestframework \
+	python3-redis \
+	python3-requests \
+	python3-sorl-thumbnail \
+	python3-coverage \
+	python3-pytest \
+	python3-pytest-cov \
+	python3-pytest-django \
+	python3-pytest-xdist \
+	bpython3
 
 ifeq ($(DEBIAN_CODENAME), wheezy)
 	apt-get --assume-yes install libjpeg8-dev
@@ -517,7 +530,6 @@ deb-bullseye:
 	--depends "libxml2"   \
 	--depends "libxslt1.1"   \
 	--depends "libxslt1-dev"   \
-	--depends "python3-dev"   \
 	--depends "python3-pip"   \
 	--depends "python3-venv"   \
 	--depends "sqlite3"   \
@@ -526,6 +538,19 @@ deb-bullseye:
 	--depends "nginx"   \
 	--depends "redis-server"   \
 	--depends "supervisor"   \
+	--depends "python3-dev"   \
+	--depends "python3-bs4" \
+	--depends "python3-django" \
+	--depends "python3-djangorestframework" \
+	--depends "python3-redis" \
+	--depends "python3-requests" \
+	--depends "python3-sorl-thumbnail" \
+	--depends "bpython3" \
+	--depends "python3-coverage" \
+	--depends "python3-pytest" \
+	--depends "python3-pytest-cov" \
+	--depends "python3-pytest-django" \
+	--depends "python3-pytest-xdist" \
 	--chdir $(INSTALLDIR)   \
 	conf/front.cfg=etc/encyc/front.cfg   \
 	conf=$(DEB_BASE)   \

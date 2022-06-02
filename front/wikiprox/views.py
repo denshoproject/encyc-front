@@ -130,9 +130,13 @@ def source(request, encyclopedia_id, template_name='wikiprox/source.html'):
         source = models.Source.get(encyclopedia_id)
     except models.NotFoundError:
         raise Http404
+    try:
+        article_url = source.article().absolute_url()
+    except AttributeError:
+        article_url = request.META.get('HTTP_REFERER')
     return render(request, template_name, {
         'source': source,
-        'article_url': source.article().absolute_url(),
+        'article_url': article_url,
         # TODO this belongs in model
         'document_download_url': os.path.join(
             settings.SOURCES_MEDIA_URL,

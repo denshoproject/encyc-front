@@ -396,19 +396,11 @@ class Page(repo_models.Page):
     def topics(self):
         """List of DDR topics associated with this page.
         
-        @returns: list
+        @returns: list of FacetTerms
         """
-        # return list of dicts rather than an Elasticsearch results object
-        terms = []
-        for term in FacetTerm.topics_by_url().get(self.title, []):
-            #term.pop('encyc_urls')
-            url = '%s/%s/' % (
-                settings.DDR_TOPICS_BASE,
-                term['term_id']
-            )
-            setattr(term, 'ddr_topic_url', url)
-            terms.append(term)
-        return terms
+        return [
+            term for term in FacetTerm.topics_by_url().get(self.title, [])
+        ]
     
     def ddr_terms_objects(self, size=100):
         """Get dict of DDR objects for article's DDR topic terms.
@@ -666,7 +658,7 @@ class FacetTerm(repo_models.FacetTerm):
 
     @staticmethod
     def topics():
-        TERM_INCLUDE_FIELDS = ['id', 'term_id', 'title',]
+        TERM_INCLUDE_FIELDS = ['id', 'term_id', 'title', 'encyc_urls',]
         searcher = search.Searcher(DOCSTORE)
         searcher.prepare(
             params={
@@ -686,6 +678,8 @@ class FacetTerm(repo_models.FacetTerm):
     
     @staticmethod
     def topics_by_url():
+        """Dict of ENCYCLOPEDIA_TITLE:[FacetTerm,...]
+        """
         KEY = 'encyc-front:topics_by_url'
         TIMEOUT = 60*5
         data = cache.get(KEY)
@@ -694,6 +688,11 @@ class FacetTerm(repo_models.FacetTerm):
             for term in FacetTerm.topics():
                 if hasattr(term, 'encyc_urls') and term.encyc_urls:
                     for url in term.encyc_urls:
+                        # Add URL of DDR topic page
+                        term['ddr_topic_url'] = '%s/%s/' % (
+                            settings.DDR_TOPICS_BASE, term['term_id']
+                        )
+                        # insert into dict by page title
                         title = url['title']
                         if not data.get(title, None):
                             data[title] = []

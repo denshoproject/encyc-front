@@ -408,25 +408,8 @@ class Page(repo_models.Page):
         Ironic: this uses DDR's REST UI rather than ES.
         """
         if not hasattr(self, '_related_terms_docs'):
-            terms = self.topics()
-            objects = ddr.related_by_topic(
-                term_ids=[term.term_id for term in terms],
-                size=size
-            )
-            for term in terms:
-                term['objects'] = objects[term.term_id]
+            terms = ddr.related_by_topic(self.topics(), size)
         return terms
-    
-    def ddr_objects(self, size=5):
-        """Get list of objects for terms from DDR.
-        
-        Ironic: this uses DDR's REST UI rather than ES.
-        """
-        objects = ddr.related_by_topic(
-            term_ids=[term['id'] for term in self.topics()],
-            size=size
-        )
-        return ddr._balance(objects, size)
 
     def set_prev_next(self):
         """Sets and previous and next page objects

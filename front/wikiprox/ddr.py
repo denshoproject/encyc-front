@@ -145,14 +145,12 @@ def distribute_list(terms_objects, limit):
                 misses = misses + 1
     return objects
 
-def related_by_topic(term_ids, size):
-    """Documents from DDR related to terms.
+def related_by_topic(terms, size):
+    """Add related documents from DDR to terms
     
-    @param term_ids: list of Topic term IDs.
+    @param terms: list of FacetTerms.
     @param size: int Number of results per term.
     """
-    term_results = {
-        tid: _term_documents(tid, size)
-        for tid in term_ids
-    }
-    return term_results
+    for term in terms:
+        term['objects'] = _term_documents(term['term_id'], size)
+    return terms

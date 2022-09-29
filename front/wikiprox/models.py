@@ -396,19 +396,11 @@ class Page(repo_models.Page):
     def topics(self):
         """List of DDR topics associated with this page.
         
-        @returns: list
+        @returns: list of FacetTerms
         """
-        # return list of dicts rather than an Elasticsearch results object
-        terms = []
-        for term in FacetTerm.topics_by_url().get(self.title, []):
-            #term.pop('encyc_urls')
-            url = '%s/%s/' % (
-                settings.DDR_TOPICS_BASE,
-                term['term_id']
-            )
-            setattr(term, 'ddr_topic_url', url)
-            terms.append(term)
-        return terms
+        return [
+            term for term in FacetTerm.topics_by_url().get(self.title, [])
+        ]
     
     def ddr_terms_objects(self, size=100):
         """Get dict of DDR objects for article's DDR topic terms.
@@ -416,25 +408,8 @@ class Page(repo_models.Page):
         Ironic: this uses DDR's REST UI rather than ES.
         """
         if not hasattr(self, '_related_terms_docs'):
-            terms = self.topics()
-            objects = ddr.related_by_topic(
-                term_ids=[term.term_id for term in terms],
-                size=size
-            )
-            for term in terms:
-                term['objects'] = objects[term.term_id]
+            terms = ddr.related_by_topic(self.topics(), size)
         return terms
-    
-    def ddr_objects(self, size=5):
-        """Get list of objects for terms from DDR.
-        
-        Ironic: this uses DDR's REST UI rather than ES.
-        """
-        objects = ddr.related_by_topic(
-            term_ids=[term['id'] for term in self.topics()],
-            size=size
-        )
-        return ddr._balance(objects, size)
 
     def set_prev_next(self):
         """Sets and previous and next page objects
@@ -666,7 +641,7 @@ class FacetTerm(repo_models.FacetTerm):
 
     @staticmethod
     def topics():
-        TERM_INCLUDE_FIELDS = ['id', 'term_id', 'title',]
+        TERM_INCLUDE_FIELDS = ['id', 'term_id', 'title', 'encyc_urls',]
         searcher = search.Searcher(DOCSTORE)
         searcher.prepare(
             params={
@@ -686,6 +661,8 @@ class FacetTerm(repo_models.FacetTerm):
     
     @staticmethod
     def topics_by_url():
+        """Dict of ENCYCLOPEDIA_TITLE:[FacetTerm,...]
+        """
         KEY = 'encyc-front:topics_by_url'
         TIMEOUT = 60*5
         data = cache.get(KEY)
@@ -694,6 +671,11 @@ class FacetTerm(repo_models.FacetTerm):
             for term in FacetTerm.topics():
                 if hasattr(term, 'encyc_urls') and term.encyc_urls:
                     for url in term.encyc_urls:
+                        # Add URL of DDR topic page
+                        term['ddr_topic_url'] = '%s/%s/' % (
+                            settings.DDR_TOPICS_BASE, term['term_id']
+                        )
+                        # insert into dict by page title
                         title = url['title']
                         if not data.get(title, None):
                             data[title] = []

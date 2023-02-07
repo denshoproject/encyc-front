@@ -287,6 +287,7 @@ endif
 # virtualenv
 	source $(VIRTUALENV)/bin/activate; \
 	pip3 install -U --cache-dir=$(PIP_CACHE_DIR) -r $(INSTALLDIR)/requirements.txt
+	sudo -u encyc git config --global --add safe.directory $(INSTALLDIR)
 # log dir
 	-mkdir $(LOG_BASE)
 	chown -R encyc.root $(LOG_BASE)

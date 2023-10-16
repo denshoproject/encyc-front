@@ -1,5 +1,5 @@
 from django.views.generic import TemplateView
-from django.contrib.sitemaps import views as sitemap_views
+from django.contrib.sitemaps.views import sitemap
 from django.urls import include, path, re_path
 
 #from django.contrib import admin
@@ -10,10 +10,10 @@ from events import api as events_api
 from events import views as events_views
 from wikiprox import api as wiki_api
 from wikiprox import views as wiki_views
-from wikiprox.sitemaps import MediaWikiSitemap, SourceSitemap
-sitemaps = {
-    'wiki': MediaWikiSitemap,
-    'sources': SourceSitemap,
+from wikiprox import sitemaps
+
+SITEMAPS = {
+    'pages': sitemaps.PageSitemap,
 }
 
 urlpatterns = [
@@ -33,7 +33,7 @@ urlpatterns = [
     path('crossdomain.xml', TemplateView.as_view(template_name='crossdomain.xml')),
     path('qr/', TemplateView.as_view(template_name='front/qr.html'), name='qr'),
     path('robots.txt', TemplateView.as_view(template_name='front/robots.txt')),
-    path('sitemap.xml', sitemap_views.sitemap, {'sitemaps': sitemaps}),
+    path('sitemap.xml', sitemap, {'sitemaps': SITEMAPS}, name='wikiprox-sitemap'),
     #
     path('videotest/', TemplateView.as_view(template_name='wikiprox/LVplusJWPlayer.html')),
     #

@@ -1,8 +1,8 @@
 from datetime import datetime
-from urllib.parse import urlparse
 
 from django.conf import settings
 from django.contrib.sitemaps import Sitemap
+from rest_framework.reverse import reverse
 
 from wikiprox import models
 
@@ -15,44 +15,22 @@ class Item(object):
         self.title
     
     def get_absolute_url(self):
-        return urlparse(self.location).path
-    
-class MediaWikiSitemap(Sitemap):
-    changefreq = 'monthly'
-    priority = 0.5
-    protocol = 'https'
-    
-    def items(self):
-        items = []
-        for p in models.Page.pages():
-            item = Item()
-            item.title = p.title
-            item.location = urlparse(p.absolute_url()).path
-            if item.location[-1] != '/':
-                item.location = f'{item.location}/'
-            item.timestamp = p.modified
-            items.append(item)
-        return items
-    
-    def lastmod(self, obj):
-        if isinstance(obj.timestamp, datetime):
-            return obj.timestamp
+        return self.location
 
-class SourceSitemap(Sitemap):
-    changefreq = 'monthly'
-    priority = 0.5
-    protocol = 'https'
+
+class PageSitemap(Sitemap):
+    changefreq = "weekly"
+    priority = 0.8
     
     def items(self):
         items = []
-        for s in models.Source.sources():
+        for page in models.Page.pages():
             item = Item()
-            item.title = s.encyclopedia_id
-            item.location = urlparse(s.absolute_url()).path
-            item.timestamp = s.modified
+            item.title = page.title
+            item.location = f"/{page.url_title}"
+            item.timestamp = page.modified
             items.append(item)
         return items
     
     def lastmod(self, obj):
-        if isinstance(obj.timestamp, datetime):
-            return obj.timestamp
+        return obj.timestamp

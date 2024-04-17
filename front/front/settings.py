@@ -10,8 +10,10 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 
 import configparser
 import os
+import socket
 import subprocess
 import sys
+from urllib.parse import urlparse
 
 from elastictools import docstore
 
@@ -100,6 +102,8 @@ ALLOWED_HOSTS = [
 STATIC_URL = config.get('media', 'static_url')
 MEDIA_URL = config.get('media', 'media_url')
 MEDIA_URL_LOCAL = config.get('media', 'media_url_local')
+MEDIA_URL_LOCAL_NETLOC = urlparse(MEDIA_URL_LOCAL).netloc
+MEDIA_URL_LOCAL_IP = socket.gethostbyname(urlparse(MEDIA_URL_LOCAL).netloc)
 
 BOOTSTRAP_URL = f'{STATIC_URL}bootstrap/2.3.1'
 

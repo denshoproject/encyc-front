@@ -23,6 +23,8 @@ def sitewide(request):
         'docstore_host': settings.DOCSTORE_HOST,
         'encycfront_cluster': settings.DOCSTORE_CLUSTER,
         'MEDIA_URL': settings.MEDIA_URL,
+        'MEDIA_URL_LOCAL_NETLOC': settings.MEDIA_URL_LOCAL_NETLOC,
+        'MEDIA_URL_LOCAL_IP': settings.MEDIA_URL_LOCAL_IP,
         'STATIC_URL': settings.STATIC_URL,
         'BOOTSTRAP_URL': settings.BOOTSTRAP_URL,
         'MEDIAWIKI_DEFAULT_PAGE': settings.MEDIAWIKI_DEFAULT_PAGE,

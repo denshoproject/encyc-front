@@ -235,12 +235,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
   <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=densho"></script>
 
-  <!--
-      {{ time }}
-      {{ host }} {{ pid }}
-      {{ git_commit }} {{ git_branch }} {{ version }} {{ packages }}
-      encycfront {{ docstore_host|safe }} ({{ encycfront_cluster|safe }})
-    -->
+<!--
+v{{ version }} {{ packages }}
+{{ git_commit }} {{ git_branch }}
+encycfront  {{ docstore_host|safe }}
+media  {{ MEDIA_URL_LOCAL_NETLOC }}  {{ MEDIA_URL_LOCAL_IP }}
+{{ host }}  {{ pid }}
+{{ time }}
+-->
 
 </body>
 </html>

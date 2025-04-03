@@ -40,15 +40,17 @@ DEBIAN_RELEASE := $(shell lsb_release -sr)
 # Sortable major version tag e.g. deb8
 DEBIAN_RELEASE_TAG = deb$(shell lsb_release -sr | cut -c1)
 
-OPENJDK_PKG=
 ifeq ($(DEBIAN_CODENAME), bullseye)
 	OPENJDK_PKG=openjdk-17-jre-headless
+	PYTHON_VERSION=python3.9
 endif
 ifeq ($(DEBIAN_CODENAME), bookworm)
 	OPENJDK_PKG=openjdk-17-jre-headless
+	PYTHON_VERSION=python3.11
 endif
 ifeq ($(DEBIAN_CODENAME), trixie)
 	OPENJDK_PKG=openjdk-17-jre-headless
+	PYTHON_VERSION=python3.13
 endif
 
 ELASTICSEARCH=elasticsearch-2.4.6.deb
